@@ -5,6 +5,7 @@ import { OrbitControls, Environment } from '@react-three/drei';
 import { Suspense, useEffect, useState, useRef } from 'react';
 import * as THREE from 'three';
 import WallDecorGroup from './WallDecorGroup';
+import DeskGroup from '../deskandchair/DeskGroup';
 
 interface WallSceneProps {
   enableOrbitControls?: boolean;
@@ -23,42 +24,41 @@ const BREAKPOINTS = {
 function getCameraSettings(width: number, height: number) {
   const aspectRatio = width / height;
   
-  // Base settings - camera positioned higher, looking at upper wall area
-  // This ensures top of wall is always visible, allowing cuts at bottom only
-  let cameraZ = 12;
-  let cameraY = 3;
-  let lookAtY = 2;
+  // Base settings - camera at human eye level to frame wall + desk/chair
+  let cameraZ = 14;
+  let cameraY = 1.5;
+  let lookAtY = 0.5;
   let fov = 50;
   
   if (width >= BREAKPOINTS.large) {
     // 1920+ - Full HD and above
-    cameraZ = 12;
-    cameraY = 3;
-    lookAtY = 2;
+    cameraZ = 14;
+    cameraY = 1.5;
+    lookAtY = 0.5;
     fov = 50;
   } else if (width >= BREAKPOINTS.medium) {
     // 1440-1919 - Laptop large
-    cameraZ = 13;
-    cameraY = 3;
-    lookAtY = 2;
+    cameraZ = 15;
+    cameraY = 1.5;
+    lookAtY = 0.5;
     fov = 50;
   } else if (width >= BREAKPOINTS.small) {
     // 1366-1439 - Common laptop
-    cameraZ = 14;
-    cameraY = 3;
-    lookAtY = 2;
+    cameraZ = 16;
+    cameraY = 1.5;
+    lookAtY = 0.5;
     fov = 52;
   } else if (width >= BREAKPOINTS.tablet) {
     // 1024-1365 - Tablet landscape
-    cameraZ = 15;
-    cameraY = 3.5;
-    lookAtY = 2.5;
+    cameraZ = 17;
+    cameraY = 2;
+    lookAtY = 1;
     fov = 54;
   } else {
     // <1024 - Small screens
-    cameraZ = 16;
-    cameraY = 4;
-    lookAtY = 3;
+    cameraZ = 18;
+    cameraY = 2.5;
+    lookAtY = 1.5;
     fov = 56;
   }
   
@@ -212,8 +212,8 @@ export default function WallScene({
       <Canvas
         shadows="soft"
         camera={{
-          position: [0, 0.8, 8],
-          fov: 48,
+          position: [0, 1.5, 14],
+          fov: 50,
           near: 0.1,
           far: 100,
         }}
@@ -250,8 +250,8 @@ export default function WallScene({
             <WallDecorGroup position={[0, 0, 0]} />
           </group>
 
-          {/* Reserved space for future foreground layer (desk, character) */}
-          {/* <ForegroundLayer position={[0, -2, 2]} /> */}
+          {/* Foreground: Desk + Chair — placed on the floor (Y=-3), in front of wall (Z=2) */}
+          <DeskGroup position={[0, -3, 2]} />
 
           {enableOrbitControls && (
             <OrbitControls

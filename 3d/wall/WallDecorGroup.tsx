@@ -218,7 +218,7 @@ export default function WallDecorGroup({
       <RandomBookStack position={[7.0, 1.35, -3.15]} />
 
       {/* Photography Umbrella/Light Stand (right side) */}
-      <LightStand position={[7.5, 3.5, 1.5]} />
+      <LightStand position={[7.5, -3, 1.5]} />
     </group>
   );
 }
@@ -489,18 +489,18 @@ function CRTMonitor({ position = [0, 0, 0] as [number, number, number] }) {
 function LightStand({ position = [0, 0, 0] as [number, number, number] }) {
   return (
     <group position={position} rotation={[0, -0.3, 0]}>
-      {/* Stand Pole */}
-      <mesh position={[0, -2, 0]} castShadow>
-        <cylinderGeometry args={[0.03, 0.04, 5]} />
-        <meshStandardMaterial color="#2a2a2a" roughness={0.3} metalness={0.5} />
-      </mesh>
-      {/* Stand Base */}
-      <mesh position={[0, -4.5, 0]} castShadow>
+      {/* Stand Base — sits on the floor */}
+      <mesh position={[0, 0.05, 0]} castShadow>
         <cylinderGeometry args={[0.4, 0.5, 0.1]} />
         <meshStandardMaterial color="#1a1a1a" roughness={0.4} metalness={0.3} />
       </mesh>
-      {/* Umbrella Frame */}
-      <mesh position={[0, 0.8, 0]} rotation={[0.3, 0, 0]} castShadow>
+      {/* Stand Pole — rises from base */}
+      <mesh position={[0, 2.5, 0]} castShadow>
+        <cylinderGeometry args={[0.03, 0.04, 5]} />
+        <meshStandardMaterial color="#2a2a2a" roughness={0.3} metalness={0.5} />
+      </mesh>
+      {/* Umbrella Frame — at top of pole */}
+      <mesh position={[0, 5.3, 0]} rotation={[0.3, 0, 0]} castShadow>
         <coneGeometry args={[1.2, 0.8, 8, 1, true]} />
         <meshStandardMaterial
           color="#f5f5f5"
