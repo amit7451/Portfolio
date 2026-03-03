@@ -92,9 +92,19 @@ canvas {
   -ms-user-select: none;
 }
 
-/* Hide scrollbar everywhere */
+/* Hide scrollbar everywhere — but allow drei ScrollControls internal scroll */
 ::-webkit-scrollbar {
   display: none;
+}
+
+/* Allow drei ScrollControls scroll container to function */
+div[style*="overflow:auto"], div[style*="overflow: auto"] {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+div[style*="overflow:auto"]::-webkit-scrollbar,
+div[style*="overflow: auto"]::-webkit-scrollbar {
+  display: none !important;
 }
 
 * {

@@ -3,7 +3,7 @@
 import dynamic from 'next/dynamic';
 
 // Dynamic import to avoid SSR issues with Three.js
-const WallScene = dynamic(() => import('../../3d/wall/WallScene'), {
+const BuildingScene = dynamic(() => import('../../3d/wall/BuildingScene'), {
   ssr: false,
   loading: () => (
     <div
@@ -57,7 +57,7 @@ const WallScene = dynamic(() => import('../../3d/wall/WallScene'), {
 export default function Home() {
   return (
     <>
-      {/* Hero Section - Full viewport 3D scene */}
+      {/* Hero Section - Full viewport 3D scene with scroll-driven building */}
       <main
         id="main-hero"
         style={{
@@ -71,8 +71,8 @@ export default function Home() {
           padding: 0,
         }}
       >
-        {/* 3D Wall Scene */}
-        <WallScene enableOrbitControls={false} />
+        {/* 3D Building Scene — scroll-driven camera animation */}
+        <BuildingScene />
       </main>
     </>
   );

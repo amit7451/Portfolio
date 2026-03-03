@@ -2,6 +2,7 @@
 
 import Desk from './Desk';
 import Chair from './Chair';
+import { Character } from '../character';
 
 interface DeskGroupProps {
   position?: [number, number, number];
@@ -33,12 +34,17 @@ export default function DeskGroup({
         color="#3a3028"
       />
 
-      {/* Chair — on the far side of the desk (behind it, toward the wall).
-          Z = -2.2 places it on the opposite side from the camera.
-          Rotated 180° (Math.PI) so the chair faces the camera / the person sitting faces forward. */}
+      {/* Character — positioned to sit ON chair seat */}
+      <Character
+        position={[0, 1.0, -1.9]}
+        rotation={[0, 0, 0]}
+        scale={[1.4, 1.4, 1.4]}
+      />
+
+      {/* Chair — behind the character, angled toward monitor */}
       <Chair
-        position={[0, 0, -2.2]}
-        rotation={[0, Math.PI, 0]}
+        position={[0, 0, -3.5]}
+        rotation={[0, Math.PI + 0.175, 0]}
         scale={[1.7, 1.7, 1.7]}
         color="#1a1a1a"
       />

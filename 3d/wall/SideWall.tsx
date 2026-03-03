@@ -34,14 +34,16 @@ export default function SideWall({
   const meshRef = useRef<THREE.Mesh>(null);
   
   // Load wall texture
-  const texture = useTexture('/textures/wall-texture.jpg');
+  const baseTexture = useTexture('/textures/wall-texture.jpg');
   
-  // Configure texture repeating
-  useMemo(() => {
-    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-    texture.repeat.set(textureRepeatX, textureRepeatY);
-    texture.needsUpdate = true;
-  }, [texture, textureRepeatX, textureRepeatY]);
+  // Clone and configure texture once with stable settings
+  const texture = useMemo(() => {
+    const cloned = baseTexture.clone();
+    cloned.wrapS = cloned.wrapT = THREE.RepeatWrapping;
+    cloned.repeat.set(textureRepeatX, textureRepeatY);
+    cloned.needsUpdate = true;
+    return cloned;
+  }, [baseTexture, textureRepeatX, textureRepeatY]);
 
   if (!visible) return null;
 

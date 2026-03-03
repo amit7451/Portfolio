@@ -163,25 +163,26 @@ export default function Desk({
         const bezelW = 0.02;
         const monX = -topW / 2 + monW / 2 + 0.18; // near left edge
         const monBaseY = deskY + topH / 2;
-        const monAngle = -0.6; // tilted toward chair side (-Z)
+        const monAngle = -0.6 + Math.PI; // Rotated 180 degrees to face character (screen faces -Z, back faces +Z)
         return (
           <group position={[monX, monBaseY, topD / 2 - 0.4]} rotation={[0, monAngle, 0]}>
             {/* Monitor stand base */}
             <mesh position={[0, 0.015, 0.08]} castShadow receiveShadow>
               <boxGeometry args={[0.22, 0.015, 0.16]} />
-              <meshStandardMaterial color="#111111" roughness={0.25} metalness={0.6} />
+              <meshStandardMaterial color="#222222" roughness={0.25} metalness={0.6} />
             </mesh>
             {/* Monitor stand neck */}
             <mesh position={[0, 0.14, 0.05]} castShadow>
               <boxGeometry args={[0.04, 0.25, 0.04]} />
-              <meshStandardMaterial color="#1a1a1a" roughness={0.3} metalness={0.5} />
+              <meshStandardMaterial color="#2a2a2a" roughness={0.3} metalness={0.5} />
             </mesh>
             {/* Screen frame (black bezel) */}
             <mesh position={[0, 0.28 + monH / 2, 0]} castShadow>
               <boxGeometry args={[monW + bezelW * 2, monH + bezelW * 2, monThick]} />
-              <meshStandardMaterial color="#111111" roughness={0.25} metalness={0.3} />
+              <meshStandardMaterial color="#222222" roughness={0.25} metalness={0.3} />
             </mesh>
-            {/* Screen display surface */}
+            
+            {/* ═══ FRONT SCREEN (facing character) ═══ */}
             <mesh position={[0, 0.28 + monH / 2, monThick / 2 + 0.001]}>
               <planeGeometry args={[monW, monH]} />
               <meshStandardMaterial
@@ -192,10 +193,65 @@ export default function Desk({
                 emissiveIntensity={0.15}
               />
             </mesh>
-            {/* Thin bottom chin */}
-            <mesh position={[0, 0.28 - 0.01, monThick / 2 + 0.001]}>
-              <boxGeometry args={[monW * 0.3, 0.014, 0.004]} />
-              <meshStandardMaterial color="#222222" roughness={0.3} metalness={0.4} />
+            
+            {/* ═══ BACK PANEL (visible to viewer) ═══ */}
+            {/* Main back panel with lighter gray for visibility */}
+            <mesh position={[0, 0.28 + monH / 2, -monThick / 2 - 0.005]} castShadow>
+              <boxGeometry args={[monW + bezelW * 1.5, monH + bezelW * 1.5, 0.01]} />
+              <meshStandardMaterial color="#505050" roughness={0.5} metalness={0.5} />
+            </mesh>
+
+            {/* Brand logo area - highly visible */}
+            <mesh position={[0, 0.28 + monH - 0.06, -monThick / 2 - 0.01]}>
+              <boxGeometry args={[0.2, 0.04, 0.004]} />
+              <meshStandardMaterial color="#888888" roughness={0.2} metalness={0.8} />
+            </mesh>
+
+            {/* VESA mount plate - lighter for contrast */}
+            <mesh position={[0, 0.28 + monH / 2, -monThick / 2 - 0.008]} castShadow>
+              <boxGeometry args={[0.25, 0.25, 0.008]} />
+              <meshStandardMaterial color="#606060" roughness={0.6} metalness={0.6} />
+            </mesh>
+
+            {/* VESA mount holes */}
+            {[
+              [-0.08, 0.08], [0.08, 0.08], [-0.08, -0.08], [0.08, -0.08]
+            ].map((pos, i) => (
+              <mesh key={i} position={[pos[0], 0.28 + monH / 2 + pos[1], -monThick / 2 - 0.012]} castShadow>
+                <cylinderGeometry args={[0.012, 0.012, 0.015, 12]} />
+                <meshStandardMaterial color="#222222" roughness={0.8} metalness={0.2} />
+              </mesh>
+            ))}
+
+            {/* Ventilation panel - right side */}
+            <mesh position={[0.25, 0.28 + monH / 2, -monThick / 2 - 0.008]} castShadow>
+              <boxGeometry args={[0.18, 0.3, 0.006]} />
+              <meshStandardMaterial color="#444444" roughness={0.7} metalness={0.4} />
+            </mesh>
+
+            {/* Ventilation grilles - dark contrast */}
+            {Array.from({ length: 12 }, (_, i) => (
+              <mesh key={`vent-${i}`} position={[0.25, 0.28 + monH / 2 - 0.12 + i * 0.02, -monThick / 2 - 0.01]} castShadow>
+                <boxGeometry args={[0.15, 0.004, 0.003]} />
+                <meshStandardMaterial color="#1a1a1a" roughness={0.9} metalness={0.1} />
+              </mesh>
+            ))}
+
+            {/* I/O panel - lighter */}
+            <mesh position={[-0.28, 0.28 + monH / 2 - 0.08, -monThick / 2 - 0.008]} castShadow>
+              <boxGeometry args={[0.12, 0.16, 0.006]} />
+              <meshStandardMaterial color="#444444" roughness={0.5} metalness={0.5} />
+            </mesh>
+
+            {/* Power LED - bright green glow */}
+            <mesh position={[-0.32, 0.28 + monH / 2 - 0.15, -monThick / 2 - 0.01]}>
+              <sphereGeometry args={[0.005, 8, 8]} />
+              <meshStandardMaterial 
+                color="#00ff00" 
+                emissive="#00ff00" 
+                emissiveIntensity={2.0}
+                toneMapped={false}
+              />
             </mesh>
 
             {/* ═══ CABLES going from back of monitor down into desk ═══ */}

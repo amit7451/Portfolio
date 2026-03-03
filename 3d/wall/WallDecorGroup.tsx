@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, useMemo } from 'react';
 import * as THREE from 'three';
 import { useTexture } from '@react-three/drei';
 import WallBase from './WallBase';
@@ -13,6 +13,7 @@ import StickyNote from './StickyNote';
 import DigitalClock from './DigitalClock';
 import PhotoFrame from './PhotoFrame';
 import DeskCalendar from './DeskCalendar';
+import Wardrobe from './Wardrobe';
 import { TanjiroFigurine, ZenitsuFigurine, SpiderManFigurine, IronManFigurine, CaptainAmericaFigurine } from './ToyFigurines';
 
 interface WallDecorGroupProps {
@@ -29,12 +30,16 @@ export default function WallDecorGroup({
   visible = true,
 }: WallDecorGroupProps) {
   const groupRef = useRef<THREE.Group>(null);
-  const ceilingTexture = useTexture('/3d/wall/textures/ceiling_interior.jpg');
+  const baseCeilingTexture = useTexture('/3d/wall/textures/ceiling_interior.jpg');
   
-  // Configure texture repeat
-  ceilingTexture.wrapS = ceilingTexture.wrapT = THREE.RepeatWrapping;
-  // Adjust repeat based on size (20, 12) - maybe 3x2 helps avoid stretching while tiling nicely
-  ceilingTexture.repeat.set(5, 3);
+  // Clone and configure ceiling texture once with stable settings
+  const ceilingTexture = useMemo(() => {
+    const cloned = baseCeilingTexture.clone();
+    cloned.wrapS = cloned.wrapT = THREE.RepeatWrapping;
+    cloned.repeat.set(5, 5.5);
+    cloned.needsUpdate = true;
+    return cloned;
+  }, [baseCeilingTexture]);
 
   if (!visible) return null;
 
@@ -51,39 +56,52 @@ export default function WallDecorGroup({
 
       {/* Left Side Wall - creates room depth */}
       <SideWall
-        position={[-10, 3, 0]}
-        width={10}
+        position={[-10, 3, 6]}
+        width={22}
         height={12}
         color="#ebe8e3"
         roughness={0.92}
         side="left"
+        textureRepeatX={3}
+        textureRepeatY={2}
       />
 
       {/* Right Side Wall - creates room depth */}
       <SideWall
-        position={[10, 3, 0]}
-        width={10}
+        position={[10, 3, 6]}
+        width={22}
         height={12}
         color="#ebe8e3"
         roughness={0.92}
         side="right"
+        textureRepeatX={3}
+        textureRepeatY={2}
+      />
+      
+      {/* Wardrobe - Left Side Wall */}
+      <Wardrobe
+        position={[-9.65, -3, 0]} 
+        rotation={[0, Math.PI / 2, 0]}
+        scale={[1, 1, 1]}
       />
 
       {/* Floor - wooden floor extending forward */}
       <FloorBase
-        position={[0, -3, 1]}
+        position={[0, -3, 6]}
         width={20}
-        depth={12}
+        depth={22}
         color="#d4c4a8"
+        textureRepeatX={4}
+        textureRepeatY={11}
       />
 
       {/* Ceiling - white ceiling matching floor size */}
       <mesh
-        position={[0, 9, 1]}
+        position={[0, 9, 6]}
         rotation={[Math.PI / 2, 0, 0]}
         receiveShadow
       >
-        <planeGeometry args={[20, 12]} />
+        <planeGeometry args={[20, 22]} />
         <meshStandardMaterial
           map={ceilingTexture}
           color="#ffffff"
