@@ -1,7 +1,8 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, useMemo } from 'react';
 import * as THREE from 'three';
+import { useTexture } from '@react-three/drei';
 
 /**
  * ProjectsRoom — A floor module representing the "Projects" showcase.
@@ -19,8 +20,48 @@ export default function ProjectsRoom({
   rotation = [0, 0, 0],
   scale = [1, 1, 1],
 }: ProjectsRoomProps) {
-  const groupRef = useRef<THREE.Group>(null);
-
+  const groupRef = useRef<THREE.Group>(null);  
+  // Load textures for walls and ceiling
+  const basePlasterTexture = useTexture('/3d/wall/textures/plaster.jpg');
+  const baseCeilingTexture = useTexture('/3d/wall/textures/ceiling_interior.jpg');
+  const baseFloorTexture = useTexture('/3d/wall/textures/floor.jpg');
+  
+  // Configure wall texture with anisotropy to prevent flickering
+  const wallTexture = useMemo(() => {
+    const cloned = basePlasterTexture.clone();
+    cloned.wrapS = cloned.wrapT = THREE.RepeatWrapping;
+    cloned.repeat.set(6, 3);
+    cloned.magFilter = THREE.LinearFilter;
+    cloned.minFilter = THREE.LinearMipmapLinearFilter;
+    cloned.anisotropy = 16;
+    cloned.needsUpdate = true;
+    return cloned;
+  }, [basePlasterTexture]);
+  
+  // Configure ceiling texture with anisotropy
+  const ceilingTexture = useMemo(() => {
+    const cloned = baseCeilingTexture.clone();
+    cloned.wrapS = cloned.wrapT = THREE.RepeatWrapping;
+    cloned.repeat.set(5, 5.5);
+    cloned.magFilter = THREE.LinearFilter;
+    cloned.minFilter = THREE.LinearMipmapLinearFilter;
+    cloned.anisotropy = 16;
+    cloned.colorSpace = THREE.SRGBColorSpace;
+    cloned.needsUpdate = true;
+    return cloned;
+  }, [baseCeilingTexture]);
+  
+  // Configure floor texture with anisotropy
+  const floorTexture = useMemo(() => {
+    const cloned = baseFloorTexture.clone();
+    cloned.wrapS = cloned.wrapT = THREE.RepeatWrapping;
+    cloned.repeat.set(4, 11);
+    cloned.magFilter = THREE.LinearFilter;
+    cloned.minFilter = THREE.LinearMipmapLinearFilter;
+    cloned.anisotropy = 16;
+    cloned.needsUpdate = true;
+    return cloned;
+  }, [baseFloorTexture]);
   // Room dimensions (matching building room depth)
   const roomW = 20;
   const roomH = 12;
@@ -35,33 +76,53 @@ export default function ProjectsRoom({
   return (
     <group ref={groupRef} position={position} rotation={rotation} scale={scale}>
       {/* ═══ BACK WALL ═══ */}
-      <mesh position={[0, roomH / 2, backWallZ]} receiveShadow>
+      <mesh position={[0, roomH / 2, backWallZ]}>
         <planeGeometry args={[roomW, roomH]} />
-        <meshStandardMaterial color={wallColor} roughness={0.9} metalness={0.02} />
+        <meshStandardMaterial map={wallTexture} color="#e8e4e0" roughness={0.9} metalness={0.02} />
       </mesh>
 
-      {/* ═══ LEFT SIDE WALL (no front wall — glass facade) ═══ */}
-      <mesh position={[-roomW / 2, roomH / 2, 0]} rotation={[0, Math.PI / 2, 0]} receiveShadow>
+      {/* ═══ LEFT SIDE WALL ═══ */}
+      <mesh position={[-roomW / 2, roomH / 2, 0]} rotation={[0, Math.PI / 2, 0]}>
         <planeGeometry args={[roomD, roomH]} />
-        <meshStandardMaterial color={wallColor} roughness={0.9} metalness={0.02} />
+        <meshStandardMaterial
+          map={wallTexture}
+          color="#e8e4e0"
+          roughness={0.9}
+          metalness={0.02}
+          polygonOffset
+          polygonOffsetFactor={-1}
+          polygonOffsetUnits={-1}
+        />
       </mesh>
 
       {/* ═══ RIGHT SIDE WALL ═══ */}
-      <mesh position={[roomW / 2, roomH / 2, 0]} rotation={[0, -Math.PI / 2, 0]} receiveShadow>
+      <mesh position={[roomW / 2, roomH / 2, 0]} rotation={[0, -Math.PI / 2, 0]}>
         <planeGeometry args={[roomD, roomH]} />
-        <meshStandardMaterial color={wallColor} roughness={0.9} metalness={0.02} />
+        <meshStandardMaterial
+          map={wallTexture}
+          color="#e8e4e0"
+          roughness={0.9}
+          metalness={0.02}
+          polygonOffset
+          polygonOffsetFactor={-1}
+          polygonOffsetUnits={-1}
+        />
       </mesh>
 
       {/* ═══ FLOOR ═══ */}
-      <mesh position={[0, 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+      <mesh position={[0, 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[roomW, roomD]} />
-        <meshStandardMaterial color="#b8a88a" roughness={0.8} metalness={0.05} />
+        <meshStandardMaterial map={floorTexture} color="#b8a88a" roughness={0.8} metalness={0.05} />
       </mesh>
 
       {/* ═══ CEILING ═══ */}
-      <mesh position={[0, roomH - 0.01, 0]} rotation={[Math.PI / 2, 0, 0]} receiveShadow>
+      <mesh position={[0, roomH - 0.3, 0]} rotation={[Math.PI / 2, 0, 0]}>
         <planeGeometry args={[roomW, roomD]} />
-        <meshStandardMaterial color="#f0ece8" roughness={0.9} metalness={0} />
+        <meshBasicMaterial
+          map={ceilingTexture}
+          color="#f5f5f5"
+          side={THREE.DoubleSide}
+        />
       </mesh>
 
       {/* ═══ "PROJECTS" TITLE ON BACK WALL ═══ */}

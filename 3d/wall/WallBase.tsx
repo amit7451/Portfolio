@@ -31,15 +31,20 @@ export default function WallBase({
 }: WallBaseProps) {
   const meshRef = useRef<THREE.Mesh>(null);
   
-  // Load wall texture
-  const texture = useTexture('/textures/wall-texture.jpg');
+  // Load plaster texture for the back wall
+  const baseTexture = useTexture('/3d/wall/textures/plaster.jpg');
   
-  // Configure texture repeating
-  useMemo(() => {
-    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-    texture.repeat.set(textureRepeatX, textureRepeatY);
-    texture.needsUpdate = true;
-  }, [texture, textureRepeatX, textureRepeatY]);
+  // Configure texture with anisotropy to prevent flickering
+  const texture = useMemo(() => {
+    const cloned = baseTexture.clone();
+    cloned.wrapS = cloned.wrapT = THREE.RepeatWrapping;
+    cloned.repeat.set(textureRepeatX, textureRepeatY);
+    cloned.magFilter = THREE.LinearFilter;
+    cloned.minFilter = THREE.LinearMipmapLinearFilter;
+    cloned.anisotropy = 16;
+    cloned.needsUpdate = true;
+    return cloned;
+  }, [baseTexture, textureRepeatX, textureRepeatY]);
 
   if (!visible) return null;
 
@@ -48,7 +53,6 @@ export default function WallBase({
       {/* Main Wall - receives shadows from 3D text */}
       <mesh
         ref={meshRef}
-        receiveShadow
         position={[0, 0, 0]}
       >
         <planeGeometry args={[width, height]} />

@@ -32,11 +32,14 @@ export default function FloorBase({
   // Load floor texture
   const baseTexture = useTexture('/textures/floor-texture.jpg');
   
-  // Clone and configure texture once with stable settings
+  // Clone and configure texture once with stable settings and anisotropy
   const texture = useMemo(() => {
     const cloned = baseTexture.clone();
     cloned.wrapS = cloned.wrapT = THREE.RepeatWrapping;
     cloned.repeat.set(textureRepeatX, textureRepeatY);
+    cloned.magFilter = THREE.LinearFilter;
+    cloned.minFilter = THREE.LinearMipmapLinearFilter;
+    cloned.anisotropy = 16;
     cloned.needsUpdate = true;
     return cloned;
   }, [baseTexture, textureRepeatX, textureRepeatY]);
@@ -49,7 +52,6 @@ export default function FloorBase({
       position={position}
       rotation={rotation}
       scale={scale}
-      receiveShadow
     >
       <planeGeometry args={[width, depth]} />
       <meshStandardMaterial

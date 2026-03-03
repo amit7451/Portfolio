@@ -33,14 +33,17 @@ export default function SideWall({
 }: SideWallProps) {
   const meshRef = useRef<THREE.Mesh>(null);
   
-  // Load wall texture
-  const baseTexture = useTexture('/textures/wall-texture.jpg');
+  // Load plaster texture
+  const baseTexture = useTexture('/3d/wall/textures/plaster.jpg');
   
-  // Clone and configure texture once with stable settings
+  // Clone and configure texture once with stable settings and anisotropy
   const texture = useMemo(() => {
     const cloned = baseTexture.clone();
     cloned.wrapS = cloned.wrapT = THREE.RepeatWrapping;
     cloned.repeat.set(textureRepeatX, textureRepeatY);
+    cloned.magFilter = THREE.LinearFilter;
+    cloned.minFilter = THREE.LinearMipmapLinearFilter;
+    cloned.anisotropy = 4;
     cloned.needsUpdate = true;
     return cloned;
   }, [baseTexture, textureRepeatX, textureRepeatY]);
@@ -58,8 +61,6 @@ export default function SideWall({
       position={position}
       rotation={sideRotation}
       scale={scale}
-      receiveShadow
-      castShadow
     >
       <planeGeometry args={[width, height]} />
       <meshStandardMaterial
@@ -67,6 +68,9 @@ export default function SideWall({
         color={color}
         roughness={roughness}
         metalness={0.02}
+        polygonOffset
+        polygonOffsetFactor={-1}
+        polygonOffsetUnits={-1}
         side={THREE.FrontSide}
       />
     </mesh>

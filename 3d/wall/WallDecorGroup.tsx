@@ -32,11 +32,15 @@ export default function WallDecorGroup({
   const groupRef = useRef<THREE.Group>(null);
   const baseCeilingTexture = useTexture('/3d/wall/textures/ceiling_interior.jpg');
   
-  // Clone and configure ceiling texture once with stable settings
+  // Clone and configure ceiling texture with anisotropy to prevent flickering
   const ceilingTexture = useMemo(() => {
     const cloned = baseCeilingTexture.clone();
     cloned.wrapS = cloned.wrapT = THREE.RepeatWrapping;
     cloned.repeat.set(5, 5.5);
+    cloned.magFilter = THREE.LinearFilter;
+    cloned.minFilter = THREE.LinearMipmapLinearFilter;
+    cloned.anisotropy = 16;
+    cloned.colorSpace = THREE.SRGBColorSpace;
     cloned.needsUpdate = true;
     return cloned;
   }, [baseCeilingTexture]);
@@ -62,8 +66,8 @@ export default function WallDecorGroup({
         color="#ebe8e3"
         roughness={0.92}
         side="left"
-        textureRepeatX={3}
-        textureRepeatY={2}
+        textureRepeatX={8}
+        textureRepeatY={4}
       />
 
       {/* Right Side Wall - creates room depth */}
@@ -74,8 +78,8 @@ export default function WallDecorGroup({
         color="#ebe8e3"
         roughness={0.92}
         side="right"
-        textureRepeatX={3}
-        textureRepeatY={2}
+        textureRepeatX={8}
+        textureRepeatY={4}
       />
       
       {/* Wardrobe - Left Side Wall */}
@@ -95,18 +99,16 @@ export default function WallDecorGroup({
         textureRepeatY={11}
       />
 
-      {/* Ceiling - white ceiling matching floor size */}
+      {/* Ceiling - textured ceiling matching floor size */}
       <mesh
-        position={[0, 9, 6]}
+        position={[0, 8.5, 6]}
         rotation={[Math.PI / 2, 0, 0]}
-        receiveShadow
       >
         <planeGeometry args={[20, 22]} />
-        <meshStandardMaterial
+        <meshBasicMaterial
           map={ceilingTexture}
-          color="#ffffff"
-          roughness={0.9}
-          metalness={0}
+          color="#f5f5f5"
+          side={THREE.DoubleSide}
         />
       </mesh>
 
