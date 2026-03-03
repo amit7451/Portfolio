@@ -7,6 +7,7 @@ import WallBase from './WallBase';
 import FloorBase from './FloorBase';
 import SideWall from './SideWall';
 import WallText from './WallText';
+import RisingLaserLines from './RisingLaserLines';
 import Shelf from './Shelf';
 import Frame from './Frame';
 import StickyNote from './StickyNote';
@@ -57,6 +58,11 @@ export default function WallDecorGroup({
         color="#f5f2ed"
         roughness={0.92}
       />
+
+      {/* Rising Laser Lines Effect */}
+      <group position={[0, -3, 0]}>
+        <RisingLaserLines wallWidth={20} wallZ={-4} density={0.5} intensity={0.5} />
+      </group>
 
       {/* Left Side Wall - creates room depth */}
       <SideWall
@@ -112,15 +118,15 @@ export default function WallDecorGroup({
         />
       </mesh>
 
-      {/* Main Title Text - painted on wall look */}
+      {/* Main Title Text - aligned style with other rooms */}
       <WallText
-        position={[0, 7.5, -3.95]}
+        position={[0, 7, -3.9]}
         text="FULL STACK DEVELOPER"
-        fontSize={0.75}
-        depth={0.02}
-        color="#9a8b7a"
-        roughness={1.0}
-        metalness={0}
+        fontSize={0.9}
+        depth={0.06}
+        color="#6b6560"
+        roughness={0.85}
+        metalness={0.05}
       />
 
       {/* Upper Shelf - shorter, centered */}

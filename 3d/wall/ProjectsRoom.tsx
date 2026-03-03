@@ -3,6 +3,7 @@
 import { useRef, useMemo } from 'react';
 import * as THREE from 'three';
 import { useTexture } from '@react-three/drei';
+import WallText from './WallText';
 
 /**
  * ProjectsRoom — A floor module representing the "Projects" showcase.
@@ -125,17 +126,18 @@ export default function ProjectsRoom({
         />
       </mesh>
 
-      {/* ═══ "PROJECTS" TITLE ON BACK WALL ═══ */}
-      <mesh position={[0, roomH - 2, backWallZ + 0.05]}>
-        <planeGeometry args={[6, 1]} />
-        <meshStandardMaterial
-          color={accentColor}
-          roughness={0.4}
-          metalness={0.2}
-          emissive={accentColor}
-          emissiveIntensity={0.1}
-        />
-      </mesh>
+      {/* ═══ "PROJECT ROOM" TITLE EMBEDDED IN WALL ═══ */}
+      <WallText
+        position={[0, roomH - 2, backWallZ + 0.1]}
+        rotation={[0, 0, 0]}
+        scale={[1, 1, 1]}
+        color="#6b6560"
+        text="PROJECTS ROOM"
+        fontSize={0.9}
+        depth={0.06}
+        roughness={0.85}
+        metalness={0.05}
+      />
 
       {/* ═══ PROJECT DISPLAY BOARDS ═══ */}
       {/* Left Project Board */}
@@ -167,21 +169,21 @@ export default function ProjectsRoom({
       {/* ═══ ACCENT LIGHTING ═══ */}
       <pointLight
         position={[0, roomH - 1, 0]}
-        intensity={0.6}
+        intensity={0.45}
         color="#ffffff"
         distance={15}
         decay={2}
       />
       <pointLight
         position={[-6, roomH - 1, 0]}
-        intensity={0.3}
+        intensity={0.15}
         color="#e0e8ff"
         distance={10}
         decay={2}
       />
       <pointLight
         position={[6, roomH - 1, 0]}
-        intensity={0.3}
+        intensity={0.15}
         color="#e0e8ff"
         distance={10}
         decay={2}

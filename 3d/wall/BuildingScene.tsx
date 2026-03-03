@@ -2,11 +2,14 @@
 
 import { Canvas, useThree, useFrame } from '@react-three/fiber';
 import { Environment, ScrollControls, useScroll, ContactShadows } from '@react-three/drei';
-import { Suspense, useRef, useMemo } from 'react';
+import { Suspense, useRef, useMemo, useEffect } from 'react';
 import * as THREE from 'three';
 import WallDecorGroup from './WallDecorGroup';
 import DeskGroup from '../deskandchair/DeskGroup';
-import ProjectsRoom from './ProjectsRoom';
+import ProjectsRoom from '../ProjectRoom/ProjectsRoom';
+import AboutRoom from './AboutRoom';
+import ContactsRoom from './ContactsRoom';
+import LiftPanel from './LiftPanel';
 
 // ────────────────────────────────────────────────────
 // CONSTANTS — Room & Building geometry
@@ -14,7 +17,7 @@ import ProjectsRoom from './ProjectsRoom';
 const ROOM_WIDTH = 20;
 const ROOM_HEIGHT = 12;
 const ROOM_DEPTH = 32;
-const FLOOR_COUNT = 5;
+const FLOOR_COUNT = 4; // 0: Dev, 1: Projects, 2: About, 3: Contacts
 const FLOOR_SLAB_THICKNESS = 0.4;
 const FLOOR_SPACING = ROOM_HEIGHT + FLOOR_SLAB_THICKNESS; // 12.4 per floor
 
@@ -28,10 +31,8 @@ const BUILDING_TOP_Y = 3; // Y-center of floor 0 = developer room center
 // ────────────────────────────────────────────────────
 // Camera keyframes driven by scroll (0→1)
 //
-// Phase 1 (0.00 → 0.15): Hero — static inside room
-// Phase 2 (0.15 → 0.45): Pull straight back through glass, reveal room
-// Phase 3 (0.45 → 0.70): Move straight down to projects floor
-// Phase 4 (0.70 → 1.00): Push straight forward into projects room
+// Pages expanded to handle multiple rooms
+// Each room transition: inside → outside → descend → to next room
 // ────────────────────────────────────────────────────
 
 function lerpValue(a: number, b: number, t: number) {
@@ -52,20 +53,54 @@ function ScrollCamera() {
 
   // Key positions
   const INSIDE_Z = 14;
-  const OUTSIDE_Z = 26;      // 14 units outside the glass facade (at Z=16)
+  const OUTSIDE_Z = 26;
   const HERO_Y = 4.72;
   const LOOK_Y = 3.72;
-  const PROJ_Y = -FLOOR_SPACING + HERO_Y;
-  const PROJ_LOOK_Y = -FLOOR_SPACING + LOOK_Y;
 
-  // Keyframes: continuous path, camera moves directly with scroll (no lerp lag)
-  const keyframes = useMemo(() => [
-    { s: 0.00, y: HERO_Y,  z: INSIDE_Z,  ly: LOOK_Y },         // inside room
-    { s: 0.08, y: HERO_Y,  z: INSIDE_Z,  ly: LOOK_Y },         // hero hold (short)
-    { s: 0.35, y: HERO_Y,  z: OUTSIDE_Z, ly: LOOK_Y - 1 },     // outside glass
-    { s: 0.60, y: PROJ_Y,  z: OUTSIDE_Z, ly: PROJ_LOOK_Y },     // descended
-    { s: 1.00, y: PROJ_Y,  z: INSIDE_Z,  ly: PROJ_LOOK_Y },     // inside projects
-  ], [HERO_Y, LOOK_Y, PROJ_Y, PROJ_LOOK_Y, INSIDE_Z, OUTSIDE_Z]);
+  const keyframes = useMemo(() => {
+    const kf = [];
+
+    // Floor 0: Developer Room (0.00 -> 0.20)
+    kf.push(
+      { s: 0.00, y: HERO_Y, z: INSIDE_Z, ly: LOOK_Y }, // inside dev room
+      { s: 0.10, y: HERO_Y, z: INSIDE_Z, ly: LOOK_Y }, // hero hold slightly longer
+      { s: 0.20, y: HERO_Y, z: OUTSIDE_Z, ly: LOOK_Y - 1 } // outside dev room
+    );
+
+    // Transition to Floor 1: Projects Room (0.20 -> 0.33)
+    kf.push(
+      { s: 0.28, y: HERO_Y - FLOOR_SPACING, z: OUTSIDE_Z, ly: LOOK_Y - FLOOR_SPACING - 1 },
+      { s: 0.33, y: HERO_Y - FLOOR_SPACING, z: INSIDE_Z, ly: LOOK_Y - FLOOR_SPACING }
+    );
+
+    // Floor 1: Projects Room - inside (0.33 -> 0.53)
+    kf.push(
+      { s: 0.33, y: HERO_Y - FLOOR_SPACING, z: INSIDE_Z, ly: LOOK_Y - FLOOR_SPACING },
+      { s: 0.43, y: HERO_Y - FLOOR_SPACING, z: INSIDE_Z, ly: LOOK_Y - FLOOR_SPACING },
+      { s: 0.53, y: HERO_Y - FLOOR_SPACING, z: OUTSIDE_Z, ly: LOOK_Y - FLOOR_SPACING - 1 }
+    );
+
+    // Transition to Floor 2: About Room (0.53 -> 0.66)
+    kf.push(
+      { s: 0.61, y: HERO_Y - 2 * FLOOR_SPACING, z: OUTSIDE_Z, ly: LOOK_Y - 2 * FLOOR_SPACING - 1 },
+      { s: 0.66, y: HERO_Y - 2 * FLOOR_SPACING, z: INSIDE_Z, ly: LOOK_Y - 2 * FLOOR_SPACING }
+    );
+
+    // Floor 2: About Room - inside (0.66 -> 0.86)
+    kf.push(
+      { s: 0.66, y: HERO_Y - 2 * FLOOR_SPACING, z: INSIDE_Z, ly: LOOK_Y - 2 * FLOOR_SPACING },
+      { s: 0.76, y: HERO_Y - 2 * FLOOR_SPACING, z: INSIDE_Z, ly: LOOK_Y - 2 * FLOOR_SPACING },
+      { s: 0.86, y: HERO_Y - 2 * FLOOR_SPACING, z: OUTSIDE_Z, ly: LOOK_Y - 2 * FLOOR_SPACING - 1 }
+    );
+
+    // Transition to Floor 3: Contacts Room (0.86 -> 1.00)
+    kf.push(
+      { s: 0.94, y: HERO_Y - 3 * FLOOR_SPACING, z: OUTSIDE_Z, ly: LOOK_Y - 3 * FLOOR_SPACING - 1 },
+      { s: 1.00, y: HERO_Y - 3 * FLOOR_SPACING, z: INSIDE_Z, ly: LOOK_Y - 3 * FLOOR_SPACING }
+    );
+
+    return kf;
+  }, [HERO_Y, LOOK_Y, INSIDE_Z, OUTSIDE_Z]);
 
   useFrame(() => {
     const offset = scroll.offset;
@@ -86,7 +121,6 @@ function ScrollCamera() {
     const camZ = kf0.z + (kf1.z - kf0.z) * t;
     const lookY = kf0.ly + (kf1.ly - kf0.ly) * t;
 
-    // Direct position — no lerp, moves exactly with scroll
     camera.position.set(0, camY, camZ);
     camera.lookAt(0, lookY, 0);
   });
@@ -237,7 +271,7 @@ function BuildingLighting() {
   return (
     <>
       {/* Single ambient light for minimal GPU usage */}
-      <ambientLight intensity={0.6} color="#ffffff" />
+      <ambientLight intensity={0.5} color="#ffffff" />
     </>
   );
 }
@@ -252,6 +286,37 @@ function LoadingFallback() {
       <meshStandardMaterial color="#444" />
     </mesh>
   );
+}
+
+// ────────────────────────────────────────────────────
+// NavigationController — Handles navigation sign clicks
+// ────────────────────────────────────────────────────
+function NavigationController() {
+  const scroll = useScroll();
+
+  useEffect(() => {
+    const handleNavigation = (event: any) => {
+      const { targetPage } = event.detail;
+      // With 4 pages (0 to 3), the offsets are 0, 1/3, 2/3, 1
+      const targetOffset = targetPage / 3;
+      
+      const scrollContainer = scroll.el;
+      // Calculate target scrollTop. scroll.el is the scroll container.
+      // Maximum scroll is at offset 1.
+      const scrollMax = scrollContainer.scrollHeight - scrollContainer.clientHeight;
+      const targetScrollTop = targetOffset * scrollMax;
+
+      scrollContainer.scrollTo({
+        top: targetScrollTop,
+        behavior: 'smooth'
+      });
+    };
+
+    window.addEventListener('navigationClicked', handleNavigation);
+    return () => window.removeEventListener('navigationClicked', handleNavigation);
+  }, [scroll]);
+
+  return null;
 }
 
 // ────────────────────────────────────────────────────
@@ -289,10 +354,11 @@ export default function BuildingScene() {
       >
         <color attach="background" args={['#87CEEB']} />
 
-        {/* ScrollControls: 5 pages of scroll content */}
-        <ScrollControls pages={5} damping={0.15}>
+        {/* ScrollControls: 4 pages of scroll content */}
+        <ScrollControls pages={4} damping={0.25}>
           <Suspense fallback={<LoadingFallback />}>
             <ScrollCamera />
+            <NavigationController />
             <BuildingLighting />
 
             {/* Minimal environment - reduced GPU load */}
@@ -302,7 +368,9 @@ export default function BuildingScene() {
                 BUILDING GROUP
                 Floor 0 = Developer Room (original scene)
                 Floor 1 = Projects Room
-                Floors 2–4 = Empty/furnished shells
+                Floor 2 = About Me
+                Floor 3 = Contacts
+                Floors 4–5 = Empty/furnished shells
             ════════════════════════════════════════════ */}
             <group>
               {/* ── Building exterior shell & floor slabs ── */}
@@ -321,25 +389,62 @@ export default function BuildingScene() {
                     Shift same +3.22 → [0, 0.22, 2] */}
                 <DeskGroup position={[0, 0.22, 2]} />
 
-                {/* Minimal ambient lighting only */}
-                <ambientLight intensity={0.5} color="#ffffff" />
+
+                {/* Floor 0 Lights */}
+                <pointLight
+                  position={[0, 9, 0]} 
+                  intensity={0.45}
+                  color="#ffffff"
+                  distance={12}
+                  decay={2}
+                />
+                 <pointLight
+                  position={[-6, 5, 2]} 
+                  intensity={0.25}
+                  color="#e0e8ff"
+                  distance={10}
+                  decay={2}
+                />
+
+                {/* ══ NAV: HOME (0) ══ */}
+                <LiftPanel 
+                  currentFloorIndex={0} 
+                  position={[9.2, 9.0, -3.8]} 
+                />
               </group>
 
               {/* ══ FLOOR 1: Projects Room ══ */}
               <group position={[0, -FLOOR_SPACING, 0]}>
                 <ProjectsRoom position={[0, 0.22, 0]} />
-                <ambientLight intensity={0.5} color="#ffffff" />
+                
+                {/* ══ NAV: PROJECTS (1) ══ */}
+                <LiftPanel 
+                  currentFloorIndex={1} 
+                  position={[9.2, 9.0, -3.8]} 
+                />
               </group>
 
-              {/* ══ FLOORS 2–4: Empty shells ══ */}
-              {[2, 3, 4].map((floorIdx) => (
-                <group key={`floor-${floorIdx}`} position={[0, -floorIdx * FLOOR_SPACING, 0]}>
-                  <EmptyFloorRoom
-                    position={[0, 0.2, 0]}
-                    floorLabel={`Floor ${floorIdx}`}
-                  />
-                </group>
-              ))}
+              {/* ══ FLOOR 2: About Me Room ══ */}
+              <group position={[0, -2 * FLOOR_SPACING, 0]}>
+                <AboutRoom position={[0, 0.22, 0]} />
+
+                {/* ══ NAV: ABOUT (2) ══ */}
+                <LiftPanel 
+                  currentFloorIndex={2} 
+                  position={[9.2, 9.0, -3.8]} 
+                />
+              </group>
+
+              {/* ══ FLOOR 3: Contacts Room ══ */}
+              <group position={[0, -3 * FLOOR_SPACING, 0]}>
+                <ContactsRoom position={[0, 0.22, 0]} />
+
+                {/* ══ NAV: CONTACT (3) ══ */}
+                <LiftPanel 
+                  currentFloorIndex={3} 
+                  position={[9.2, 9.0, -3.8]} 
+                />
+              </group>
             </group>
           </Suspense>
         </ScrollControls>
