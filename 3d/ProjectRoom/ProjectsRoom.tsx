@@ -327,8 +327,10 @@ function FloatingCard({
   tableRadius: number;
   cardId: number;
 }) {
+
   const cardRef = useRef<THREE.Group>(null);
   const [hovered, setHovered] = useState(false);
+  const [buttonHovered, setButtonHovered] = useState<number | null>(null);
   const mousePos = useRef({ x: 0, y: 0 });
   const targetRotation = useRef({ x: 0, y: 0, z: 0 });
   
@@ -336,6 +338,12 @@ function FloatingCard({
   const cardHeight = 3.5;
   const cardDepth = 0.2;
   const baseFloatHeight = tableHeight + 1.8;
+  
+  // Load textures for all cards (hooks must be called unconditionally)
+  const githubTexture = useTexture('/3d/ProjectRoom/images/github.png');
+  const playstoreTexture = useTexture('/3d/ProjectRoom/images/playstore.png');
+  const linkedinTexture = useTexture('/3d/ProjectRoom/images/linkedin.png');
+  const webTexture = useTexture('/3d/ProjectRoom/images/web.png');
   
   // Random seed for each card
   const seed = useMemo(() => cardId * 1.337, [cardId]);
@@ -445,6 +453,21 @@ function FloatingCard({
         onPointerOver={() => setHovered(true)}
         onPointerOut={() => setHovered(false)}
         onPointerMove={handlePointerMove}
+        onClick={(e) => {
+          if (typeof window === 'undefined') return;
+          if (cardId === 0) {
+            e.stopPropagation();
+            window.dispatchEvent(new CustomEvent('open-rentra-popup'));
+          }
+          if (cardId === 1) {
+            e.stopPropagation();
+            window.dispatchEvent(new CustomEvent('open-gocab-popup'));
+          }
+          if (cardId === 2) {
+            e.stopPropagation();
+            window.dispatchEvent(new CustomEvent('open-pdfsuite-popup'));
+          }
+        }}
       >
         <meshStandardMaterial
           color={hovered ? "#0a0a0a" : "#050505"}
@@ -518,6 +541,516 @@ function FloatingCard({
           metalness={0.8}
         />
       </RoundedBox>
+
+      {/* Rentra Card Special Content */}
+      {cardId === 0 && (
+        <group position={[0, 0, cardDepth / 2 + 0.05]}>
+          {/* Title - Bold Green Heading Line 1 */}
+          <Text
+            position={[0, 1.4, 0]}
+            fontSize={0.2}
+            color="#00ff00"
+            anchorX="center"
+            anchorY="middle"
+            fontWeight="bold"
+            maxWidth={cardWidth - 0.2}
+            letterSpacing={0.02}
+          >
+            Rentra
+          </Text>
+
+          {/* Title - Line 2 */}
+          <Text
+            position={[0, 1.1, 0]}
+            fontSize={0.16}
+            color="#00ff00"
+            anchorX="center"
+            anchorY="middle"
+            fontWeight="bold"
+            maxWidth={cardWidth - 0.2}
+            lineHeight={1.1}
+          >
+            Flats & Hostels
+          </Text>
+
+          {/* Subtitle */}
+          <Text
+            position={[0, 0.85, 0]}
+            fontSize={0.15}
+            color="#00ff00"
+            anchorX="center"
+            anchorY="middle"
+            fontWeight="bold"
+            maxWidth={cardWidth - 0.2}
+          >
+            Near You
+          </Text>
+
+          {/* Tech Stack Header */}
+          <Text
+            position={[0, 0.45, 0]}
+            fontSize={0.13}
+            color="#00d9ff"
+            anchorX="center"
+            anchorY="middle"
+            fontWeight="600"
+          >
+            Tech Stack:
+          </Text>
+
+          <Text
+            position={[0, 0.20, 0]}
+            fontSize={0.11}
+            color="#00d9ff"
+            anchorX="center"
+            anchorY="middle"
+            maxWidth={cardWidth - 0.1}
+            lineHeight={1.4}
+          >
+            Flutter • Firebase • Node.js
+          </Text>
+
+          <Text
+            position={[0, 0.02, 0]}
+            fontSize={0.11}
+            color="#00d9ff"
+            anchorX="center"
+            anchorY="middle"
+            maxWidth={cardWidth - 0.1}
+            lineHeight={1.4}
+          >
+            Maps APIs • OneSignal
+          </Text>
+
+          {/* Three Squircle Link Buttons */}
+          {/* GitHub Button */}
+          <group position={[-0.55, -1.05, 0]}>
+            <mesh
+              onClick={() => window.open('https://github.com/amit7451/Rentra', '_blank')}
+              onPointerOver={() => setButtonHovered(0)}
+              onPointerOut={() => setButtonHovered(null)}
+            >
+              <RoundedBox args={[0.35, 0.35, 0.05]} radius={0.1} smoothness={4}>
+                <meshStandardMaterial
+                  color="#24292e"
+                  roughness={0.5}
+                  metalness={0.3}
+                  emissiveIntensity={buttonHovered === 0 ? 0.6 : 0.2}
+                  emissive={buttonHovered === 0 ? "#00ff00" : "#000000"}
+                />
+              </RoundedBox>
+            </mesh>
+            {/* Icon on top */}
+            <mesh position={[0, 0, 0.04]}>
+              <planeGeometry args={[0.28, 0.28]} />
+              <meshBasicMaterial
+                map={githubTexture}
+                transparent={true}
+                toneMapped={false}
+                side={THREE.DoubleSide}
+              />
+            </mesh>
+          </group>
+
+          {/* PlayStore Button */}
+          <group position={[0, -1.05, 0]}>
+            <mesh
+              onClick={() => window.open('https://play.google.com/store/apps/details?id=com.rentra.app.rentra', '_blank')}
+              onPointerOver={() => setButtonHovered(1)}
+              onPointerOut={() => setButtonHovered(null)}
+            >
+              <RoundedBox args={[0.35, 0.35, 0.05]} radius={0.1} smoothness={4}>
+                <meshStandardMaterial
+                  color="#01875f"
+                  roughness={0.5}
+                  metalness={0.3}
+                  emissiveIntensity={buttonHovered === 1 ? 0.6 : 0.2}
+                  emissive={buttonHovered === 1 ? "#00ff00" : "#000000"}
+                />
+              </RoundedBox>
+            </mesh>
+            {/* Icon on top */}
+            <mesh position={[0, 0, 0.04]}>
+              <planeGeometry args={[0.28, 0.28]} />
+              <meshBasicMaterial
+                map={playstoreTexture}
+                transparent={true}
+                toneMapped={false}
+                side={THREE.DoubleSide}
+              />
+            </mesh>
+          </group>
+
+          {/* LinkedIn Button */}
+          <group position={[0.55, -1.05, 0]}>
+            <mesh
+              onClick={() => window.open('https://linkedin.com/in/amit-devspace', '_blank')}
+              onPointerOver={() => setButtonHovered(2)}
+              onPointerOut={() => setButtonHovered(null)}
+            >
+              <RoundedBox args={[0.35, 0.35, 0.05]} radius={0.1} smoothness={4}>
+                <meshStandardMaterial
+                  color="#0a66c2"
+                  roughness={0.5}
+                  metalness={0.3}
+                  emissiveIntensity={buttonHovered === 2 ? 0.6 : 0.2}
+                  emissive={buttonHovered === 2 ? "#0a66c2" : "#000000"}
+                />
+              </RoundedBox>
+            </mesh>
+            {/* Icon on top */}
+            <mesh position={[0, 0, 0.04]}>
+              <planeGeometry args={[0.28, 0.28]} />
+              <meshBasicMaterial
+                map={linkedinTexture}
+                transparent={true}
+                toneMapped={false}
+                side={THREE.DoubleSide}
+              />
+            </mesh>
+          </group>
+        </group>
+      )}
+
+      {/* goCab Card Special Content */}
+      {cardId === 1 && (
+        <group position={[0, 0, cardDepth / 2 + 0.05]}>
+          {/* Title - Bold Green Heading Line 1 */}
+          <Text
+            position={[0, 1.4, 0]}
+            fontSize={0.2}
+            color="#00ff00"
+            anchorX="center"
+            anchorY="middle"
+            fontWeight="bold"
+            maxWidth={cardWidth - 0.2}
+            letterSpacing={0.02}
+          >
+            goCab
+          </Text>
+
+          {/* Title - Line 2 */}
+          <Text
+            position={[0, 1.1, 0]}
+            fontSize={0.14}
+            color="#00ff00"
+            anchorX="center"
+            anchorY="middle"
+            fontWeight="bold"
+            maxWidth={cardWidth - 0.2}
+            lineHeight={1.1}
+          >
+            Real-Time Cab
+          </Text>
+
+          {/* Subtitle */}
+          <Text
+            position={[0, 0.88, 0]}
+            fontSize={0.13}
+            color="#00ff00"
+            anchorX="center"
+            anchorY="middle"
+            fontWeight="bold"
+            maxWidth={cardWidth - 0.2}
+          >
+            Booking Web App
+          </Text>
+
+          {/* Tech Stack Header */}
+          <Text
+            position={[0, 0.45, 0]}
+            fontSize={0.13}
+            color="#00d9ff"
+            anchorX="center"
+            anchorY="middle"
+            fontWeight="600"
+          >
+            Tech Stack:
+          </Text>
+
+          <Text
+            position={[0, 0.20, 0]}
+            fontSize={0.11}
+            color="#00d9ff"
+            anchorX="center"
+            anchorY="middle"
+            maxWidth={cardWidth - 0.1}
+            lineHeight={1.4}
+          >
+            React • Node • Express
+          </Text>
+
+          <Text
+            position={[0, 0.02, 0]}
+            fontSize={0.11}
+            color="#00d9ff"
+            anchorX="center"
+            anchorY="middle"
+            maxWidth={cardWidth - 0.1}
+            lineHeight={1.4}
+          >
+            Maps APIs • WebSockets
+          </Text>
+
+          {/* Three Squircle Link Buttons */}
+          {/* GitHub Button */}
+          <group position={[-0.55, -1.05, 0]}>
+            <mesh
+              onClick={() => window.open('https://github.com/amit7451/goCab', '_blank')}
+              onPointerOver={() => setButtonHovered(3)}
+              onPointerOut={() => setButtonHovered(null)}
+            >
+              <RoundedBox args={[0.35, 0.35, 0.05]} radius={0.1} smoothness={4}>
+                <meshStandardMaterial
+                  color="#24292e"
+                  roughness={0.5}
+                  metalness={0.3}
+                  emissiveIntensity={buttonHovered === 3 ? 0.6 : 0.2}
+                  emissive={buttonHovered === 3 ? "#00ff00" : "#000000"}
+                />
+              </RoundedBox>
+            </mesh>
+            {/* Icon on top */}
+            <mesh position={[0, 0, 0.04]}>
+              <planeGeometry args={[0.28, 0.28]} />
+              <meshBasicMaterial
+                map={githubTexture}
+                transparent={true}
+                toneMapped={false}
+                side={THREE.DoubleSide}
+              />
+            </mesh>
+          </group>
+
+          {/* Web Button */}
+          <group position={[0, -1.05, 0]}>
+            <mesh
+              onClick={() => window.open('https://gocab-1-frontend.onrender.com', '_blank')}
+              onPointerOver={() => setButtonHovered(4)}
+              onPointerOut={() => setButtonHovered(null)}
+            >
+              <RoundedBox args={[0.35, 0.35, 0.05]} radius={0.1} smoothness={4}>
+                <meshStandardMaterial
+                  color="#0ea5e9"
+                  roughness={0.5}
+                  metalness={0.3}
+                  emissiveIntensity={buttonHovered === 4 ? 0.6 : 0.2}
+                  emissive={buttonHovered === 4 ? "#00ff00" : "#000000"}
+                />
+              </RoundedBox>
+            </mesh>
+            {/* Icon on top */}
+            <mesh position={[0, 0, 0.04]}>
+              <planeGeometry args={[0.28, 0.28]} />
+              <meshBasicMaterial
+                map={webTexture}
+                transparent={true}
+                toneMapped={false}
+                side={THREE.DoubleSide}
+              />
+            </mesh>
+          </group>
+
+          {/* LinkedIn Button */}
+          <group position={[0.55, -1.05, 0]}>
+            <mesh
+              onClick={() => window.open('https://linkedin.com/in/amit-devspace', '_blank')}
+              onPointerOver={() => setButtonHovered(5)}
+              onPointerOut={() => setButtonHovered(null)}
+            >
+              <RoundedBox args={[0.35, 0.35, 0.05]} radius={0.1} smoothness={4}>
+                <meshStandardMaterial
+                  color="#0a66c2"
+                  roughness={0.5}
+                  metalness={0.3}
+                  emissiveIntensity={buttonHovered === 5 ? 0.6 : 0.2}
+                  emissive={buttonHovered === 5 ? "#0a66c2" : "#000000"}
+                />
+              </RoundedBox>
+            </mesh>
+            {/* Icon on top */}
+            <mesh position={[0, 0, 0.04]}>
+              <planeGeometry args={[0.28, 0.28]} />
+              <meshBasicMaterial
+                map={linkedinTexture}
+                transparent={true}
+                toneMapped={false}
+                side={THREE.DoubleSide}
+              />
+            </mesh>
+          </group>
+        </group>
+      )}
+
+      {/* PDF Suite Card Special Content */}
+      {cardId === 2 && (
+        <group position={[0, 0, cardDepth / 2 + 0.05]}>
+          {/* Title - Bold Green Heading Line 1 */}
+          <Text
+            position={[0, 1.4, 0]}
+            fontSize={0.18}
+            color="#00ff00"
+            anchorX="center"
+            anchorY="middle"
+            fontWeight="bold"
+            maxWidth={cardWidth - 0.2}
+            letterSpacing={0.02}
+          >
+            PDF Suite
+          </Text>
+
+          {/* Title - Line 2 */}
+          <Text
+            position={[0, 1.12, 0]}
+            fontSize={0.13}
+            color="#00ff00"
+            anchorX="center"
+            anchorY="middle"
+            fontWeight="bold"
+            maxWidth={cardWidth - 0.2}
+            lineHeight={1.1}
+          >
+            Web-based PDF
+          </Text>
+
+          {/* Subtitle */}
+          <Text
+            position={[0, 0.9, 0]}
+            fontSize={0.12}
+            color="#00ff00"
+            anchorX="center"
+            anchorY="middle"
+            fontWeight="bold"
+            maxWidth={cardWidth - 0.2}
+          >
+            Processing Platform
+          </Text>
+
+          {/* Tech Stack Header */}
+          <Text
+            position={[0, 0.45, 0]}
+            fontSize={0.13}
+            color="#00d9ff"
+            anchorX="center"
+            anchorY="middle"
+            fontWeight="600"
+          >
+            Tech Stack:
+          </Text>
+
+          <Text
+            position={[0, 0.20, 0]}
+            fontSize={0.11}
+            color="#00d9ff"
+            anchorX="center"
+            anchorY="middle"
+            maxWidth={cardWidth - 0.1}
+            lineHeight={1.4}
+          >
+            FastAPI • pypdf • pdfplumber
+          </Text>
+
+          <Text
+            position={[0, 0.02, 0]}
+            fontSize={0.11}
+            color="#00d9ff"
+            anchorX="center"
+            anchorY="middle"
+            maxWidth={cardWidth - 0.1}
+            lineHeight={1.4}
+          >
+            pdf2image • Pillow • Docker
+          </Text>
+
+          {/* Three Squircle Link Buttons */}
+          {/* GitHub Button */}
+          <group position={[-0.55, -1.05, 0]}>
+            <mesh
+              onClick={() => window.open('https://github.com/amit7451/PDF_Suite', '_blank')}
+              onPointerOver={() => setButtonHovered(6)}
+              onPointerOut={() => setButtonHovered(null)}
+            >
+              <RoundedBox args={[0.35, 0.35, 0.05]} radius={0.1} smoothness={4}>
+                <meshStandardMaterial
+                  color="#24292e"
+                  roughness={0.5}
+                  metalness={0.3}
+                  emissiveIntensity={buttonHovered === 6 ? 0.6 : 0.2}
+                  emissive={buttonHovered === 6 ? "#00ff00" : "#000000"}
+                />
+              </RoundedBox>
+            </mesh>
+            {/* Icon on top */}
+            <mesh position={[0, 0, 0.04]}>
+              <planeGeometry args={[0.28, 0.28]} />
+              <meshBasicMaterial
+                map={githubTexture}
+                transparent={true}
+                toneMapped={false}
+                side={THREE.DoubleSide}
+              />
+            </mesh>
+          </group>
+
+          {/* Web Button */}
+          <group position={[0, -1.05, 0]}>
+            <mesh
+              onClick={() => window.open('https://github.com/amit7451/PDF_Suite', '_blank')}
+              onPointerOver={() => setButtonHovered(7)}
+              onPointerOut={() => setButtonHovered(null)}
+            >
+              <RoundedBox args={[0.35, 0.35, 0.05]} radius={0.1} smoothness={4}>
+                <meshStandardMaterial
+                  color="#0ea5e9"
+                  roughness={0.5}
+                  metalness={0.3}
+                  emissiveIntensity={buttonHovered === 7 ? 0.6 : 0.2}
+                  emissive={buttonHovered === 7 ? "#00ff00" : "#000000"}
+                />
+              </RoundedBox>
+            </mesh>
+            {/* Icon on top */}
+            <mesh position={[0, 0, 0.04]}>
+              <planeGeometry args={[0.28, 0.28]} />
+              <meshBasicMaterial
+                map={webTexture}
+                transparent={true}
+                toneMapped={false}
+                side={THREE.DoubleSide}
+              />
+            </mesh>
+          </group>
+
+          {/* LinkedIn Button */}
+          <group position={[0.55, -1.05, 0]}>
+            <mesh
+              onClick={() => window.open('https://linkedin.com/in/amit-devspace', '_blank')}
+              onPointerOver={() => setButtonHovered(8)}
+              onPointerOut={() => setButtonHovered(null)}
+            >
+              <RoundedBox args={[0.35, 0.35, 0.05]} radius={0.1} smoothness={4}>
+                <meshStandardMaterial
+                  color="#0a66c2"
+                  roughness={0.5}
+                  metalness={0.3}
+                  emissiveIntensity={buttonHovered === 8 ? 0.6 : 0.2}
+                  emissive={buttonHovered === 8 ? "#0a66c2" : "#000000"}
+                />
+              </RoundedBox>
+            </mesh>
+            {/* Icon on top */}
+            <mesh position={[0, 0, 0.04]}>
+              <planeGeometry args={[0.28, 0.28]} />
+              <meshBasicMaterial
+                map={linkedinTexture}
+                transparent={true}
+                toneMapped={false}
+                side={THREE.DoubleSide}
+              />
+            </mesh>
+          </group>
+        </group>
+      )}
     </group>
   );
 }

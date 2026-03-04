@@ -4,7 +4,6 @@ import { useRef, useMemo } from 'react';
 import * as THREE from 'three';
 import { useTexture } from '@react-three/drei';
 import WallText from './WallText';
-import RisingLaserLines from './RisingLaserLines';
 
 interface AboutRoomProps {
   position?: [number, number, number];
@@ -23,6 +22,14 @@ export default function AboutRoom({
   const basePlasterTexture = useTexture('/3d/wall/textures/plaster.jpg');
   const baseCeilingTexture = useTexture('/3d/wall/textures/ceiling_interior.jpg');
   const baseFloorTexture = useTexture('/3d/wall/textures/floor.jpg');
+  
+  // Load certificate images
+  const nosqlTexture = useTexture('/3d/AboutRoom/images/nosql.png');
+  const cs50pTexture = useTexture('/3d/AboutRoom/images/cs50p.png');
+  const nlpTexture = useTexture('/3d/AboutRoom/images/nlp.png');
+  const aiTexture = useTexture('/3d/AboutRoom/images/ai.png');
+  const awscloudTexture = useTexture('/3d/AboutRoom/images/awscloud.png');
+  const mlTexture = useTexture('/3d/AboutRoom/images/ml.png');
 
   // Configure wall texture
   const wallTexture = useMemo(() => {
@@ -68,6 +75,50 @@ export default function AboutRoom({
   const floorY = 0;
   const ceilY = roomH;
 
+  // PhotoFrame Component
+  const PhotoFrame = ({
+    position,
+    width,
+    height,
+    texture,
+  }: {
+    position: [number, number, number];
+    width: number;
+    height: number;
+    texture?: THREE.Texture;
+  }) => {
+    const frameThickness = 0.15;
+    
+    return (
+      <group position={position}>
+        {/* Outer black frame */}
+        <mesh position={[0, 0, 0.01]}>
+          <planeGeometry args={[width, height]} />
+          <meshStandardMaterial
+            color="#000000"
+            metalness={0.3}
+            roughness={0.5}
+          />
+        </mesh>
+        {/* Inner content area with image */}
+        <mesh position={[0, 0, 0.02]}>
+          <planeGeometry
+            args={[width - frameThickness * 2, height - frameThickness * 2]}
+          />
+          {texture ? (
+            <meshBasicMaterial map={texture} toneMapped={false} />
+          ) : (
+            <meshStandardMaterial
+              color="#e8e4e0"
+              metalness={0.1}
+              roughness={0.8}
+            />
+          )}
+        </mesh>
+      </group>
+    );
+  };
+
   return (
     <group ref={groupRef} position={position} rotation={rotation} scale={scale}>
       {/* ═══ BACK WALL ═══ */}
@@ -75,9 +126,6 @@ export default function AboutRoom({
         <planeGeometry args={[roomW, roomH]} />
         <meshStandardMaterial map={wallTexture} color="#e8e4e0" roughness={0.9} metalness={0.02} />
       </mesh>
-
-      {/* Rising Laser Lines Effect */}
-      <RisingLaserLines wallWidth={roomW} wallZ={backWallZ} />
 
       {/* ═══ LEFT SIDE WALL ═══ */}
       <mesh position={[-roomW / 2, roomH / 2, 0]} rotation={[0, Math.PI / 2, 0]}>
@@ -135,6 +183,27 @@ export default function AboutRoom({
         roughness={0.85}
         metalness={0.05}
       />
+
+      {/* ═══ PHOTO FRAMES GROUP ═══ */}
+      <group position={[0, 0, backWallZ]}>
+        {/* Frame 1: Left-Top Portrait - NoSQL Certificate */}
+        <PhotoFrame position={[-5.2, 6, 0.03]} width={2.5} height={3.5} texture={nosqlTexture} />
+
+        {/* Frame 2: Center-Top Large Landscape - CS50P Certificate */}
+        <PhotoFrame position={[-1.57, 7.2, 0.03]} width={4.2} height={3} texture={cs50pTexture} />
+
+        {/* Frame 3: Right-Top Small Portrait - NLP Certificate */}
+        <PhotoFrame position={[1.85, 6.8, 0.03]} width={2} height={2.8} texture={nlpTexture} />
+
+        {/* Frame 4: Center-Middle Landscape - AI Certificate */}
+        <PhotoFrame position={[-1.65, 4.2, 0.03]} width={3.8} height={2.5} texture={aiTexture} />
+
+        {/* Frame 5: Right-Middle Landscape - AWS Cloud Certificate */}
+        <PhotoFrame position={[2.2, 4, 0.03]} width={3.5} height={2.3} texture={awscloudTexture} />
+
+        {/* Frame 6: Center-Bottom Large Landscape - ML Certificate */}
+        <PhotoFrame position={[5.0, 7, 0.03]} width={3.8} height={3} texture={mlTexture} />
+      </group>
 
       {/* ═══ ACCENT LIGHTING ═══ */}
       <pointLight
