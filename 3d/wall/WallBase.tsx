@@ -30,10 +30,10 @@ export default function WallBase({
   textureRepeatY = 2,
 }: WallBaseProps) {
   const meshRef = useRef<THREE.Mesh>(null);
-  
+
   // Load plaster texture for the back wall
   const baseTexture = useTexture('/3d/wall/textures/plaster.jpg');
-  
+
   // Configure texture with anisotropy to prevent flickering
   const texture = useMemo(() => {
     const cloned = baseTexture.clone();
@@ -41,7 +41,7 @@ export default function WallBase({
     cloned.repeat.set(textureRepeatX, textureRepeatY);
     cloned.magFilter = THREE.LinearFilter;
     cloned.minFilter = THREE.LinearMipmapLinearFilter;
-    cloned.anisotropy = 16;
+    cloned.anisotropy = 4;
     cloned.needsUpdate = true;
     return cloned;
   }, [baseTexture, textureRepeatX, textureRepeatY]);

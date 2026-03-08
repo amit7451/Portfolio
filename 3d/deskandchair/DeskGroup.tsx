@@ -1,11 +1,15 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { RoundedBox, Text3D, Center, Outlines, useCursor } from '@react-three/drei';
 import Desk from './Desk';
 import Chair from './Chair';
+import DeskLamp from './DeskLamp';
 import { Character } from '../character';
 import * as THREE from 'three';
+
+
 
 interface DeskGroupProps {
   position?: [number, number, number];
@@ -66,8 +70,8 @@ function StoolBoxButton({
         args={[0.92, 0.22, 0.52]}
         radius={0.06}
         smoothness={4}
-        castShadow
-        receiveShadow
+        castShadow={false}
+        receiveShadow={false}
       >
         <meshStandardMaterial
           color={color}
@@ -162,12 +166,12 @@ export default function DeskGroup({
       />
 
       <group position={[4.75, 0, 0.55]} scale={[1.42, 1.42, 1.42]}>
-        <mesh position={[0, 0.9, 0]} castShadow receiveShadow>
+        <mesh position={[0, 0.9, 0]} castShadow={false} receiveShadow={false}>
           <cylinderGeometry args={[0.58, 0.62, 0.12, 32]} />
           <meshStandardMaterial color="#6e4a2f" roughness={0.72} metalness={0.04} />
         </mesh>
 
-        <mesh position={[0, 0.82, 0]} castShadow>
+        <mesh position={[0, 0.82, 0]} castShadow={false}>
           <cylinderGeometry args={[0.46, 0.5, 0.06, 28]} />
           <meshStandardMaterial color="#5a3b26" roughness={0.76} metalness={0.03} />
         </mesh>
@@ -178,13 +182,13 @@ export default function DeskGroup({
           [0.3, 0.4, -0.3],
           [-0.3, 0.4, -0.3],
         ].map((legPos, idx) => (
-          <mesh key={`stool-leg-${idx}`} position={legPos as [number, number, number]} castShadow>
+          <mesh key={`stool-leg-${idx}`} position={legPos as [number, number, number]} castShadow={false}>
             <cylinderGeometry args={[0.05, 0.06, 0.78, 18]} />
             <meshStandardMaterial color="#5a3b26" roughness={0.75} metalness={0.03} />
           </mesh>
         ))}
 
-        <mesh position={[0, 0.1, 0]} castShadow>
+        <mesh position={[0, 0.1, 0]} castShadow={false}>
           <cylinderGeometry args={[0.34, 0.36, 0.05, 24]} />
           <meshStandardMaterial color="#4b301f" roughness={0.78} metalness={0.02} />
         </mesh>
@@ -197,6 +201,121 @@ export default function DeskGroup({
             />
           ))}
         </group>
+      </group>
+
+      {/* Promotion Block on the opposite side */}
+      <PromotionBlock position={[-5.5, 0.4, -0.5]} />
+
+      {/*
+        Desk lamp: placed on desk top surface.
+        DeskGroup is at world Y=0.22. Desk scale=1.8, deskY=1.54 → surface at 1.54*1.8=2.77.
+        Lamp position in DeskGroup local space: Y = 2.77.
+        X = -1.4 (left side of desk), Z = -0.9 (back edge near wall).
+      */}
+      <DeskLamp position={[-1.4, 2.77, -0.9]} scale={0.9} />
+    </group>
+  );
+}
+
+/**
+ * Sub-component for the Promotion Block
+ */
+function PromotionBlock({ position }: { position: [number, number, number] }) {
+  const router = useRouter();
+  const [hovered, setHovered] = useState(false);
+  useCursor(hovered);
+
+  const handleClick = (e: any) => {
+    e.stopPropagation();
+    router.push('/products');
+  };
+
+  return (
+    <group position={position} rotation={[0, Math.PI / 4, 0]}>
+      {/* Base Pedestal */}
+      <mesh position={[0, -0.2, 0]} castShadow={false}>
+        <boxGeometry args={[3, 0.4, 1.5]} />
+        <meshStandardMaterial color="#2a2a2a" roughness={0.7} metalness={0.2} />
+      </mesh>
+
+      {/* Main Backing Board */}
+      <mesh position={[0, 1.0, -0.5]} rotation={[-0.1, 0, 0]} castShadow={false}>
+        <boxGeometry args={[2.8, 1.6, 0.1]} />
+        <meshStandardMaterial color="#111111" roughness={0.4} metalness={0.3} />
+        {/* Neon Glow Outline */}
+        <Outlines thickness={0.02} color="#00ffff" opacity={0.5} transparent />
+      </mesh>
+
+      {/* Title Text */}
+      <Center position={[0, 1.3, -0.4]} rotation={[-0.1, 0, 0]}>
+        <Text3D
+          font="/fonts/helvetiker_bold.typeface.json"
+          size={0.16}
+          height={0.02}
+          curveSegments={4}
+        >
+          Want to Create a Similar
+          <meshStandardMaterial color="#ffffff" emissive="#bbbbbb" emissiveIntensity={0.2} />
+        </Text3D>
+      </Center>
+      <Center position={[0, 1.0, -0.4]} rotation={[-0.1, 0, 0]}>
+        <Text3D
+          font="/fonts/helvetiker_bold.typeface.json"
+          size={0.18}
+          height={0.02}
+          curveSegments={4}
+        >
+          Portfolio/Website?
+          <meshStandardMaterial color="#00ffff" emissive="#00ffff" emissiveIntensity={0.5} />
+        </Text3D>
+      </Center>
+
+      {/* Interactive Button */}
+      <group position={[0, 0.4, 0.2]} rotation={[-0.1, 0, 0]}>
+        <RoundedBox
+          args={[1.6, 0.4, 0.1]}
+          radius={0.05}
+          smoothness={2}
+          onClick={handleClick}
+          onPointerOver={(e) => { e.stopPropagation(); setHovered(true); }}
+          onPointerOut={(e) => { e.stopPropagation(); setHovered(false); }}
+        >
+          <meshStandardMaterial
+            color="#00cc66"
+            roughness={0.3}
+            metalness={0.2}
+            emissive="#00ff80"
+            emissiveIntensity={hovered ? 0.9 : 0.2}
+          />
+          {/* Edge Glow on Hover */}
+          <Outlines
+            thickness={hovered ? 0.06 : 0}
+            color="#00ff80"
+            transparent
+            opacity={hovered ? 1 : 0}
+          />
+        </RoundedBox>
+        {/* Point light that glows around the button on hover */}
+        {hovered && (
+          <pointLight
+            color="#00ff80"
+            intensity={3}
+            distance={1.6}
+            decay={2}
+            position={[0, 0, 0.3]}
+          />
+        )}
+        <Center position={[0, 0, 0.06]}>
+          <Text3D
+            font="/fonts/helvetiker_bold.typeface.json"
+            size={0.14}
+            height={0.01}
+            curveSegments={2}
+          >
+            CLICK HERE
+            <meshBasicMaterial color="#ffffff" />
+          </Text3D>
+        </Center>
       </group>
     </group>
   );

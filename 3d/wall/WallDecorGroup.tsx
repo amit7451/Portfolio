@@ -1,8 +1,8 @@
 'use client';
 
-import { useRef, useMemo } from 'react';
+import { useRef, useMemo, useState } from 'react';
 import * as THREE from 'three';
-import { useTexture } from '@react-three/drei';
+import { useTexture, useCursor } from '@react-three/drei';
 import WallBase from './WallBase';
 import FloorBase from './FloorBase';
 import SideWall from './SideWall';
@@ -32,7 +32,7 @@ export default function WallDecorGroup({
 }: WallDecorGroupProps) {
   const groupRef = useRef<THREE.Group>(null);
   const baseCeilingTexture = useTexture('/3d/wall/textures/ceiling_interior.jpg');
-  
+
   // Clone and configure ceiling texture with anisotropy to prevent flickering
   const ceilingTexture = useMemo(() => {
     const cloned = baseCeilingTexture.clone();
@@ -40,7 +40,7 @@ export default function WallDecorGroup({
     cloned.repeat.set(5, 5.5);
     cloned.magFilter = THREE.LinearFilter;
     cloned.minFilter = THREE.LinearMipmapLinearFilter;
-    cloned.anisotropy = 16;
+    cloned.anisotropy = 4;
     cloned.colorSpace = THREE.SRGBColorSpace;
     cloned.needsUpdate = true;
     return cloned;
@@ -87,10 +87,10 @@ export default function WallDecorGroup({
         textureRepeatX={8}
         textureRepeatY={4}
       />
-      
+
       {/* Wardrobe - Left Side Wall */}
       <Wardrobe
-        position={[-9.65, -3, 0]} 
+        position={[-9.65, -3, 0]}
         rotation={[0, Math.PI / 2, 0]}
         scale={[1, 1, 1]}
       />
@@ -120,7 +120,7 @@ export default function WallDecorGroup({
 
       {/* Main Title Text - aligned style with other rooms */}
       <WallText
-        position={[0, 7, -3.9]}
+        position={[0, 7.5, -3.9]}
         text="FULL STACK DEVELOPER"
         fontSize={0.9}
         depth={0.06}
@@ -190,7 +190,7 @@ export default function WallDecorGroup({
         height={2.2}
         frameColor="#3d2817"
       />
-      
+
       {/* Right side - 2 frames stacked */}
       <PhotoFrame
         position={[6.5, 5.5, -3.85]}
@@ -255,12 +255,12 @@ function Printer({ position = [0, 0, 0] as [number, number, number] }) {
   return (
     <group position={position}>
       {/* Main Body */}
-      <mesh castShadow>
+      <mesh castShadow={false}>
         <boxGeometry args={[1.2, 0.4, 0.6]} />
         <meshStandardMaterial color="#2a2a2a" roughness={0.3} metalness={0.2} />
       </mesh>
       {/* Paper Tray */}
-      <mesh position={[0, 0.25, 0.1]} castShadow>
+      <mesh position={[0, 0.25, 0.1]} castShadow={false}>
         <boxGeometry args={[0.8, 0.1, 0.4]} />
         <meshStandardMaterial color="#1a1a1a" roughness={0.4} metalness={0.1} />
       </mesh>
@@ -282,12 +282,12 @@ function PrinterWithPaper({ position = [0, 0, 0] as [number, number, number] }) 
   return (
     <group position={position}>
       {/* Main Body */}
-      <mesh castShadow>
+      <mesh castShadow={false}>
         <boxGeometry args={[1.2, 0.4, 0.6]} />
         <meshStandardMaterial color="#2a2a2a" roughness={0.3} metalness={0.2} />
       </mesh>
       {/* Paper Tray */}
-      <mesh position={[0, 0.25, 0.1]} castShadow>
+      <mesh position={[0, 0.25, 0.1]} castShadow={false}>
         <boxGeometry args={[0.8, 0.1, 0.4]} />
         <meshStandardMaterial color="#1a1a1a" roughness={0.4} metalness={0.1} />
       </mesh>
@@ -302,16 +302,16 @@ function PrinterWithPaper({ position = [0, 0, 0] as [number, number, number] }) 
         <meshStandardMaterial color="#1a3a2a" emissive="#0a2015" emissiveIntensity={0.3} />
       </mesh>
       {/* White paper stack on top */}
-      <mesh position={[0, 0.35, 0.05]} castShadow>
+      <mesh position={[0, 0.35, 0.05]} castShadow={false}>
         <boxGeometry args={[0.7, 0.08, 0.5]} />
         <meshStandardMaterial color="#ffffff" roughness={0.9} metalness={0} />
       </mesh>
       {/* Output paper tray with papers */}
-      <mesh position={[0, 0.1, 0.45]} rotation={[-0.2, 0, 0]} castShadow>
+      <mesh position={[0, 0.1, 0.45]} rotation={[-0.2, 0, 0]} castShadow={false}>
         <boxGeometry args={[0.65, 0.02, 0.3]} />
         <meshStandardMaterial color="#ffffff" roughness={0.9} metalness={0} />
       </mesh>
-      <mesh position={[0, 0.12, 0.48]} rotation={[-0.15, 0, 0]} castShadow>
+      <mesh position={[0, 0.12, 0.48]} rotation={[-0.15, 0, 0]} castShadow={false}>
         <boxGeometry args={[0.65, 0.02, 0.28]} />
         <meshStandardMaterial color="#f8f8f8" roughness={0.9} metalness={0} />
       </mesh>
@@ -325,7 +325,7 @@ function BookStack({ position = [0, 0, 0] as [number, number, number] }) {
   return (
     <group position={position}>
       {bookColors.map((color, i) => (
-        <mesh key={i} position={[0, i * 0.08, 0]} castShadow>
+        <mesh key={i} position={[0, i * 0.08, 0]} castShadow={false}>
           <boxGeometry args={[0.6, 0.07, 0.4]} />
           <meshStandardMaterial color={color} roughness={0.7} metalness={0.05} />
         </mesh>
@@ -354,11 +354,11 @@ function RandomBookStack({ position = [0, 0, 0] as [number, number, number] }) {
         const yPos = currentHeight + book.height / 2;
         currentHeight += book.height;
         return (
-          <mesh 
-            key={i} 
-            position={[book.xOffset, yPos, book.zOffset]} 
+          <mesh
+            key={i}
+            position={[book.xOffset, yPos, book.zOffset]}
             rotation={[0, book.rotation, 0]}
-            castShadow
+            castShadow={false}
           >
             <boxGeometry args={[book.width, book.height, book.depth]} />
             <meshStandardMaterial color={book.color} roughness={0.7} metalness={0.05} />
@@ -375,7 +375,7 @@ function BinderGroup({ position = [0, 0, 0] as [number, number, number] }) {
   return (
     <group position={position}>
       {binderColors.map((color, i) => (
-        <mesh key={i} position={[i * 0.15, 0, 0]} castShadow>
+        <mesh key={i} position={[i * 0.15, 0, 0]} castShadow={false}>
           <boxGeometry args={[0.12, 0.7, 0.35]} />
           <meshStandardMaterial color={color} roughness={0.6} metalness={0.1} />
         </mesh>
@@ -388,12 +388,12 @@ function CableCoil({ position = [0, 0, 0] as [number, number, number] }) {
   return (
     <group position={position}>
       {/* Coiled cable simplified as torus */}
-      <mesh rotation={[Math.PI / 2, 0, 0]} castShadow>
+      <mesh rotation={[Math.PI / 2, 0, 0]} castShadow={false}>
         <torusGeometry args={[0.15, 0.02, 8, 24]} />
         <meshStandardMaterial color="#1a1a1a" roughness={0.4} metalness={0.2} />
       </mesh>
       {/* Inner coils */}
-      <mesh position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0.3]} castShadow>
+      <mesh position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0.3]} castShadow={false}>
         <torusGeometry args={[0.1, 0.02, 8, 24]} />
         <meshStandardMaterial color="#1a1a1a" roughness={0.4} metalness={0.2} />
       </mesh>
@@ -410,19 +410,19 @@ function CRTMonitor({ position = [0, 0, 0] as [number, number, number] }) {
   return (
     <group position={position}>
       {/* Monitor body - boxy CRT shape */}
-      <mesh position={[0, 0.55, 0]} castShadow>
+      <mesh position={[0, 0.55, 0]} castShadow={false}>
         <boxGeometry args={[1.8, 1.5, 1.4]} />
         <meshStandardMaterial color="#c8c0b0" roughness={0.85} metalness={0.05} />
       </mesh>
 
       {/* Rear bulge (CRT tube) */}
-      <mesh position={[0, 0.55, -0.55]} castShadow>
+      <mesh position={[0, 0.55, -0.55]} castShadow={false}>
         <boxGeometry args={[1.5, 1.2, 0.5]} />
         <meshStandardMaterial color="#b8b0a0" roughness={0.9} metalness={0.05} />
       </mesh>
 
       {/* Screen bezel - dark frame */}
-      <mesh position={[0, 0.6, 0.71]} castShadow>
+      <mesh position={[0, 0.6, 0.71]} castShadow={false}>
         <boxGeometry args={[1.55, 1.25, 0.04]} />
         <meshStandardMaterial color="#3a3a3a" roughness={0.6} metalness={0.1} />
       </mesh>
@@ -474,13 +474,13 @@ function CRTMonitor({ position = [0, 0, 0] as [number, number, number] }) {
       </mesh>
 
       {/* Monitor stand/base */}
-      <mesh position={[0, -0.15, 0.1]} castShadow>
+      <mesh position={[0, -0.15, 0.1]} castShadow={false}>
         <boxGeometry args={[0.6, 0.15, 0.6]} />
         <meshStandardMaterial color="#b8b0a0" roughness={0.8} metalness={0.05} />
       </mesh>
 
       {/* Stand foot */}
-      <mesh position={[0, -0.22, 0.1]} castShadow>
+      <mesh position={[0, -0.22, 0.1]} castShadow={false}>
         <boxGeometry args={[1.0, 0.06, 0.8]} />
         <meshStandardMaterial color="#a8a090" roughness={0.85} metalness={0.05} />
       </mesh>
@@ -503,7 +503,7 @@ function CRTMonitor({ position = [0, 0, 0] as [number, number, number] }) {
 
       {/* Ventilation slots on side */}
       {Array.from({ length: 5 }).map((_, i) => (
-        <mesh key={i} position={[0.91, 0.35 + i * 0.12, 0]} castShadow>
+        <mesh key={i} position={[0.91, 0.35 + i * 0.12, 0]} castShadow={false}>
           <boxGeometry args={[0.01, 0.04, 0.6]} />
           <meshStandardMaterial color="#555" roughness={0.7} metalness={0.2} />
         </mesh>
@@ -513,26 +513,48 @@ function CRTMonitor({ position = [0, 0, 0] as [number, number, number] }) {
 }
 
 function LightStand({ position = [0, 0, 0] as [number, number, number] }) {
+  const [hovered, setHovered] = useState(false);
+  useCursor(hovered);
+
   return (
-    <group position={position} rotation={[0, -0.3, 0]}>
-      {/* Stand Base — sits on the floor */}
-      <mesh position={[0, 0.05, 0]} castShadow>
+    <group
+      position={position}
+      rotation={[0, -0.3, 0]}
+      onPointerOver={(e) => { e.stopPropagation(); setHovered(true); }}
+      onPointerOut={() => setHovered(false)}
+    >
+      {/* Stand Base */}
+      <mesh position={[0, 0.05, 0]} castShadow={false}>
         <cylinderGeometry args={[0.4, 0.5, 0.1]} />
         <meshStandardMaterial color="#1a1a1a" roughness={0.4} metalness={0.3} />
       </mesh>
-      {/* Stand Pole — rises from base */}
-      <mesh position={[0, 2.5, 0]} castShadow>
+      {/* Stand Pole */}
+      <mesh position={[0, 2.5, 0]} castShadow={false}>
         <cylinderGeometry args={[0.03, 0.04, 5]} />
         <meshStandardMaterial color="#2a2a2a" roughness={0.3} metalness={0.5} />
       </mesh>
-      {/* Umbrella Frame — at top of pole */}
-      <mesh position={[0, 5.3, 0]} rotation={[0.3, 0, 0]} castShadow>
+      {/* Shade — glows warm amber on hover */}
+      <mesh position={[0, 5.3, 0]} rotation={[0.3, 0, 0]} castShadow={false}>
         <coneGeometry args={[1.2, 0.8, 8, 1, true]} />
         <meshStandardMaterial
-          color="#f5f5f5"
+          color={hovered ? '#ffe8b0' : '#f5f5f5'}
+          emissive={hovered ? '#ffb830' : '#000000'}
+          emissiveIntensity={hovered ? 1.0 : 0}
           roughness={0.8}
           metalness={0}
           side={THREE.DoubleSide}
+        />
+      </mesh>
+      {/* Bulb glow sphere inside — visible through open shade bottom */}
+      <mesh position={[0, 4.9, 0]}>
+        <sphereGeometry args={[0.12, 10, 10]} />
+        <meshStandardMaterial
+          color={hovered ? '#fff5c0' : '#888888'}
+          emissive={hovered ? '#ffdd44' : '#000000'}
+          emissiveIntensity={hovered ? 3.5 : 0}
+          roughness={0.1}
+          metalness={0}
+          toneMapped={false}
         />
       </mesh>
     </group>

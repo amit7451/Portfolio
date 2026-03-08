@@ -29,46 +29,29 @@ export default function WallText({
   roughness = 1.0,
   metalness = 0,
 }: WallTextProps) {
-  const meshRef = useRef<THREE.Mesh>(null);
-  const groupRef = useRef<THREE.Group>(null);
-
-  useEffect(() => {
-    if (meshRef.current) {
-      // Calculate bounds to center the text
-      const geometry = meshRef.current.geometry;
-      geometry.computeBoundingBox();
-      const bbox = geometry.boundingBox;
-      if (bbox) {
-        const centerOffsetX = -(bbox.max.x - bbox.min.x) / 2 - bbox.min.x;
-        if (groupRef.current) {
-          groupRef.current.position.x = centerOffsetX;
-        }
-      }
-    }
-  }, [text, fontSize]);
-
   if (!visible) return null;
 
   return (
-    <group position={position} rotation={rotation} scale={scale} ref={groupRef}>
-      <Text3D
-        ref={meshRef}
-        font="/fonts/helvetiker_bold.typeface.json"
-        size={fontSize}
-        height={depth}
-        curveSegments={12}
-        bevelEnabled={false}
-        castShadow
-      >
-        {text}
-        <meshStandardMaterial
-          color={color}
-          roughness={roughness}
-          metalness={metalness}
-          envMapIntensity={0}
-          flatShading={false}
-        />
-      </Text3D>
+    <group position={position} rotation={rotation} scale={scale}>
+      <Center>
+        <Text3D
+          font="/fonts/helvetiker_bold.typeface.json"
+          size={fontSize}
+          height={depth}
+          curveSegments={4}
+          bevelEnabled={false}
+          castShadow={false}
+        >
+          {text}
+          <meshStandardMaterial
+            color={color}
+            roughness={roughness}
+            metalness={metalness}
+            envMapIntensity={0}
+            flatShading={false}
+          />
+        </Text3D>
+      </Center>
     </group>
   );
 }

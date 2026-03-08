@@ -21,12 +21,12 @@ export default function ProjectsRoom({
   rotation = [0, 0, 0],
   scale = [1, 1, 1],
 }: ProjectsRoomProps) {
-  const groupRef = useRef<THREE.Group>(null);  
+  const groupRef = useRef<THREE.Group>(null);
   // Load textures for walls and ceiling
   const basePlasterTexture = useTexture('/3d/wall/textures/plaster.jpg');
   const baseCeilingTexture = useTexture('/3d/wall/textures/ceiling_interior.jpg');
   const baseFloorTexture = useTexture('/3d/wall/textures/floor.jpg');
-  
+
   // Configure wall texture with anisotropy to prevent flickering
   const wallTexture = useMemo(() => {
     const cloned = basePlasterTexture.clone();
@@ -34,11 +34,11 @@ export default function ProjectsRoom({
     cloned.repeat.set(6, 3);
     cloned.magFilter = THREE.LinearFilter;
     cloned.minFilter = THREE.LinearMipmapLinearFilter;
-    cloned.anisotropy = 16;
+    cloned.anisotropy = 4;
     cloned.needsUpdate = true;
     return cloned;
   }, [basePlasterTexture]);
-  
+
   // Configure ceiling texture with anisotropy
   const ceilingTexture = useMemo(() => {
     const cloned = baseCeilingTexture.clone();
@@ -46,12 +46,12 @@ export default function ProjectsRoom({
     cloned.repeat.set(5, 5.5);
     cloned.magFilter = THREE.LinearFilter;
     cloned.minFilter = THREE.LinearMipmapLinearFilter;
-    cloned.anisotropy = 16;
+    cloned.anisotropy = 4;
     cloned.colorSpace = THREE.SRGBColorSpace;
     cloned.needsUpdate = true;
     return cloned;
   }, [baseCeilingTexture]);
-  
+
   // Configure floor texture with anisotropy
   const floorTexture = useMemo(() => {
     const cloned = baseFloorTexture.clone();
@@ -59,7 +59,7 @@ export default function ProjectsRoom({
     cloned.repeat.set(4, 11);
     cloned.magFilter = THREE.LinearFilter;
     cloned.minFilter = THREE.LinearMipmapLinearFilter;
-    cloned.anisotropy = 16;
+    cloned.anisotropy = 4;
     cloned.needsUpdate = true;
     return cloned;
   }, [baseFloorTexture]);
@@ -128,7 +128,7 @@ export default function ProjectsRoom({
 
       {/* ═══ "PROJECT ROOM" TITLE EMBEDDED IN WALL ═══ */}
       <WallText
-        position={[0, roomH - 2, backWallZ + 0.1]}
+        position={[0, roomH - 1.0, backWallZ + 0.1]}
         rotation={[0, 0, 0]}
         scale={[1, 1, 1]}
         color="#6b6560"
@@ -142,7 +142,7 @@ export default function ProjectsRoom({
       {/* ═══ PROJECT DISPLAY BOARDS ═══ */}
       {/* Left Project Board */}
       <ProjectBoard
-        position={[-6, roomH / 2 + 0.5, backWallZ + 0.1]}
+        position={[-6, roomH / 2, backWallZ + 0.1]}
         title="Project 1"
         color="#3a7ca5"
       />
@@ -167,26 +167,14 @@ export default function ProjectsRoom({
       <ProjectTable position={[5, 0, 1]} />
 
       {/* ═══ ACCENT LIGHTING ═══ */}
+      {/* Single light to optimize shader passes */}
       <pointLight
         position={[0, roomH - 1, 0]}
-        intensity={0.45}
+        intensity={0.65}
         color="#ffffff"
-        distance={15}
+        distance={20}
         decay={2}
-      />
-      <pointLight
-        position={[-6, roomH - 1, 0]}
-        intensity={0.15}
-        color="#e0e8ff"
-        distance={10}
-        decay={2}
-      />
-      <pointLight
-        position={[6, roomH - 1, 0]}
-        intensity={0.15}
-        color="#e0e8ff"
-        distance={10}
-        decay={2}
+        castShadow={false}
       />
     </group>
   );
@@ -206,7 +194,7 @@ function ProjectBoard({
   return (
     <group position={position}>
       {/* Board frame */}
-      <mesh castShadow>
+      <mesh castShadow={false}>
         <boxGeometry args={[4, 3, 0.08]} />
         <meshStandardMaterial color="#2a2a2a" roughness={0.3} metalness={0.4} />
       </mesh>
@@ -248,7 +236,7 @@ function ProjectTable({
   return (
     <group position={position}>
       {/* Table top */}
-      <mesh position={[0, tableH, 0]} castShadow receiveShadow>
+      <mesh position={[0, tableH, 0]} castShadow={false} receiveShadow={false}>
         <boxGeometry args={[tableW, 0.06, tableD]} />
         <meshStandardMaterial color="#4a3828" roughness={0.6} metalness={0.1} />
       </mesh>
@@ -259,7 +247,7 @@ function ProjectTable({
         [-tableW / 2 + 0.1, tableH / 2, tableD / 2 - 0.1],
         [tableW / 2 - 0.1, tableH / 2, tableD / 2 - 0.1],
       ].map((pos, i) => (
-        <mesh key={i} position={pos as [number, number, number]} castShadow>
+        <mesh key={i} position={pos as [number, number, number]} castShadow={false}>
           <boxGeometry args={[0.06, tableH, 0.06]} />
           <meshStandardMaterial color="#2a2a2a" roughness={0.3} metalness={0.5} />
         </mesh>
@@ -267,12 +255,12 @@ function ProjectTable({
       {/* Laptop on table */}
       <group position={[0, tableH + 0.06, 0]}>
         {/* Laptop base */}
-        <mesh castShadow>
+        <mesh castShadow={false}>
           <boxGeometry args={[0.7, 0.02, 0.45]} />
           <meshStandardMaterial color="#333333" roughness={0.3} metalness={0.5} />
         </mesh>
         {/* Laptop screen */}
-        <mesh position={[0, 0.25, -0.2]} rotation={[-0.2, 0, 0]} castShadow>
+        <mesh position={[0, 0.25, -0.2]} rotation={[-0.2, 0, 0]} castShadow={false}>
           <boxGeometry args={[0.68, 0.45, 0.01]} />
           <meshStandardMaterial color="#333333" roughness={0.3} metalness={0.5} />
         </mesh>

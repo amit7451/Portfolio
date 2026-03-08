@@ -22,7 +22,7 @@ export default function AboutRoom({
   const basePlasterTexture = useTexture('/3d/wall/textures/plaster.jpg');
   const baseCeilingTexture = useTexture('/3d/wall/textures/ceiling_interior.jpg');
   const baseFloorTexture = useTexture('/3d/wall/textures/floor.jpg');
-  
+
   // Load certificate images
   const nosqlTexture = useTexture('/3d/AboutRoom/images/nosql.png');
   const cs50pTexture = useTexture('/3d/AboutRoom/images/cs50p.png');
@@ -38,7 +38,7 @@ export default function AboutRoom({
     cloned.repeat.set(6, 3);
     cloned.magFilter = THREE.LinearFilter;
     cloned.minFilter = THREE.LinearMipmapLinearFilter;
-    cloned.anisotropy = 16;
+    cloned.anisotropy = 4;
     cloned.needsUpdate = true;
     return cloned;
   }, [basePlasterTexture]);
@@ -50,7 +50,7 @@ export default function AboutRoom({
     cloned.repeat.set(5, 5.5);
     cloned.magFilter = THREE.LinearFilter;
     cloned.minFilter = THREE.LinearMipmapLinearFilter;
-    cloned.anisotropy = 16;
+    cloned.anisotropy = 4;
     cloned.colorSpace = THREE.SRGBColorSpace;
     cloned.needsUpdate = true;
     return cloned;
@@ -63,7 +63,7 @@ export default function AboutRoom({
     cloned.repeat.set(4, 11);
     cloned.magFilter = THREE.LinearFilter;
     cloned.minFilter = THREE.LinearMipmapLinearFilter;
-    cloned.anisotropy = 16;
+    cloned.anisotropy = 4;
     cloned.needsUpdate = true;
     return cloned;
   }, [baseFloorTexture]);
@@ -88,7 +88,7 @@ export default function AboutRoom({
     texture?: THREE.Texture;
   }) => {
     const frameThickness = 0.15;
-    
+
     return (
       <group position={position}>
         {/* Outer black frame */}
@@ -173,7 +173,7 @@ export default function AboutRoom({
 
       {/* ═══ "ABOUT ME" TITLE ═══ */}
       <WallText
-        position={[0, roomH - 2, backWallZ + 0.1]}
+        position={[0, roomH - 1.5, backWallZ + 0.1]}
         rotation={[0, 0, 0]}
         scale={[1, 1, 1]}
         color="#6b6560"
@@ -206,34 +206,9 @@ export default function AboutRoom({
       </group>
 
       {/* ═══ ACCENT LIGHTING ═══ */}
-      <pointLight
-        position={[0, roomH - 1, 0]}
-        intensity={0.45}
-        color="#ffffff"
-        distance={10}
-        decay={2}
-      />
-      <pointLight
-        position={[-6, roomH - 1, 0]}
-        intensity={0.3}
-        color="#e0e8ff"
-        distance={8}
-        decay={2}
-      />
-      <pointLight
-        position={[6, roomH - 1, 0]}
-        intensity={0.35}
-        color="#e0e8ff"
-        distance={10}
-        decay={2}
-      />
-      <pointLight
-        position={[8, roomH / 2, 4]}
-        intensity={0.3}
-        color="#ffffff"
-        distance={10}
-        decay={2}
-      />
+      {/* Optimized lighting setup */}
+      <pointLight position={[0, roomH - 1, 0]} intensity={0.65} color="#ffffff" distance={20} decay={2} castShadow={false} />
+      <pointLight position={[8, roomH / 2, 4]} intensity={0.4} color="#e0e8ff" distance={15} decay={2} castShadow={false} />
     </group>
   );
 }

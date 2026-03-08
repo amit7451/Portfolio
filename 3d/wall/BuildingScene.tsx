@@ -102,6 +102,21 @@ function ScrollCamera() {
     return kf;
   }, [HERO_Y, LOOK_Y, INSIDE_Z, OUTSIDE_Z]);
 
+  useEffect(() => {
+    // Check if '?contact=true' is in the URL when scene mounts
+    if (typeof window !== 'undefined' && window.location.search.includes('contact=true')) {
+      // Auto-scroll to the bottom of the ScrollControls element slowly
+      setTimeout(() => {
+        if (scroll.el) {
+          scroll.el.scrollTo({
+            top: scroll.el.scrollHeight,
+            behavior: 'smooth'
+          });
+        }
+      }, 500); // 500ms delay to let the initial scene render
+    }
+  }, [scroll.el]);
+
   useFrame(() => {
     const offset = scroll.offset;
 
@@ -299,7 +314,7 @@ function NavigationController() {
       const { targetPage } = event.detail;
       // With 4 pages (0 to 3), the offsets are 0, 1/3, 2/3, 1
       const targetOffset = targetPage / 3;
-      
+
       const scrollContainer = scroll.el;
       // Calculate target scrollTop. scroll.el is the scroll container.
       // Maximum scroll is at offset 1.
@@ -334,121 +349,130 @@ export default function BuildingScene() {
         background: '#1a1a1a',
       }}
     >
-      <Canvas
-        camera={{
-          position: [0, 4.72, 14],
-          fov: 50,
-          near: 0.1,
-          far: 200,
-        }}
-        gl={{
-          antialias: true,
-          alpha: false,
-          powerPreference: 'high-performance',
-          toneMapping: THREE.ACESFilmicToneMapping,
-          toneMappingExposure: 1.2,
-        }}
-        dpr={[1, 2]}
-        style={{ width: '100%', height: '100%', display: 'block' }}
-        performance={{ min: 0.5 }}
-      >
-        <color attach="background" args={['#87CEEB']} />
+      <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+        <Canvas
+          camera={{
+            position: [0, 4.72, 14],
+            fov: 50,
+            near: 0.1,
+            far: 200,
+          }}
+          gl={{
+            antialias: true,
+            alpha: false,
+            powerPreference: 'high-performance',
+            toneMapping: THREE.ACESFilmicToneMapping,
+            toneMappingExposure: 1.2,
+          }}
+          dpr={[1, 2]}
+          style={{ width: '100%', height: '100%', display: 'block' }}
+          performance={{ min: 0.5 }}
+        >
+          <color attach="background" args={['#87CEEB']} />
 
-        {/* ScrollControls: 4 pages of scroll content */}
-        <ScrollControls pages={4} damping={0.25}>
-          <Suspense fallback={<LoadingFallback />}>
-            <ScrollCamera />
-            <NavigationController />
-            <BuildingLighting />
+          {/* ScrollControls: 4.5 pages to allow extra scroll buffer at the end */}
+          <ScrollControls pages={4.5} damping={0.25}>
+            <Suspense fallback={<LoadingFallback />}>
+              <ScrollCamera />
+              <NavigationController />
+              <BuildingLighting />
 
-            {/* Minimal environment - reduced GPU load */}
-            <Environment preset="studio" background={false} environmentIntensity={0.1} />
+              {/* Minimal environment - reduced GPU load */}
+              <Environment preset="studio" background={false} environmentIntensity={0.1} />
 
-            {/* ═══════════════════════════════════════════
-                BUILDING GROUP
-                Floor 0 = Developer Room (original scene)
-                Floor 1 = Projects Room
-                Floor 2 = About Me
-                Floor 3 = Contacts
-                Floors 4–5 = Empty/furnished shells
-            ════════════════════════════════════════════ */}
-            <group>
-              {/* ── Building exterior shell & floor slabs ── */}
-              <BuildingShell />
+              {/* ═══════════════════════════════════════════
+                  BUILDING GROUP
+                  Floor 0 = Developer Room (original scene)
+                  Floor 1 = Projects Room
+                  Floor 2 = About Me
+                  Floor 3 = Contacts
+                  Floors 4–5 = Empty/furnished shells
+              ════════════════════════════════════════════ */}
+              <group>
+                {/* ── Building exterior shell & floor slabs ── */}
+                <BuildingShell />
 
-              {/* ══ FLOOR 0: Developer Room (original) ══ */}
-              <group position={[0, 0, 0]}>
-                {/* Offset: the original WallDecorGroup has floor at Y=-3, center at Y=3
-                    We place it so floor aligns with building slab at Y=0.
-                    Original floor is at Y=-3, so shift group up by 3.
-                    Extra +0.22 to clear the 0.4-thick structural slab (top at Y=0.2). */}
-                <group position={[0, 3.22, 0]}>
-                  <WallDecorGroup position={[0, 0, 0]} />
+                {/* ══ FLOOR 0: Developer Room (original) ══ */}
+                <group position={[0, 0, 0]}>
+                  {/* Offset: the original WallDecorGroup has floor at Y=-3, center at Y=3
+                      We place it so floor aligns with building slab at Y=0.
+                      Original floor is at Y=-3, so shift group up by 3.
+                      Extra +0.22 to clear the 0.4-thick structural slab (top at Y=0.2). */}
+                  <group position={[0, 3.22, 0]}>
+                    <WallDecorGroup position={[0, 0, 0]} />
+                  </group>
+                  {/* DeskGroup was at [0, -3, 2] in original scene.
+                      Shift same +3.22 → [0, 0.22, 2] */}
+                  <DeskGroup position={[0, 0.22, 2]} />
+
+
+                  {/* Floor 0 Lights */}
+                  <pointLight
+                    position={[0, 9, 0]}
+                    intensity={0.45}
+                    color="#ffffff"
+                    distance={12}
+                    decay={2}
+                  />
+                  <pointLight
+                    position={[-6, 5, 2]}
+                    intensity={0.25}
+                    color="#e0e8ff"
+                    distance={10}
+                    decay={2}
+                  />
+
+                  {/* ══ NAV: HOME (0) ══ */}
+                  <LiftPanel
+                    currentFloorIndex={0}
+                    position={[9.2, 9.0, -3.8]}
+                  />
                 </group>
-                {/* DeskGroup was at [0, -3, 2] in original scene.
-                    Shift same +3.22 → [0, 0.22, 2] */}
-                <DeskGroup position={[0, 0.22, 2]} />
 
+                {/* ══ FLOOR 1: Projects Room ══ */}
+                <group position={[0, -FLOOR_SPACING, 0]}>
+                  <ProjectsRoom position={[0, 0.22, 0]} />
 
-                {/* Floor 0 Lights */}
-                <pointLight
-                  position={[0, 9, 0]} 
-                  intensity={0.45}
-                  color="#ffffff"
-                  distance={12}
-                  decay={2}
-                />
-                 <pointLight
-                  position={[-6, 5, 2]} 
-                  intensity={0.25}
-                  color="#e0e8ff"
-                  distance={10}
-                  decay={2}
-                />
+                  {/* ══ NAV: PROJECTS (1) ══ */}
+                  <LiftPanel
+                    currentFloorIndex={1}
+                    position={[9.2, 9.0, -3.8]}
+                  />
+                </group>
 
-                {/* ══ NAV: HOME (0) ══ */}
-                <LiftPanel 
-                  currentFloorIndex={0} 
-                  position={[9.2, 9.0, -3.8]} 
-                />
+                {/* ══ FLOOR 2: About Me Room ══ */}
+                <group position={[0, -2 * FLOOR_SPACING, 0]}>
+                  <AboutRoom position={[0, 0.22, 0]} />
+
+                  {/* ══ NAV: ABOUT (2) ══ */}
+                  <LiftPanel
+                    currentFloorIndex={2}
+                    position={[9.2, 9.0, -3.8]}
+                  />
+                </group>
+
+                {/* ══ FLOOR 3: Contacts Room ══ */}
+                <group position={[0, -3 * FLOOR_SPACING, 0]}>
+                  <ContactsRoom position={[0, 0.22, 0]} />
+
+                  {/* ══ NAV: CONTACT (3) ══ */}
+                  <LiftPanel
+                    currentFloorIndex={3}
+                    position={[9.2, 9.0, -3.8]}
+                  />
+                </group>
               </group>
+            </Suspense>
+          </ScrollControls>
+        </Canvas>
 
-              {/* ══ FLOOR 1: Projects Room ══ */}
-              <group position={[0, -FLOOR_SPACING, 0]}>
-                <ProjectsRoom position={[0, 0.22, 0]} />
-                
-                {/* ══ NAV: PROJECTS (1) ══ */}
-                <LiftPanel 
-                  currentFloorIndex={1} 
-                  position={[9.2, 9.0, -3.8]} 
-                />
-              </group>
-
-              {/* ══ FLOOR 2: About Me Room ══ */}
-              <group position={[0, -2 * FLOOR_SPACING, 0]}>
-                <AboutRoom position={[0, 0.22, 0]} />
-
-                {/* ══ NAV: ABOUT (2) ══ */}
-                <LiftPanel 
-                  currentFloorIndex={2} 
-                  position={[9.2, 9.0, -3.8]} 
-                />
-              </group>
-
-              {/* ══ FLOOR 3: Contacts Room ══ */}
-              <group position={[0, -3 * FLOOR_SPACING, 0]}>
-                <ContactsRoom position={[0, 0.22, 0]} />
-
-                {/* ══ NAV: CONTACT (3) ══ */}
-                <LiftPanel 
-                  currentFloorIndex={3} 
-                  position={[9.2, 9.0, -3.8]} 
-                />
-              </group>
-            </group>
-          </Suspense>
-        </ScrollControls>
-      </Canvas>
+        {/*
+          PORTAL ROOT
+          Provides a safe 2D DOM surface outside the WebGL/ScrollControls transformation matrix,
+          preventing the ContactsRoom Html component from getting scaled to 0px or clipped.
+        */}
+        <div id="html-portal-root" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }} />
+      </div>
     </div>
   );
 }
