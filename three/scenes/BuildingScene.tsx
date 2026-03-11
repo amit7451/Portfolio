@@ -1,7 +1,7 @@
 'use client';
 
 import { Canvas, useThree, useFrame } from '@react-three/fiber';
-import { Environment, ScrollControls, useScroll, ContactShadows } from '@react-three/drei';
+import { Environment, ScrollControls, useScroll } from '@react-three/drei';
 import { Suspense, useRef, useMemo, useEffect } from 'react';
 import * as THREE from 'three';
 import WallDecorGroup from '../models/wall/WallDecorGroup';
@@ -10,6 +10,7 @@ import ProjectsRoom from '../rooms/ProjectsRoom';
 import AboutRoom from '../rooms/AboutRoom';
 import ContactsRoom from '../rooms/ContactsRoom';
 import LiftPanel from '../models/wall/LiftPanel';
+import CanvasLoader from '../../components/CanvasLoader';
 
 // ────────────────────────────────────────────────────
 // CONSTANTS — Room & Building geometry
@@ -294,15 +295,6 @@ function BuildingLighting() {
 // ────────────────────────────────────────────────────
 // Loading fallback
 // ────────────────────────────────────────────────────
-function LoadingFallback() {
-  return (
-    <mesh>
-      <boxGeometry args={[1, 1, 1]} />
-      <meshStandardMaterial color="#444" />
-    </mesh>
-  );
-}
-
 // ────────────────────────────────────────────────────
 // NavigationController — Handles navigation sign clicks
 // ────────────────────────────────────────────────────
@@ -372,7 +364,7 @@ export default function BuildingScene() {
 
           {/* ScrollControls: 4.5 pages to allow extra scroll buffer at the end */}
           <ScrollControls pages={4.5} damping={0.25}>
-            <Suspense fallback={<LoadingFallback />}>
+            <Suspense fallback={<CanvasLoader message="Loading 3D Assets" />}>
               <ScrollCamera />
               <NavigationController />
               <BuildingLighting />

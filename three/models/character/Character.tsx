@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
+import { useRef, useLayoutEffect, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useGLTF, useAnimations } from '@react-three/drei';
 import * as THREE from 'three';
@@ -18,7 +18,8 @@ export default function Character({
 }: CharacterProps) {
   const group = useRef<THREE.Group>(null);
   const { scene: characterModel, animations } = useGLTF('/model/char_Typing.glb');
-  const { mixer, actions } = useAnimations(animations, group);
+  const { actions } = useAnimations(animations, group);
+  const [animationReady, setAnimationReady] = useState(false);
 
   // Animation state for subtle breathing/typing motion
   const animationState = useRef({
@@ -27,19 +28,30 @@ export default function Character({
     typingPhase: 0,
   });
 
-  useEffect(() => {
-    // Start typing animation if available
-    if (actions && Object.keys(actions).length > 0) {
-      const firstAction = Object.values(actions)[0];
-      if (firstAction) {
-        firstAction.play();
-        firstAction.setLoop(THREE.LoopRepeat, Infinity);
+  useLayoutEffect(() => {
+    const firstAction = Object.values(actions).find(Boolean);
+    if (!firstAction) {
+      if (animations.length === 0) {
+        setAnimationReady(true);
       }
+      return;
     }
-  }, [actions]);
 
-  useFrame((state, delta) => {
-    if (!group.current) return;
+    firstAction.reset();
+    firstAction.setLoop(THREE.LoopRepeat, Infinity);
+    firstAction.clampWhenFinished = false;
+    firstAction.fadeIn(0.1);
+    firstAction.play();
+    setAnimationReady(true);
+
+    return () => {
+      firstAction.fadeOut(0.1);
+      firstAction.stop();
+    };
+  }, [actions, animations.length]);
+
+  useFrame((_, delta) => {
+    if (!group.current || !animationReady) return;
 
     animationState.current.time += delta;
     
@@ -96,6 +108,7 @@ export default function Character({
           object={characterModel} 
           castShadow 
           receiveShadow
+          visible={animationReady}
           scale={1.0}
           position={[0, 0, 0]}
         />

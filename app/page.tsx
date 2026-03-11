@@ -2,57 +2,12 @@
 
 import dynamic from 'next/dynamic';
 import { useState, useEffect, useCallback } from 'react';
+import Loader from '../components/Loader';
 
 // Dynamic import to avoid SSR issues with Three.js
 const BuildingScene = dynamic(() => import('../three/scenes/BuildingScene'), {
   ssr: false,
-  loading: () => (
-    <div
-      className="hero-loading"
-      style={{
-        width: '100vw',
-        height: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: '#1a1a1a',
-        color: '#fff',
-        fontFamily: 'system-ui, -apple-system, sans-serif',
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        zIndex: 9999,
-      }}
-    >
-      <div style={{ textAlign: 'center' }}>
-        <div
-          style={{
-            width: '48px',
-            height: '48px',
-            border: '3px solid #333',
-            borderTop: '3px solid #c9a227',
-            borderRadius: '50%',
-            animation: 'spin 1s linear infinite',
-            margin: '0 auto 24px',
-          }}
-        />
-        <p style={{ 
-          fontSize: '14px', 
-          letterSpacing: '2px',
-          textTransform: 'uppercase',
-          color: '#888'
-        }}>
-          Loading Scene
-        </p>
-        <style>{`
-          @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-        `}</style>
-      </div>
-    </div>
-  ),
+  loading: () => <Loader message="Loading Experience" />,
 });
 
 export default function Home() {

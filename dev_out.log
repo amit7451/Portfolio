@@ -1,0 +1,21 @@
+
+> portfolio-3d@0.1.0 dev
+> next dev -p 3000
+
+  ▲ Next.js 14.2.35
+  - Local:        http://localhost:3000
+  - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 1323ms
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 1460ms (454 modules)
+ GET /_next/static/webpack/f3eb4c7360578556.webpack.hot-update.json 404 in 1555ms
+ ○ Compiling / ...
+ ✓ Compiled / in 5.2s (1679 modules)
+ GET / 200 in 5189ms
+ GET / 200 in 115ms
+ GET /_next/static/webpack/f3eb4c7360578556.webpack.hot-update.json 404 in 120ms
+ GET / 200 in 31ms
+ GET / 200 in 55ms
+[?25h
