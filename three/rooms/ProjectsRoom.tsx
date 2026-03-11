@@ -178,35 +178,6 @@ export default function ProjectsRoom({
       <ProjectTable position={[5, 0, 4]} cardId={2} />
 
       {/* ═══ ACCENT LIGHTING ═══ */}
-      <pointLight
-        position={[0, roomH - 1, 0]}
-        intensity={0.6}
-        color="#ffffff"
-        distance={10}
-        decay={2}
-      />
-      <pointLight
-        position={[-6, roomH - 1, 0]}
-        intensity={0.3}
-        color="#e0e8ff"
-        distance={8}
-        decay={2}
-      />
-      {/* Enhanced right side lighting */}
-      <pointLight
-        position={[6, roomH - 1, 0]}
-        intensity={0.5}
-        color="#e0e8ff"
-        distance={8}
-        decay={2}
-      />
-      <pointLight
-        position={[8, roomH / 2, 4]}
-        intensity={0.4}
-        color="#ffffff"
-        distance={8}
-        decay={2}
-      />
     </group>
   );
 }

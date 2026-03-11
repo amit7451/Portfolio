@@ -122,9 +122,6 @@ export default function ContactsRoom({
       {/* Embedded Touchscreen Monitor aligned to the ProjectsRoom architecture */}
       <ContactBoard position={[0, 4.0, backWallZ + 0.1]} />
 
-      {/* Only using 2 lights for performance instead of 5 */}
-      <pointLight position={[0, roomH - 1, 0]} intensity={0.6} color="#ffffff" distance={15} decay={2} castShadow={false} />
-      <pointLight position={[0, 4.0, 4]} intensity={0.4} color="#e0e8ff" distance={10} decay={2} />
     </group>
   );
 }

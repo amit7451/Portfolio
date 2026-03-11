@@ -207,8 +207,6 @@ export default function AboutRoom({
 
       {/* ═══ ACCENT LIGHTING ═══ */}
       {/* Optimized lighting setup */}
-      <pointLight position={[0, roomH - 1, 0]} intensity={0.65} color="#ffffff" distance={20} decay={2} castShadow={false} />
-      <pointLight position={[8, roomH / 2, 4]} intensity={0.4} color="#e0e8ff" distance={15} decay={2} castShadow={false} />
     </group>
   );
 }

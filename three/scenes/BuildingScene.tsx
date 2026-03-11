@@ -2,7 +2,7 @@
 
 import { Canvas, useThree, useFrame } from '@react-three/fiber';
 import { Environment, ScrollControls, useScroll } from '@react-three/drei';
-import { Suspense, useRef, useMemo, useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
 import * as THREE from 'three';
 import WallDecorGroup from '../models/wall/WallDecorGroup';
 import DeskGroup from '../models/deskandchair/DeskGroup';
@@ -36,15 +36,6 @@ const BUILDING_TOP_Y = 3; // Y-center of floor 0 = developer room center
 // Each room transition: inside → outside → descend → to next room
 // ────────────────────────────────────────────────────
 
-function lerpValue(a: number, b: number, t: number) {
-  return a + (b - a) * t;
-}
-
-function smoothstep(edge0: number, edge1: number, x: number) {
-  const t = Math.max(0, Math.min(1, (x - edge0) / (edge1 - edge0)));
-  return t * t * (3 - 2 * t);
-}
-
 // ────────────────────────────────────────────────────
 // ScrollCamera — reads useScroll offset & animates
 // ────────────────────────────────────────────────────
@@ -52,56 +43,11 @@ function ScrollCamera() {
   const { camera } = useThree();
   const scroll = useScroll();
 
-  // Key positions
-  const INSIDE_Z = 14;
-  const OUTSIDE_Z = 26;
-  const HERO_Y = 4.72;
-  const LOOK_Y = 3.72;
-
-  const keyframes = useMemo(() => {
-    const kf = [];
-
-    // Floor 0: Developer Room (0.00 -> 0.20)
-    kf.push(
-      { s: 0.00, y: HERO_Y, z: INSIDE_Z, ly: LOOK_Y }, // inside dev room
-      { s: 0.10, y: HERO_Y, z: INSIDE_Z, ly: LOOK_Y }, // hero hold slightly longer
-      { s: 0.20, y: HERO_Y, z: OUTSIDE_Z, ly: LOOK_Y - 1 } // outside dev room
-    );
-
-    // Transition to Floor 1: Projects Room (0.20 -> 0.33)
-    kf.push(
-      { s: 0.28, y: HERO_Y - FLOOR_SPACING, z: OUTSIDE_Z, ly: LOOK_Y - FLOOR_SPACING - 1 },
-      { s: 0.33, y: HERO_Y - FLOOR_SPACING, z: INSIDE_Z, ly: LOOK_Y - FLOOR_SPACING }
-    );
-
-    // Floor 1: Projects Room - inside (0.33 -> 0.53)
-    kf.push(
-      { s: 0.33, y: HERO_Y - FLOOR_SPACING, z: INSIDE_Z, ly: LOOK_Y - FLOOR_SPACING },
-      { s: 0.43, y: HERO_Y - FLOOR_SPACING, z: INSIDE_Z, ly: LOOK_Y - FLOOR_SPACING },
-      { s: 0.53, y: HERO_Y - FLOOR_SPACING, z: OUTSIDE_Z, ly: LOOK_Y - FLOOR_SPACING - 1 }
-    );
-
-    // Transition to Floor 2: About Room (0.53 -> 0.66)
-    kf.push(
-      { s: 0.61, y: HERO_Y - 2 * FLOOR_SPACING, z: OUTSIDE_Z, ly: LOOK_Y - 2 * FLOOR_SPACING - 1 },
-      { s: 0.66, y: HERO_Y - 2 * FLOOR_SPACING, z: INSIDE_Z, ly: LOOK_Y - 2 * FLOOR_SPACING }
-    );
-
-    // Floor 2: About Room - inside (0.66 -> 0.86)
-    kf.push(
-      { s: 0.66, y: HERO_Y - 2 * FLOOR_SPACING, z: INSIDE_Z, ly: LOOK_Y - 2 * FLOOR_SPACING },
-      { s: 0.76, y: HERO_Y - 2 * FLOOR_SPACING, z: INSIDE_Z, ly: LOOK_Y - 2 * FLOOR_SPACING },
-      { s: 0.86, y: HERO_Y - 2 * FLOOR_SPACING, z: OUTSIDE_Z, ly: LOOK_Y - 2 * FLOOR_SPACING - 1 }
-    );
-
-    // Transition to Floor 3: Contacts Room (0.86 -> 1.00)
-    kf.push(
-      { s: 0.94, y: HERO_Y - 3 * FLOOR_SPACING, z: OUTSIDE_Z, ly: LOOK_Y - 3 * FLOOR_SPACING - 1 },
-      { s: 1.00, y: HERO_Y - 3 * FLOOR_SPACING, z: INSIDE_Z, ly: LOOK_Y - 3 * FLOOR_SPACING }
-    );
-
-    return kf;
-  }, [HERO_Y, LOOK_Y, INSIDE_Z, OUTSIDE_Z]);
+  const insideZ = 14;
+  const outsideZ = 26;
+  const heroY = 4.72;
+  const lookY = 3.72;
+  const floorsToTravel = FLOOR_COUNT - 1;
 
   useEffect(() => {
     // Check if '?contact=true' is in the URL when scene mounts
@@ -119,26 +65,19 @@ function ScrollCamera() {
   }, [scroll.el]);
 
   useFrame(() => {
-    const offset = scroll.offset;
+    const clampedOffset = Math.max(0, Math.min(1, scroll.offset));
+    const floorProgress = clampedOffset * floorsToTravel;
+    const localProgress = floorProgress - Math.floor(floorProgress);
 
-    // Find keyframe segment
-    let i = 0;
-    for (let k = 0; k < keyframes.length - 1; k++) {
-      if (offset >= keyframes[k].s) i = k;
-    }
+    const transitionCurve = Math.sin(localProgress * Math.PI);
+    const transitionStrength = transitionCurve * transitionCurve;
 
-    const kf0 = keyframes[i];
-    const kf1 = keyframes[Math.min(i + 1, keyframes.length - 1)];
-
-    const segLen = kf1.s - kf0.s;
-    const t = segLen > 0 ? Math.max(0, Math.min(1, (offset - kf0.s) / segLen)) : 0;
-
-    const camY = kf0.y + (kf1.y - kf0.y) * t;
-    const camZ = kf0.z + (kf1.z - kf0.z) * t;
-    const lookY = kf0.ly + (kf1.ly - kf0.ly) * t;
+    const camY = heroY - floorProgress * FLOOR_SPACING;
+    const camZ = insideZ + (outsideZ - insideZ) * transitionStrength;
+    const targetLookY = lookY - floorProgress * FLOOR_SPACING - transitionCurve * 0.6;
 
     camera.position.set(0, camY, camZ);
-    camera.lookAt(0, lookY, 0);
+    camera.lookAt(0, targetLookY, 0);
   });
 
   return null;
@@ -232,62 +171,24 @@ function BuildingShell() {
 // ────────────────────────────────────────────────────
 // FloorModules — Duplicate room shells for floors 2–4
 // ────────────────────────────────────────────────────
-function EmptyFloorRoom({
-  position,
-  floorLabel,
-}: {
-  position: [number, number, number];
-  floorLabel: string;
-}) {
-  const wallColor = '#eae6e1';
-
-  return (
-    <group position={position}>
-      {/* Back wall */}
-      <mesh position={[0, ROOM_HEIGHT / 2, -ROOM_DEPTH / 2 + 0.1]}>
-        <planeGeometry args={[ROOM_WIDTH, ROOM_HEIGHT]} />
-        <meshStandardMaterial color={wallColor} roughness={0.9} metalness={0.02} />
-      </mesh>
-      {/* Left wall */}
-      <mesh position={[-ROOM_WIDTH / 2 + 0.1, ROOM_HEIGHT / 2, 0]} rotation={[0, Math.PI / 2, 0]}>
-        <planeGeometry args={[ROOM_DEPTH, ROOM_HEIGHT]} />
-        <meshStandardMaterial color={wallColor} roughness={0.9} metalness={0.02} />
-      </mesh>
-      {/* Right wall */}
-      <mesh position={[ROOM_WIDTH / 2 - 0.1, ROOM_HEIGHT / 2, 0]} rotation={[0, -Math.PI / 2, 0]}>
-        <planeGeometry args={[ROOM_DEPTH, ROOM_HEIGHT]} />
-        <meshStandardMaterial color={wallColor} roughness={0.9} metalness={0.02} />
-      </mesh>
-      {/* Floor */}
-      <mesh position={[0, 0.05, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[ROOM_WIDTH, ROOM_DEPTH]} />
-        <meshStandardMaterial color="#c4b498" roughness={0.8} metalness={0.05} />
-      </mesh>
-      {/* Ceiling */}
-      <mesh position={[0, ROOM_HEIGHT - 0.05, 0]} rotation={[Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[ROOM_WIDTH, ROOM_DEPTH]} />
-        <meshStandardMaterial color="#f0ece8" roughness={0.9} metalness={0} />
-      </mesh>
-      {/* Interior light */}
-      <pointLight
-        position={[0, ROOM_HEIGHT - 1, 0]}
-        intensity={0.4}
-        color="#ffffff"
-        distance={15}
-        decay={2}
-      />
-    </group>
-  );
-}
-
 // ────────────────────────────────────────────────────
 // Scene Lighting — Minimal global, cinematic per-room
 // ────────────────────────────────────────────────────
 function BuildingLighting() {
   return (
     <>
-      {/* Single ambient light for minimal GPU usage */}
-      <ambientLight intensity={0.5} color="#ffffff" />
+      {/* Low-cost consistent room lighting rig */}
+      <ambientLight intensity={0.45} color="#f7f8ff" />
+      <directionalLight
+        position={[10, 12, 8]}
+        intensity={0.7}
+        color="#fff5ea"
+      />
+      <directionalLight
+        position={[-9, 7, -6]}
+        intensity={0.3}
+        color="#d9e6ff"
+      />
     </>
   );
 }
@@ -356,14 +257,17 @@ export default function BuildingScene() {
             toneMapping: THREE.ACESFilmicToneMapping,
             toneMappingExposure: 1.2,
           }}
+          onCreated={({ gl }) => {
+            gl.shadowMap.enabled = false;
+          }}
           dpr={[1, 2]}
           style={{ width: '100%', height: '100%', display: 'block' }}
           performance={{ min: 0.5 }}
         >
           <color attach="background" args={['#87CEEB']} />
 
-          {/* ScrollControls: 4.5 pages to allow extra scroll buffer at the end */}
-          <ScrollControls pages={4.5} damping={0.25}>
+          {/* Tight damping for immediate scroll response */}
+          <ScrollControls pages={4} damping={0.08}>
             <Suspense fallback={<CanvasLoader message="Loading 3D Assets" />}>
               <ScrollCamera />
               <NavigationController />
@@ -398,21 +302,6 @@ export default function BuildingScene() {
                   <DeskGroup position={[0, 0.22, 2]} />
 
 
-                  {/* Floor 0 Lights */}
-                  <pointLight
-                    position={[0, 9, 0]}
-                    intensity={0.45}
-                    color="#ffffff"
-                    distance={12}
-                    decay={2}
-                  />
-                  <pointLight
-                    position={[-6, 5, 2]}
-                    intensity={0.25}
-                    color="#e0e8ff"
-                    distance={10}
-                    decay={2}
-                  />
 
                   {/* ══ NAV: HOME (0) ══ */}
                   <LiftPanel
