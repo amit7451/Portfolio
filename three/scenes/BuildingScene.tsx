@@ -1,8 +1,8 @@
 'use client';
 
 import { Canvas, useThree, useFrame } from '@react-three/fiber';
-import { Environment, ScrollControls, useScroll } from '@react-three/drei';
-import { Suspense, useEffect } from 'react';
+import { PerformanceMonitor, Environment, ScrollControls, useScroll } from '@react-three/drei';
+import { Suspense, useEffect, useState } from 'react';
 import * as THREE from 'three';
 import WallDecorGroup from '../models/wall/WallDecorGroup';
 import DeskGroup from '../models/deskandchair/DeskGroup';
@@ -231,6 +231,7 @@ function NavigationController() {
 // BuildingScene — Main exported component
 // ────────────────────────────────────────────────────
 export default function BuildingScene() {
+  const [dpr, setDpr] = useState(1.5);
   return (
     <div
       style={{
@@ -251,7 +252,7 @@ export default function BuildingScene() {
             far: 200,
           }}
           gl={{
-            antialias: true,
+            antialias: false,
             alpha: false,
             powerPreference: 'high-performance',
             toneMapping: THREE.ACESFilmicToneMapping,
@@ -260,10 +261,11 @@ export default function BuildingScene() {
           onCreated={({ gl }) => {
             gl.shadowMap.enabled = false;
           }}
-          dpr={[1, 2]}
+          dpr={dpr}
           style={{ width: '100%', height: '100%', display: 'block' }}
           performance={{ min: 0.5 }}
         >
+          <PerformanceMonitor onIncline={() => setDpr(1.5)} onDecline={() => setDpr(1)}>
           <color attach="background" args={['#87CEEB']} />
 
           {/* Tight damping for immediate scroll response */}
@@ -345,6 +347,7 @@ export default function BuildingScene() {
               </group>
             </Suspense>
           </ScrollControls>
+          </PerformanceMonitor>
         </Canvas>
 
         {/*
