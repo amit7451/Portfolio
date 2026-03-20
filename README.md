@@ -33,7 +33,7 @@ portfolio_main/
 └── ...
 ```
 
-## Route compatibility
+## Route compatibilities
 
 - Primary pages: `/`, `/projects`, `/contact`
 - Legacy aliases kept: `/products`, `/contacts`
