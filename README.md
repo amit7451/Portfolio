@@ -9,7 +9,7 @@ npm install
 npm run dev
 ```
 
-## Standardized structure
+## Standardized project structure
 
 ```text
 portfolio_main/
