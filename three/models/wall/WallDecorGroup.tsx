@@ -2,7 +2,8 @@
 
 import { useRef, useMemo, useState } from 'react';
 import * as THREE from 'three';
-import { useTexture, useCursor } from '@react-three/drei';
+import { useTexture, useCursor, RoundedBox, Text } from '@react-three/drei';
+import { useRouter } from 'next/navigation';
 import WallBase from './WallBase';
 import FloorBase from './FloorBase';
 import SideWall from './SideWall';
@@ -129,6 +130,9 @@ export default function WallDecorGroup({
         metalness={0.05}
       />
 
+      {/* Article Navigation Button */}
+      <ArticleButton position={[0, 6.0, -3.8]} />
+
       {/* Upper Shelf - shorter, centered */}
       <Shelf
         position={[0, 4.5, -3.3]}
@@ -250,6 +254,54 @@ export default function WallDecorGroup({
 }
 
 // Additional Decorative Components
+
+function ArticleButton({ position = [0, 0, 0] as [number, number, number] }) {
+  const [hovered, setHover] = useState(false);
+  useCursor(hovered);
+  const router = useRouter();
+
+  return (
+    <group
+      position={position}
+      scale={hovered ? 1.05 : 1}
+      onPointerOver={(e) => {
+        e.stopPropagation();
+        setHover(true);
+      }}
+      onPointerOut={(e) => {
+        e.stopPropagation();
+        setHover(false);
+      }}
+      onClick={(e) => {
+        e.stopPropagation();
+        router.push('/article');
+      }}
+    >
+      {hovered && (
+        <mesh position={[0, 0, -0.02]}>
+          <planeGeometry args={[2.7, 1.0]} />
+          <meshBasicMaterial color="#00d9ff" transparent opacity={0.3} />
+        </mesh>
+      )}
+      <RoundedBox args={[2.5, 0.8, 0.1]} radius={0.1} smoothness={4}>
+        <meshStandardMaterial
+          color={hovered ? '#00d9ff' : '#1a1a1a'}
+          metalness={0.5}
+          roughness={0.2}
+        />
+      </RoundedBox>
+      <Text
+        position={[0, 0, 0.06]}
+        fontSize={0.28}
+        color={hovered ? '#050505' : '#00d9ff'}
+        anchorX="center"
+        anchorY="middle"
+      >
+        READ ARTICLE
+      </Text>
+    </group>
+  );
+}
 
 function Printer({ position = [0, 0, 0] as [number, number, number] }) {
   return (
