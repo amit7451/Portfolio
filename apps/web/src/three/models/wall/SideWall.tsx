@@ -34,7 +34,7 @@ export default function SideWall({
   const meshRef = useRef<THREE.Mesh>(null);
   
   // Load plaster texture
-  const baseTexture = useTexture('/3d/wall/textures/plaster.jpg');
+  const baseTexture = useTexture('/3d/wall/textures/plaster.webp');
   
   // Clone and configure texture once with stable settings and anisotropy
   const texture = useMemo(() => {

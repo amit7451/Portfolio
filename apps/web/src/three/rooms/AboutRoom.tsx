@@ -19,17 +19,17 @@ export default function AboutRoom({
   const groupRef = useRef<THREE.Group>(null);
 
   // Load textures
-  const basePlasterTexture = useTexture('/3d/wall/textures/plaster.jpg');
-  const baseCeilingTexture = useTexture('/3d/wall/textures/ceiling_interior.jpg');
-  const baseFloorTexture = useTexture('/3d/wall/textures/floor.jpg');
+  const basePlasterTexture = useTexture('/3d/wall/textures/plaster.webp');
+  const baseCeilingTexture = useTexture('/3d/wall/textures/ceiling_interior.webp');
+  const baseFloorTexture = useTexture('/3d/wall/textures/floor.webp');
 
   // Load certificate images
-  const nosqlTexture = useTexture('/3d/AboutRoom/images/nosql.png');
-  const cs50pTexture = useTexture('/3d/AboutRoom/images/cs50p.png');
-  const nlpTexture = useTexture('/3d/AboutRoom/images/nlp.png');
-  const aiTexture = useTexture('/3d/AboutRoom/images/ai.png');
-  const awscloudTexture = useTexture('/3d/AboutRoom/images/awscloud.png');
-  const mlTexture = useTexture('/3d/AboutRoom/images/ml.png');
+  const nosqlTexture = useTexture('/3d/AboutRoom/images/nosql.webp');
+  const cs50pTexture = useTexture('/3d/AboutRoom/images/cs50p.webp');
+  const nlpTexture = useTexture('/3d/AboutRoom/images/nlp.webp');
+  const aiTexture = useTexture('/3d/AboutRoom/images/ai.webp');
+  const awscloudTexture = useTexture('/3d/AboutRoom/images/awscloud.webp');
+  const mlTexture = useTexture('/3d/AboutRoom/images/ml.webp');
 
   // Configure wall texture
   const wallTexture = useMemo(() => {

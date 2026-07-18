@@ -30,7 +30,7 @@ export default function FloorBase({
   const meshRef = useRef<THREE.Mesh>(null);
 
   // Load floor texture
-  const baseTexture = useTexture('/textures/floor-texture.jpg');
+  const baseTexture = useTexture('/3d/wall/textures/floor.webp');
 
   // Clone and configure texture once with stable settings and anisotropy
   const texture = useMemo(() => {

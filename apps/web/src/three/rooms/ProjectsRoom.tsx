@@ -25,9 +25,9 @@ export default function ProjectsRoom({
 }: ProjectsRoomProps) {
   const groupRef = useRef<THREE.Group>(null);  
   // Load textures for walls and ceiling
-  const basePlasterTexture = useTexture('/3d/wall/textures/plaster.jpg');
-  const baseCeilingTexture = useTexture('/3d/wall/textures/ceiling_interior.jpg');
-  const baseFloorTexture = useTexture('/3d/wall/textures/floor.jpg');
+  const basePlasterTexture = useTexture('/3d/wall/textures/plaster.webp');
+  const baseCeilingTexture = useTexture('/3d/wall/textures/ceiling_interior.webp');
+  const baseFloorTexture = useTexture('/3d/wall/textures/floor.webp');
   
   // Configure wall texture with anisotropy to prevent flickering
   const wallTexture = useMemo(() => {
@@ -36,7 +36,7 @@ export default function ProjectsRoom({
     cloned.repeat.set(6, 3);
     cloned.magFilter = THREE.LinearFilter;
     cloned.minFilter = THREE.LinearMipmapLinearFilter;
-    cloned.anisotropy = 16;
+    cloned.anisotropy = 4;
     cloned.needsUpdate = true;
     return cloned;
   }, [basePlasterTexture]);
@@ -48,7 +48,7 @@ export default function ProjectsRoom({
     cloned.repeat.set(5, 5.5);
     cloned.magFilter = THREE.LinearFilter;
     cloned.minFilter = THREE.LinearMipmapLinearFilter;
-    cloned.anisotropy = 16;
+    cloned.anisotropy = 4;
     cloned.colorSpace = THREE.SRGBColorSpace;
     cloned.needsUpdate = true;
     return cloned;
@@ -61,7 +61,7 @@ export default function ProjectsRoom({
     cloned.repeat.set(4, 11);
     cloned.magFilter = THREE.LinearFilter;
     cloned.minFilter = THREE.LinearMipmapLinearFilter;
-    cloned.anisotropy = 16;
+    cloned.anisotropy = 4;
     cloned.needsUpdate = true;
     return cloned;
   }, [baseFloorTexture]);
@@ -142,7 +142,7 @@ export default function ProjectsRoom({
         title="Rentra"
         titleBgColor="#e63946"
         titleTextColor="#ffffff"
-        imagePath="/3d/ProjectRoom/images/Rentra.png"
+        imagePath="/3d/ProjectRoom/images/Rentra.webp"
       />
 
       {/* Center Project Board */}
@@ -151,7 +151,7 @@ export default function ProjectsRoom({
         title="goCab"
         titleBgColor="#1e56a0"
         titleTextColor="#ffd60a"
-        imagePath="/3d/ProjectRoom/images/goCab.png"
+        imagePath="/3d/ProjectRoom/images/goCab.webp"
       />
 
       {/* Right Project Board */}
@@ -160,7 +160,7 @@ export default function ProjectsRoom({
         title="pdfSuite"
         titleBgColor="#e63946"
         titleTextColor="#ffffff"
-        imagePath="/3d/ProjectRoom/images/pdf_suite.png"
+        imagePath="/3d/ProjectRoom/images/pdf_suite.webp"
       />
 
       {/* ═══ PROJECT TABLES ═══ */}

@@ -18,9 +18,9 @@ export default function ContactsRoom({
   scale = [1, 1, 1],
 }: ContactsRoomProps) {
   const groupRef = useRef<THREE.Group>(null);
-  const basePlasterTexture = useTexture('/3d/wall/textures/plaster.jpg');
-  const baseCeilingTexture = useTexture('/3d/wall/textures/ceiling_interior.jpg');
-  const baseFloorTexture = useTexture('/3d/wall/textures/floor.jpg');
+  const basePlasterTexture = useTexture('/3d/wall/textures/plaster.webp');
+  const baseCeilingTexture = useTexture('/3d/wall/textures/ceiling_interior.webp');
+  const baseFloorTexture = useTexture('/3d/wall/textures/floor.webp');
 
   const wallTexture = useMemo(() => {
     const cloned = basePlasterTexture.clone();

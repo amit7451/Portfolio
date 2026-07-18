@@ -31,7 +31,7 @@ export default function WallDecorGroup({
   visible = true,
 }: WallDecorGroupProps) {
   const groupRef = useRef<THREE.Group>(null);
-  const baseCeilingTexture = useTexture('/3d/wall/textures/ceiling_interior.jpg');
+  const baseCeilingTexture = useTexture('/3d/wall/textures/ceiling_interior.webp');
 
   // Clone and configure ceiling texture with anisotropy to prevent flickering
   const ceilingTexture = useMemo(() => {

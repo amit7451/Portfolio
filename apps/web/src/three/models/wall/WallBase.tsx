@@ -32,7 +32,7 @@ export default function WallBase({
   const meshRef = useRef<THREE.Mesh>(null);
 
   // Load plaster texture for the back wall
-  const baseTexture = useTexture('/3d/wall/textures/plaster.jpg');
+  const baseTexture = useTexture('/3d/wall/textures/plaster.webp');
 
   // Configure texture with anisotropy to prevent flickering
   const texture = useMemo(() => {
