@@ -35,5 +35,5 @@ portfolio_main/
 
 ## Route compatibility
 
-- Primary pages: `/`, `/projects`, `/contact`
+- Primary pages: `/`, `/projects`, `/contact`, `/articles`
 - Legacy aliases kept: `/products`, `/contacts`
