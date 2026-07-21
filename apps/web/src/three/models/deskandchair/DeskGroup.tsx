@@ -192,8 +192,7 @@ export default function DeskGroup({
         </group>
       </group>
 
-      {/* Promotion Block on the opposite side */}
-      <PromotionBlock position={[-5.5, 0.4, -0.5]} />
+      {/* Promotion Block removed per user request */}
 
       {/*
         Desk lamp: placed on desk top surface.
@@ -202,108 +201,6 @@ export default function DeskGroup({
         X = -1.4 (left side of desk), Z = -0.9 (back edge near wall).
       */}
       <DeskLamp position={[-1.4, 2.77, -0.9]} scale={0.9} />
-    </group>
-  );
-}
-
-/**
- * Sub-component for the Promotion Block
- */
-function PromotionBlock({ position }: { position: [number, number, number] }) {
-  const router = useRouter();
-  const [hovered, setHovered] = useState(false);
-  useCursor(hovered);
-
-  const handleClick = (e: any) => {
-    e.stopPropagation();
-    router.push('/projects');
-  };
-
-  return (
-    <group position={position} rotation={[0, Math.PI / 4, 0]}>
-      {/* Base Pedestal */}
-      <mesh position={[0, -0.2, 0]} castShadow={false}>
-        <boxGeometry args={[3, 0.4, 1.5]} />
-        <meshLambertMaterial color="#2a2a2a" />
-      </mesh>
-
-      {/* Main Backing Board */}
-      <mesh position={[0, 1.0, -0.5]} rotation={[-0.1, 0, 0]} castShadow={false}>
-        <boxGeometry args={[2.8, 1.6, 0.1]} />
-        <meshLambertMaterial color="#111111" />
-        {/* Neon Glow Outline */}
-        <Outlines thickness={0.02} color="#00ffff" opacity={0.5} transparent />
-      </mesh>
-
-      {/* Title Text */}
-      <Center position={[0, 1.3, -0.4]} rotation={[-0.1, 0, 0]}>
-        <Text3D
-          font="/fonts/helvetiker_bold.typeface.json"
-          size={0.16}
-          height={0.02}
-          curveSegments={4}
-        >
-          Want to Create a Similar
-          <meshLambertMaterial color="#ffffff" emissive="#bbbbbb" emissiveIntensity={0.2} />
-        </Text3D>
-      </Center>
-      <Center position={[0, 1.0, -0.4]} rotation={[-0.1, 0, 0]}>
-        <Text3D
-          font="/fonts/helvetiker_bold.typeface.json"
-          size={0.18}
-          height={0.02}
-          curveSegments={4}
-        >
-          Portfolio/Website?
-          <meshLambertMaterial color="#00ffff" emissive="#00ffff" emissiveIntensity={0.5} />
-        </Text3D>
-      </Center>
-
-      {/* Interactive Button */}
-      <group position={[0, 0.4, 0.2]} rotation={[-0.1, 0, 0]}>
-        <RoundedBox
-          args={[1.6, 0.4, 0.1]}
-          radius={0.05}
-          smoothness={2}
-          onClick={handleClick}
-          onPointerOver={(e) => { e.stopPropagation(); setHovered(true); }}
-          onPointerOut={(e) => { e.stopPropagation(); setHovered(false); }}
-        >
-          <meshLambertMaterial
-            color="#00cc66"
-            emissive="#00ff80"
-            emissiveIntensity={hovered ? 0.9 : 0.2}
-          />
-          {/* Edge Glow on Hover */}
-          <Outlines
-            thickness={hovered ? 0.06 : 0}
-            color="#00ff80"
-            transparent
-            opacity={hovered ? 1 : 0}
-          />
-        </RoundedBox>
-        {/* Point light that glows around the button on hover */}
-        {hovered && (
-          <pointLight
-            color="#00ff80"
-            intensity={3}
-            distance={1.6}
-            decay={2}
-            position={[0, 0, 0.3]}
-          />
-        )}
-        <Center position={[0, 0, 0.06]}>
-          <Text3D
-            font="/fonts/helvetiker_bold.typeface.json"
-            size={0.14}
-            height={0.01}
-            curveSegments={2}
-          >
-            CLICK HERE
-            <meshBasicMaterial color="#ffffff" />
-          </Text3D>
-        </Center>
-      </group>
     </group>
   );
 }

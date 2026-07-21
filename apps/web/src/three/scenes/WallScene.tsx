@@ -1,7 +1,7 @@
 'use client';
 
 import { Canvas, useThree, useFrame } from '@react-three/fiber';
-import { OrbitControls, Environment, PerformanceMonitor } from '@react-three/drei';
+import { OrbitControls, Environment } from '@react-three/drei';
 import { Suspense, useEffect, useState, useRef } from 'react';
 import * as THREE from 'three';
 import WallDecorGroup from '../models/wall/WallDecorGroup';
@@ -190,10 +190,9 @@ function SceneLighting() {
 }
 
 export default function WallScene({
+  showEnvironment = true,
   enableOrbitControls = false,
-  showEnvironment = false,
 }: WallSceneProps) {
-  const [dpr, setDpr] = useState(1.5);
   return (
     <section
       id="hero"
@@ -226,7 +225,7 @@ export default function WallScene({
           toneMapping: THREE.ACESFilmicToneMapping,
           toneMappingExposure: 1.1,
         }}
-        dpr={dpr}
+        dpr={[1, 2]}
         style={{
           width: '100%',
           height: '100%',
@@ -234,7 +233,6 @@ export default function WallScene({
         }}
         performance={{ min: 0.5 }}
       >
-        <PerformanceMonitor onIncline={() => setDpr(1.5)} onDecline={() => setDpr(1)}>
         <color attach="background" args={['#1e1e1e']} />
 
         <Suspense fallback={<LoadingFallback />}>
@@ -268,7 +266,6 @@ export default function WallScene({
             />
           )}
         </Suspense>
-        </PerformanceMonitor>
       </Canvas>
     </section>
   );

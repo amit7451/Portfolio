@@ -272,7 +272,7 @@ export default function ArticlePage() {
 
           <TiltImage 
             theme={theme}
-            src="/asset/Screenshot 2026-07-03.png" 
+            src="/asset/Screenshot 2026-07-03.webp" 
             alt="Search error illustration" 
             glowColor="from-red-500 to-pink-500" 
             accentColor="#ff3366" 
@@ -487,7 +487,7 @@ Unterminated group`}
 
           <TiltImage 
             theme={theme}
-            src="/asset/Screenshot 2026-07-06 024852.png" 
+            src="/asset/Screenshot 2026-07-06 024852.webp" 
             alt="ReDoS illustration" 
             glowColor="from-purple-500 to-cyan-500" 
             accentColor="#ccff00" 

@@ -171,14 +171,14 @@ export default function WallDecorGroup({
       {/* Left side - 2 frames stacked */}
       <PhotoFrame
         position={[-6.5, 5.5, -3.85]}
-        imagePath="/3d/wall/images/c1.png"
+        imagePath="/3d/wall/images/c1.webp"
         width={1.6}
         height={2.2}
         frameColor="#3d2817"
       />
       <PhotoFrame
         position={[-4.2, 3.8, -3.85]}
-        imagePath="/3d/wall/images/r1.png"
+        imagePath="/3d/wall/images/r1.webp"
         width={1.6}
         height={2.2}
         frameColor="#3d2817"
@@ -187,14 +187,14 @@ export default function WallDecorGroup({
       {/* Right side - 2 frames stacked */}
       <PhotoFrame
         position={[6.5, 5.5, -3.85]}
-        imagePath="/3d/wall/images/c2.png"
+        imagePath="/3d/wall/images/c2.webp"
         width={1.6}
         height={2.2}
         frameColor="#3d2817"
       />
       <PhotoFrame
         position={[4.2, 3.8, -3.85]}
-        imagePath="/3d/wall/images/r2.png"
+        imagePath="/3d/wall/images/r2.webp"
         width={1.6}
         height={2.2}
         frameColor="#3d2817"

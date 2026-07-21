@@ -1,7 +1,7 @@
 'use client';
 
 import { Canvas, useThree, useFrame } from '@react-three/fiber';
-import { PerformanceMonitor, Environment, ScrollControls, useScroll } from '@react-three/drei';
+import { Environment, ScrollControls, useScroll } from '@react-three/drei';
 import React, { Suspense, useEffect, useState, useRef } from 'react';
 import * as THREE from 'three';
 import WallDecorGroup from '../models/wall/WallDecorGroup';
@@ -254,7 +254,6 @@ function VisibilityCullingFloor({ floorIndex, children, position }: { floorIndex
 // BuildingScene — Main exported component
 // ────────────────────────────────────────────────────
 export default function BuildingScene() {
-  const [dpr, setDpr] = useState(1.5);
   return (
     <div
       style={{
@@ -284,11 +283,10 @@ export default function BuildingScene() {
           onCreated={({ gl }) => {
             gl.shadowMap.enabled = false;
           }}
-          dpr={dpr}
+          dpr={[1, 2]}
           style={{ width: '100%', height: '100%', display: 'block' }}
           performance={{ min: 0.5 }}
         >
-          <PerformanceMonitor onIncline={() => setDpr(1.5)} onDecline={() => setDpr(1)}>
           <color attach="background" args={['#87CEEB']} />
 
           {/* Tight damping for immediate scroll response */}
@@ -370,7 +368,6 @@ export default function BuildingScene() {
               </group>
             </Suspense>
           </ScrollControls>
-          </PerformanceMonitor>
         </Canvas>
 
         {/*

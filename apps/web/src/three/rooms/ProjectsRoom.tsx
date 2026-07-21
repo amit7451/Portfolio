@@ -298,10 +298,10 @@ function FloatingCard({
   const baseFloatHeight = tableHeight + 1.8;
   
   // Load textures for all cards (hooks must be called unconditionally)
-  const githubTexture = useTexture('/3d/ProjectRoom/images/github.png');
-  const playstoreTexture = useTexture('/3d/ProjectRoom/images/playstore.png');
-  const linkedinTexture = useTexture('/3d/ProjectRoom/images/linkedin.png');
-  const webTexture = useTexture('/3d/ProjectRoom/images/web.png');
+  const githubTexture = useTexture('/3d/ProjectRoom/images/github.webp');
+  const playstoreTexture = useTexture('/3d/ProjectRoom/images/playstore.webp');
+  const linkedinTexture = useTexture('/3d/ProjectRoom/images/linkedin.webp');
+  const webTexture = useTexture('/3d/ProjectRoom/images/web.webp');
   
   // Random seed for each card
   const seed = useMemo(() => cardId * 1.337, [cardId]);

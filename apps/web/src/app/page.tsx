@@ -226,9 +226,9 @@ function RentraOverlay({ onClose, isClosing }: { onClose: () => void; isClosing:
         {/* Icon buttons row */}
         <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', marginTop: '18px', flexShrink: 0 }}>
           {[
-            { href: 'https://github.com/amit7451/Rentra', src: '/3d/ProjectRoom/images/github.png', alt: 'GitHub', bg: '#24292e', glow: '0 0 20px rgba(0,255,0,0.55)' },
-            { href: 'https://play.google.com/store/apps/details?id=com.rentra.app.rentra', src: '/3d/ProjectRoom/images/playstore.png', alt: 'Play Store', bg: '#01875f', glow: '0 0 20px rgba(0,255,0,0.55)' },
-            { href: 'https://linkedin.com/in/amit-devspace', src: '/3d/ProjectRoom/images/linkedin.png', alt: 'LinkedIn', bg: '#0a66c2', glow: '0 0 20px rgba(10,102,194,0.7)' },
+            { href: 'https://github.com/amit7451/Rentra', src: '/3d/ProjectRoom/images/github.webp', alt: 'GitHub', bg: '#24292e', glow: '0 0 20px rgba(0,255,0,0.55)' },
+            { href: 'https://play.google.com/store/apps/details?id=com.rentra.app.rentra', src: '/3d/ProjectRoom/images/playstore.webp', alt: 'Play Store', bg: '#01875f', glow: '0 0 20px rgba(0,255,0,0.55)' },
+            { href: 'https://linkedin.com/in/amit-devspace', src: '/3d/ProjectRoom/images/linkedin.webp', alt: 'LinkedIn', bg: '#0a66c2', glow: '0 0 20px rgba(10,102,194,0.7)' },
           ].map(({ href, src, alt, bg, glow }, i) => (
             <a
               key={i}
@@ -376,9 +376,9 @@ function GocabOverlay({ onClose, isClosing }: { onClose: () => void; isClosing: 
 
         <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', marginTop: '18px', flexShrink: 0 }}>
           {[
-            { href: 'https://github.com/amit7451/goCab', src: '/3d/ProjectRoom/images/github.png', alt: 'GitHub', bg: '#24292e', glow: '0 0 20px rgba(0,255,0,0.55)' },
-            { href: 'https://gocab-1-frontend.onrender.com', src: '/3d/ProjectRoom/images/web.png', alt: 'Web', bg: '#0ea5e9', glow: '0 0 20px rgba(0,255,0,0.55)' },
-            { href: 'https://linkedin.com/in/amit-devspace', src: '/3d/ProjectRoom/images/linkedin.png', alt: 'LinkedIn', bg: '#0a66c2', glow: '0 0 20px rgba(10,102,194,0.7)' },
+            { href: 'https://github.com/amit7451/goCab', src: '/3d/ProjectRoom/images/github.webp', alt: 'GitHub', bg: '#24292e', glow: '0 0 20px rgba(0,255,0,0.55)' },
+            { href: 'https://gocab-1-frontend.onrender.com', src: '/3d/ProjectRoom/images/web.webp', alt: 'Web', bg: '#0ea5e9', glow: '0 0 20px rgba(0,255,0,0.55)' },
+            { href: 'https://linkedin.com/in/amit-devspace', src: '/3d/ProjectRoom/images/linkedin.webp', alt: 'LinkedIn', bg: '#0a66c2', glow: '0 0 20px rgba(10,102,194,0.7)' },
           ].map(({ href, src, alt, bg, glow }, i) => (
             <a
               key={i}
@@ -520,9 +520,9 @@ function PdfSuiteOverlay({ onClose, isClosing }: { onClose: () => void; isClosin
 
         <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', marginTop: '18px', flexShrink: 0 }}>
           {[
-            { href: 'https://github.com/amit7451/PDF_Suite', src: '/3d/ProjectRoom/images/github.png', alt: 'GitHub', bg: '#24292e', glow: '0 0 20px rgba(0,255,0,0.55)' },
-            { href: 'https://github.com/amit7451/PDF_Suite', src: '/3d/ProjectRoom/images/web.png', alt: 'Web', bg: '#0ea5e9', glow: '0 0 20px rgba(0,255,0,0.55)' },
-            { href: 'https://linkedin.com/in/amit-devspace', src: '/3d/ProjectRoom/images/linkedin.png', alt: 'LinkedIn', bg: '#0a66c2', glow: '0 0 20px rgba(10,102,194,0.7)' },
+            { href: 'https://github.com/amit7451/PDF_Suite', src: '/3d/ProjectRoom/images/github.webp', alt: 'GitHub', bg: '#24292e', glow: '0 0 20px rgba(0,255,0,0.55)' },
+            { href: 'https://github.com/amit7451/PDF_Suite', src: '/3d/ProjectRoom/images/web.webp', alt: 'Web', bg: '#0ea5e9', glow: '0 0 20px rgba(0,255,0,0.55)' },
+            { href: 'https://linkedin.com/in/amit-devspace', src: '/3d/ProjectRoom/images/linkedin.webp', alt: 'LinkedIn', bg: '#0a66c2', glow: '0 0 20px rgba(10,102,194,0.7)' },
           ].map(({ href, src, alt, bg, glow }, i) => (
             <a
               key={i}
