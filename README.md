@@ -139,7 +139,7 @@ This separation keeps the scene reusable and makes it easier to optimize or repl
 
 - The homepage is client-rendered because it depends on browser-only Three.js APIs.
 - The contact page posts JSON to the API route and clears the form after a successful submission.
-- Some older routes remain available for compatibility, so bookmarks and external links continue to work.
+- Some older routes remain available for compatibility, so bookmarks and external links continue to work.aaaaaaaaaaaaaaaaaaaaa
 
 ## Troubleshooting
 
