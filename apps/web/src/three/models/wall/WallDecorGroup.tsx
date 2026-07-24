@@ -4,6 +4,7 @@ import { useRef, useMemo, useState } from 'react';
 import * as THREE from 'three';
 import { useTexture, useCursor, RoundedBox, Text } from '@react-three/drei';
 import { useRouter } from 'next/navigation';
+import { useResponsiveCanvas } from '../../../hooks/useResponsive';
 import WallBase from './WallBase';
 import FloorBase from './FloorBase';
 import SideWall from './SideWall';
@@ -31,6 +32,7 @@ export default function WallDecorGroup({
   visible = true,
 }: WallDecorGroupProps) {
   const groupRef = useRef<THREE.Group>(null);
+  const { mapLinear } = useResponsiveCanvas();
   const baseCeilingTexture = useTexture('/3d/wall/textures/ceiling_interior.webp');
 
   // Clone and configure ceiling texture with anisotropy to prevent flickering
@@ -115,6 +117,7 @@ export default function WallDecorGroup({
         position={[0, 7.5, -3.9]}
         text="FULL STACK DEVELOPER"
         fontSize={0.9}
+        scale={[mapLinear(0.5, 1.0), mapLinear(0.5, 1.0), mapLinear(0.5, 1.0)]}
         depth={0.06}
         color="#6b6560"
       />

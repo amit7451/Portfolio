@@ -250,8 +250,19 @@ function ContactBoard({ position }: { position: [number, number, number] }) {
               opacity: 0,
             }}
           >
+            <style>{`
+              .contact-form-container {
+                padding: clamp(20px, 5vw, 40px);
+              }
+              .contact-form-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: 18px;
+              }
+            `}</style>
             <form
               onSubmit={handleSubmit}
+              className="contact-form-container"
               style={{
                 width: '100%',
                 background: 'rgba(10, 10, 10, 0.9)', // Darker translucent background
@@ -266,7 +277,7 @@ function ContactBoard({ position }: { position: [number, number, number] }) {
                 fontFamily: 'inherit',
               }}
             >
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '18px' }}>
+              <div className="contact-form-grid">
                 <input
                   name="name"
                   value={formData.name}
@@ -286,7 +297,7 @@ function ContactBoard({ position }: { position: [number, number, number] }) {
                 />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '18px' }}>
+              <div className="contact-form-grid">
                 <input
                   name="phone"
                   value={formData.phone}

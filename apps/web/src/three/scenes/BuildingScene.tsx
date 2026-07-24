@@ -11,6 +11,8 @@ import AboutRoom from '../rooms/AboutRoom';
 import ContactsRoom from '../rooms/ContactsRoom';
 import LiftPanel from '../models/wall/LiftPanel';
 import CanvasLoader from '../../components/CanvasLoader';
+import { useResponsiveCanvas, useWindowSize } from '../../hooks/useResponsive';
+import MobileNavOverlay from './MobileNavOverlay';
 
 // ────────────────────────────────────────────────────
 // CONSTANTS — Room & Building geometry
@@ -42,9 +44,10 @@ const BUILDING_TOP_Y = 3; // Y-center of floor 0 = developer room center
 function ScrollCamera() {
   const { camera } = useThree();
   const scroll = useScroll();
+  const { mapLinear } = useResponsiveCanvas();
 
-  const insideZ = 14;
-  const outsideZ = 26;
+  const insideZ = mapLinear(22, 14);
+  const outsideZ = mapLinear(32, 26);
   const heroY = 4.72;
   const lookY = 3.72;
   const floorsToTravel = FLOOR_COUNT - 1;
@@ -78,6 +81,11 @@ function ScrollCamera() {
 
     camera.position.set(0, camY, camZ);
     camera.lookAt(0, targetLookY, 0);
+
+    if (camera instanceof THREE.PerspectiveCamera) {
+      camera.fov = mapLinear(65, 50);
+      camera.updateProjectionMatrix();
+    }
   });
 
   return null;
@@ -254,6 +262,8 @@ function VisibilityCullingFloor({ floorIndex, children, position }: { floorIndex
 // BuildingScene — Main exported component
 // ────────────────────────────────────────────────────
 export default function BuildingScene() {
+  const { isMobile } = useWindowSize();
+
   return (
     <div
       style={{
@@ -290,7 +300,7 @@ export default function BuildingScene() {
           <color attach="background" args={['#87CEEB']} />
 
           {/* Tight damping for immediate scroll response */}
-          <ScrollControls pages={4} damping={0.08}>
+          <ScrollControls pages={4} damping={isMobile ? 0.2 : 0.08} eps={0.0001}>
           <Suspense fallback={null}>
               <ScrollCamera />
               <NavigationController />
@@ -376,6 +386,9 @@ export default function BuildingScene() {
           preventing the ContactsRoom Html component from getting scaled to 0px or clipped.
         */}
         <div id="html-portal-root" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }} />
+        
+        {/* Mobile Navigation Overlay */}
+        {isMobile && <MobileNavOverlay />}
       </div>
     </div>
   );

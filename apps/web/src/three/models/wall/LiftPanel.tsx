@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import { Text, RoundedBox } from '@react-three/drei';
 import * as THREE from 'three';
-
+import { useResponsiveCanvas } from '../../../hooks/useResponsive';
 
 const FLOOR_NAMES = ['HOME', 'PROJECTS', 'ABOUT', 'CONTACT'];
 
@@ -81,6 +81,8 @@ export default function LiftPanel({
   position = [0, 0, 0],
   rotation = [0, 0, 0],
 }: LiftPanelProps) {
+  const { isMobile } = useResponsiveCanvas();
+
   // Filter out current floor to get 3 remote destinations
   const remoteFloors = useMemo(() => {
     const allFloors = [0, 1, 2, 3];
@@ -94,6 +96,8 @@ export default function LiftPanel({
     });
     window.dispatchEvent(event);
   };
+
+  if (isMobile) return null;
 
   return (
     <group position={position} rotation={rotation}>

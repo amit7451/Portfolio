@@ -136,14 +136,11 @@ function RentraOverlay({ onClose, isClosing }: { onClose: () => void; isClosing:
       {/* Popup panel ΓÇö stop propagation so outside-click still works */}
       <div
         onClick={(e) => e.stopPropagation()}
+        className="project-overlay-panel"
         style={{
-          width: '70vw',
-          aspectRatio: '16/9',
           maxHeight: '70vh',
           backgroundColor: '#050505',
           border: '2px solid #00d9ff',
-          borderRadius: '18px',
-          padding: '36px 40px 28px',
           position: 'relative',
           display: 'flex',
           flexDirection: 'column',
@@ -260,6 +257,18 @@ function RentraOverlay({ onClose, isClosing }: { onClose: () => void; isClosing:
       </div>
 
       <style>{`
+        .project-overlay-panel {
+          width: clamp(320px, 90vw, 1300px);
+          aspect-ratio: 16/9;
+          padding: clamp(20px, 4vw, 36px) clamp(20px, 5vw, 40px);
+          border-radius: 18px;
+        }
+        @media (max-width: 768px) {
+          .project-overlay-panel {
+            aspect-ratio: auto;
+            min-height: 70vh;
+          }
+        }
         @keyframes rentraBgIn  { from { opacity:0 } to { opacity:1 } }
         @keyframes rentraBgOut { from { opacity:1 } to { opacity:0 } }
         @keyframes rentraIn  { from { opacity:0; transform:scale(0.94) translateY(24px) } to { opacity:1; transform:scale(1) translateY(0) } }
@@ -290,14 +299,11 @@ function GocabOverlay({ onClose, isClosing }: { onClose: () => void; isClosing: 
     >
       <div
         onClick={(e) => e.stopPropagation()}
+        className="project-overlay-panel"
         style={{
-          width: '70vw',
-          aspectRatio: '16/9',
           maxHeight: '70vh',
           backgroundColor: '#050505',
           border: '2px solid #00d9ff',
-          borderRadius: '18px',
-          padding: '36px 40px 28px',
           position: 'relative',
           display: 'flex',
           flexDirection: 'column',
@@ -433,14 +439,11 @@ function PdfSuiteOverlay({ onClose, isClosing }: { onClose: () => void; isClosin
     >
       <div
         onClick={(e) => e.stopPropagation()}
+        className="project-overlay-panel"
         style={{
-          width: '70vw',
-          aspectRatio: '16/9',
           maxHeight: '70vh',
           backgroundColor: '#050505',
           border: '2px solid #00d9ff',
-          borderRadius: '18px',
-          padding: '36px 40px 28px',
           position: 'relative',
           display: 'flex',
           flexDirection: 'column',

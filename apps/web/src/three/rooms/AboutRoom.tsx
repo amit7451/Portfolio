@@ -4,6 +4,7 @@ import { useRef, useMemo } from 'react';
 import * as THREE from 'three';
 import { useTexture } from '@react-three/drei';
 import WallText from '../models/wall/WallText';
+import { useResponsiveCanvas } from '../../hooks/useResponsive';
 
 interface AboutRoomProps {
   position?: [number, number, number];
@@ -17,6 +18,7 @@ export default function AboutRoom({
   scale = [1, 1, 1],
 }: AboutRoomProps) {
   const groupRef = useRef<THREE.Group>(null);
+  const { mapLinear } = useResponsiveCanvas();
 
   // Load textures
   const basePlasterTexture = useTexture('/3d/wall/textures/plaster.webp');
@@ -177,22 +179,22 @@ export default function AboutRoom({
       {/* ═══ PHOTO FRAMES GROUP ═══ */}
       <group position={[0, 0, backWallZ]}>
         {/* Frame 1: Left-Top Portrait - NoSQL Certificate */}
-        <PhotoFrame position={[-5.2, 6, 0.03]} width={2.5} height={3.5} texture={nosqlTexture} />
+        <PhotoFrame position={[mapLinear(-2.6, -5.2), 6, 0.03]} width={2.5} height={3.5} texture={nosqlTexture} />
 
         {/* Frame 2: Center-Top Large Landscape - CS50P Certificate */}
-        <PhotoFrame position={[-1.57, 7.2, 0.03]} width={4.2} height={3} texture={cs50pTexture} />
+        <PhotoFrame position={[mapLinear(-0.8, -1.57), 7.2, 0.03]} width={4.2} height={3} texture={cs50pTexture} />
 
         {/* Frame 3: Right-Top Small Portrait - NLP Certificate */}
-        <PhotoFrame position={[1.85, 6.8, 0.03]} width={2} height={2.8} texture={nlpTexture} />
+        <PhotoFrame position={[mapLinear(1.0, 1.85), 6.8, 0.03]} width={2} height={2.8} texture={nlpTexture} />
 
         {/* Frame 4: Center-Middle Landscape - AI Certificate */}
-        <PhotoFrame position={[-1.65, 4.2, 0.03]} width={3.8} height={2.5} texture={aiTexture} />
+        <PhotoFrame position={[mapLinear(-0.8, -1.65), 4.2, 0.03]} width={3.8} height={2.5} texture={aiTexture} />
 
         {/* Frame 5: Right-Middle Landscape - AWS Cloud Certificate */}
-        <PhotoFrame position={[2.2, 4, 0.03]} width={3.5} height={2.3} texture={awscloudTexture} />
+        <PhotoFrame position={[mapLinear(1.2, 2.2), 4, 0.03]} width={3.5} height={2.3} texture={awscloudTexture} />
 
         {/* Frame 6: Center-Bottom Large Landscape - ML Certificate */}
-        <PhotoFrame position={[5.0, 7, 0.03]} width={3.8} height={3} texture={mlTexture} />
+        <PhotoFrame position={[mapLinear(2.6, 5.0), 7, 0.03]} width={3.8} height={3} texture={mlTexture} />
       </group>
 
       {/* ═══ ACCENT LIGHTING ═══ */}

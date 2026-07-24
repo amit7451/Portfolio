@@ -7,6 +7,7 @@ import Desk from './Desk';
 import Chair from './Chair';
 import DeskLamp from './DeskLamp';
 import * as THREE from 'three';
+import { useResponsiveCanvas } from '../../../hooks/useResponsive';
 
 
 
@@ -25,7 +26,8 @@ function StoolBoxButton({
   color,
   text,
   textColor = 'white',
-  link
+  link,
+  isMobile = false
 }: {
   pos: [number, number, number];
   rot: [number, number, number];
@@ -33,8 +35,10 @@ function StoolBoxButton({
   text: string;
   textColor?: string;
   link: string;
+  isMobile?: boolean;
 }) {
   const [hovered, setHovered] = useState(false);
+  const { mapLinear } = useResponsiveCanvas();
   useCursor(hovered);
 
   const handleClick = useCallback(() => {
@@ -66,7 +70,7 @@ function StoolBoxButton({
       }}
     >
       <RoundedBox
-        args={[0.92, 0.22, 0.52]}
+        args={[mapLinear(1.2, 0.92), mapLinear(0.3, 0.22), mapLinear(0.7, 0.52)]}
         radius={0.06}
         smoothness={4}
         castShadow={false}
@@ -79,10 +83,10 @@ function StoolBoxButton({
       </RoundedBox>
 
       {/* Label on the front face (user side) */}
-      <Center position={[0, 0, 0.261]}>
+      <Center position={[0, 0, mapLinear(0.35, 0.261)]}>
         <Text3D
           font="/fonts/helvetiker_bold.typeface.json"
-          size={0.08}
+          size={mapLinear(0.12, 0.08)}
           height={0.01}
           curveSegments={12}
         >
@@ -103,6 +107,7 @@ export default function DeskGroup({
   rotation = [0, 0, 0],
   scale = [1, 1, 1],
 }: DeskGroupProps) {
+  const { mapLinear } = useResponsiveCanvas();
 
   const boxes = [
     {
@@ -139,6 +144,9 @@ export default function DeskGroup({
     },
   ];
 
+  const stoolPos = [mapLinear(2.0, 4.75), 0, mapLinear(1.5, 0.55)];
+  const stoolScale = mapLinear(1.6, 1.42);
+
   return (
     <group position={position} rotation={rotation} scale={scale}>
       <Desk
@@ -154,7 +162,7 @@ export default function DeskGroup({
         color="#1a1a1a"
       />
 
-      <group position={[4.75, 0, 0.55]} scale={[1.42, 1.42, 1.42]}>
+      <group position={stoolPos as [number, number, number]} scale={[stoolScale, stoolScale, stoolScale]}>
         <mesh position={[0, 0.9, 0]} castShadow={false} receiveShadow={false}>
           <cylinderGeometry args={[0.58, 0.62, 0.12, 32]} />
           <meshLambertMaterial color="#6e4a2f" />
@@ -183,12 +191,18 @@ export default function DeskGroup({
         </mesh>
 
         <group position={[0, 0.98, 0]}>
-          {boxes.map((box, index) => (
-            <StoolBoxButton
-              key={`stool-box-${index}`}
-              {...box}
-            />
-          ))}
+          {boxes.map((box, index) => {
+            // Adjust box Y offset so the larger buttons don't clip each other on mobile
+            const boxYOffset = mapLinear(index * 0.12, 0);
+            const adjustedBox = { ...box, pos: [box.pos[0], box.pos[1] + boxYOffset, box.pos[2]] as [number, number, number] };
+            
+            return (
+              <StoolBoxButton
+                key={`stool-box-${index}`}
+                {...adjustedBox}
+              />
+            );
+          })}
         </group>
       </group>
 

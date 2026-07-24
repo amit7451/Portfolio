@@ -5,6 +5,7 @@ import * as THREE from 'three';
 import { useTexture, Text, RoundedBox } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import WallText from '../models/wall/WallText';
+import { useResponsiveCanvas } from '../../hooks/useResponsive';
 
 
 /**
@@ -24,6 +25,7 @@ export default function ProjectsRoom({
   scale = [1, 1, 1],
 }: ProjectsRoomProps) {
   const groupRef = useRef<THREE.Group>(null);  
+  const { mapLinear } = useResponsiveCanvas();
   // Load textures for walls and ceiling
   const basePlasterTexture = useTexture('/3d/wall/textures/plaster.webp');
   const baseCeilingTexture = useTexture('/3d/wall/textures/ceiling_interior.webp');
@@ -75,6 +77,11 @@ export default function ProjectsRoom({
 
   const wallColor = '#e8e4e0';
   const accentColor = '#2a6496';
+
+  const leftBoardX = mapLinear(-3.0, -6);
+  const rightBoardX = mapLinear(3.0, 6);
+  const leftTableX = mapLinear(-2.6, -5);
+  const rightTableX = mapLinear(2.6, 5);
 
   return (
     <group ref={groupRef} position={position} rotation={rotation} scale={scale}>
@@ -138,7 +145,7 @@ export default function ProjectsRoom({
       {/* ═══ PROJECT DISPLAY BOARDS ═══ */}
       {/* Left Project Board */}
       <ProjectBoard
-        position={[-6, roomH / 2 + 1.5, backWallZ + 0.1]}
+        position={[leftBoardX, roomH / 2 + 1.5, backWallZ + 0.1]}
         title="Rentra"
         titleBgColor="#e63946"
         titleTextColor="#ffffff"
@@ -156,7 +163,7 @@ export default function ProjectsRoom({
 
       {/* Right Project Board */}
       <ProjectBoard
-        position={[6, roomH / 2 + 1.5, backWallZ + 0.1]}
+        position={[rightBoardX, roomH / 2 + 1.5, backWallZ + 0.1]}
         title="pdfSuite"
         titleBgColor="#e63946"
         titleTextColor="#ffffff"
@@ -164,9 +171,9 @@ export default function ProjectsRoom({
       />
 
       {/* ═══ PROJECT TABLES ═══ */}
-      <ProjectTable position={[-5, 0, 4]} cardId={0} />
+      <ProjectTable position={[leftTableX, 0, 4]} cardId={0} />
       <ProjectTable position={[0, 0, 4]} cardId={1} />
-      <ProjectTable position={[5, 0, 4]} cardId={2} />
+      <ProjectTable position={[rightTableX, 0, 4]} cardId={2} />
 
       {/* ═══ ACCENT LIGHTING ═══ */}
     </group>
