@@ -30,6 +30,9 @@ export function useResponsiveCanvas() {
     );
   };
 
+  const aspectRatio = size.width / size.height;
+  const isPortrait = aspectRatio < 1.0;
+
   return {
     isMobile,
     isTablet,
@@ -38,6 +41,8 @@ export function useResponsiveCanvas() {
     mapLinear,
     viewport,
     size,
+    aspectRatio,
+    isPortrait,
   };
 }
 

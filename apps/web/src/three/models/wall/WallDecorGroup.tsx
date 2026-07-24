@@ -32,7 +32,7 @@ export default function WallDecorGroup({
   visible = true,
 }: WallDecorGroupProps) {
   const groupRef = useRef<THREE.Group>(null);
-  const { mapLinear } = useResponsiveCanvas();
+  const { mapLinear, isMobile } = useResponsiveCanvas();
   const baseCeilingTexture = useTexture('/3d/wall/textures/ceiling_interior.webp');
 
   // Clone and configure ceiling texture with anisotropy to prevent flickering
@@ -112,23 +112,20 @@ export default function WallDecorGroup({
         />
       </mesh>
 
-      {/* Main Title Text - aligned style with other rooms */}
+      {/* Main Title Text - restored to original high wall position Y=7.5 */}
       <WallText
+        key={isMobile ? 'title-mobile' : 'title-desktop'}
         position={[0, 7.5, -3.9]}
-        text="FULL STACK DEVELOPER"
-        fontSize={0.9}
-        scale={[mapLinear(0.5, 1.0), mapLinear(0.5, 1.0), mapLinear(0.5, 1.0)]}
+        text={isMobile ? "DEVELOPER" : "FULL STACK DEVELOPER"}
+        fontSize={isMobile ? 0.65 : mapLinear(0.55, 0.9)}
         depth={0.06}
         color="#6b6560"
       />
 
-      {/* Article Navigation Button */}
-      <ArticleButton position={[0, 6.0, -3.8]} />
-
-      {/* Upper Shelf - shorter, centered */}
+      {/* Upper Shelf - shorter, centered, positioned above article button */}
       <Shelf
-        position={[0, 4.5, -3.3]}
-        length={6}
+        position={[0, 5.2, -3.3]}
+        length={mapLinear(4.8, 6.0)}
         thickness={0.15}
         depth={0.7}
         showLightStrip={true}
@@ -136,9 +133,12 @@ export default function WallDecorGroup({
         lightIntensity={0.5}
       />
 
+      {/* Article Navigation Button — Positioned BELOW the wooden shelf of toys */}
+      <ArticleButton position={[0, 4.35, -3.8]} />
+
       {/* Lower Shelf - full width */}
       <Shelf
-        position={[0, 1.0, -3.3]}
+        position={[0, 0.8, -3.3]}
         length={18}
         thickness={0.15}
         depth={0.7}
@@ -147,100 +147,102 @@ export default function WallDecorGroup({
         lightIntensity={0.4}
       />
 
-      {/* Toy Figurines on Upper Shelf - left side (random spacing & sizes) */}
-      <group position={[-2.8, 4.65, -3.0]} scale={[1.45, 1.45, 1.45]}>
+      {/* Toy Figurines on Upper Shelf - left side */}
+      <group position={[mapLinear(-2.0, -2.8), 5.35, -3.0]} scale={[mapLinear(0.85, 1.45), mapLinear(0.85, 1.45), mapLinear(0.85, 1.45)]}>
         <TanjiroFigurine position={[0, 0, 0]} />
       </group>
-      <group position={[-1.85, 4.65, -2.92]} scale={[1.3, 1.3, 1.3]}>
+      <group position={[mapLinear(-1.3, -1.85), 5.35, -2.92]} scale={[mapLinear(0.8, 1.3), mapLinear(0.8, 1.3), mapLinear(0.8, 1.3)]}>
         <ZenitsuFigurine position={[0, 0, 0]} />
       </group>
-      <group position={[-1.15, 4.65, -3.06]} scale={[1.55, 1.55, 1.55]}>
+      <group position={[mapLinear(-0.7, -1.15), 5.35, -3.06]} scale={[mapLinear(0.85, 1.55), mapLinear(0.85, 1.55), mapLinear(0.85, 1.55)]}>
         <SpiderManFigurine position={[0, 0, 0]} />
       </group>
-      <group position={[-0.25, 4.65, -2.88]} scale={[1.35, 1.35, 1.35]}>
+      <group position={[mapLinear(-0.1, -0.25), 5.35, -2.88]} scale={[mapLinear(0.8, 1.35), mapLinear(0.8, 1.35), mapLinear(0.8, 1.35)]}>
         <IronManFigurine position={[0, 0, 0]} />
       </group>
-      <group position={[0.45, 4.65, -3.0]} scale={[1.5, 1.5, 1.5]}>
+      <group position={[mapLinear(0.4, 0.45), 5.35, -3.0]} scale={[mapLinear(0.85, 1.5), mapLinear(0.85, 1.5), mapLinear(0.85, 1.5)]}>
         <CaptainAmericaFigurine position={[0, 0, 0]} />
       </group>
 
       {/* Digital Clock on Upper Shelf - right corner */}
       <DigitalClock
-        position={[1.8, 4.9, -3.0]}
-        scale={[0.6, 0.6, 0.6]}
+        position={[mapLinear(1.3, 1.8), 5.55, -3.0]}
+        scale={[mapLinear(0.4, 0.6), mapLinear(0.4, 0.6), mapLinear(0.4, 0.6)]}
       />
 
-      {/* 4 Photo Frames - 2x2 pattern outside upper rack x-range */}
-      {/* Left side - 2 frames stacked */}
+      {/* Photo Frames — Hide side 2 photo frames (c1 & c2) on mobile so nothing gets cut off */}
+      {!isMobile && (
+        <PhotoFrame
+          position={[mapLinear(-3.3, -6.5), 5.5, -3.85]}
+          imagePath="/3d/wall/images/c1.webp"
+          width={mapLinear(1.3, 1.6)}
+          height={mapLinear(1.8, 2.2)}
+          frameColor="#3d2817"
+        />
+      )}
       <PhotoFrame
-        position={[-6.5, 5.5, -3.85]}
-        imagePath="/3d/wall/images/c1.webp"
-        width={1.6}
-        height={2.2}
-        frameColor="#3d2817"
-      />
-      <PhotoFrame
-        position={[-4.2, 3.8, -3.85]}
+        position={[mapLinear(-2.1, -4.2), 3.2, -3.85]}
         imagePath="/3d/wall/images/r1.webp"
-        width={1.6}
-        height={2.2}
+        width={mapLinear(1.2, 1.6)}
+        height={mapLinear(1.6, 2.2)}
         frameColor="#3d2817"
       />
 
-      {/* Right side - 2 frames stacked */}
+      {!isMobile && (
+        <PhotoFrame
+          position={[mapLinear(3.3, 6.5), 5.5, -3.85]}
+          imagePath="/3d/wall/images/c2.webp"
+          width={mapLinear(1.3, 1.6)}
+          height={mapLinear(1.8, 2.2)}
+          frameColor="#3d2817"
+        />
+      )}
       <PhotoFrame
-        position={[6.5, 5.5, -3.85]}
-        imagePath="/3d/wall/images/c2.webp"
-        width={1.6}
-        height={2.2}
-        frameColor="#3d2817"
-      />
-      <PhotoFrame
-        position={[4.2, 3.8, -3.85]}
+        position={[mapLinear(2.1, 4.2), 3.2, -3.85]}
         imagePath="/3d/wall/images/r2.webp"
-        width={1.6}
-        height={2.2}
+        width={mapLinear(1.2, 1.6)}
+        height={mapLinear(1.6, 2.2)}
         frameColor="#3d2817"
       />
 
       {/* Sticky Notes Cluster - Between upper and lower shelves */}
-      <StickyNote position={[-1.8, 3.4, -3.8]} color="#fff740" size={0.38} />
-      <StickyNote position={[-1.2, 3.35, -3.78]} color="#fff740" size={0.36} />
-      <StickyNote position={[-0.6, 3.5, -3.8]} color="#fff740" size={0.34} />
-      <StickyNote position={[0, 3.3, -3.78]} color="#fff740" size={0.36} />
-      <StickyNote position={[0.5, 3.45, -3.8]} color="#fff740" size={0.34} />
-      <StickyNote position={[1.0, 3.35, -3.78]} color="#fff740" size={0.36} />
+      <StickyNote position={[-mapLinear(1.1, 1.8), 3.0, -3.8]} color="#fff740" size={mapLinear(0.24, 0.38)} />
+      <StickyNote position={[-mapLinear(0.7, 1.2), 2.95, -3.78]} color="#fff740" size={mapLinear(0.22, 0.36)} />
+      <StickyNote position={[-mapLinear(0.3, 0.6), 3.1, -3.8]} color="#fff740" size={mapLinear(0.22, 0.34)} />
+      <StickyNote position={[0, 2.9, -3.78]} color="#fff740" size={mapLinear(0.23, 0.36)} />
+      <StickyNote position={[mapLinear(0.3, 0.5), 3.05, -3.8]} color="#fff740" size={mapLinear(0.22, 0.34)} />
+      <StickyNote position={[mapLinear(0.7, 1.0), 2.95, -3.78]} color="#fff740" size={mapLinear(0.23, 0.36)} />
 
       {/* Second Row of Sticky Notes */}
-      <StickyNote position={[-1.5, 2.85, -3.8]} color="#fff740" size={0.32} />
-      <StickyNote position={[-0.9, 2.8, -3.78]} color="#fff740" size={0.34} />
-      <StickyNote position={[-0.3, 2.95, -3.8]} color="#fff740" size={0.32} />
-      <StickyNote position={[0.3, 2.75, -3.78]} color="#fff740" size={0.36} />
-      <StickyNote position={[0.8, 2.9, -3.8]} color="#fff740" size={0.32} />
+      <StickyNote position={[-mapLinear(0.9, 1.5), 2.5, -3.8]} color="#fff740" size={mapLinear(0.21, 0.32)} />
+      <StickyNote position={[-mapLinear(0.5, 0.9), 2.45, -3.78]} color="#fff740" size={mapLinear(0.22, 0.34)} />
+      <StickyNote position={[-mapLinear(0.2, 0.3), 2.6, -3.8]} color="#fff740" size={mapLinear(0.21, 0.32)} />
+      <StickyNote position={[mapLinear(0.2, 0.3), 2.4, -3.78]} color="#fff740" size={mapLinear(0.22, 0.36)} />
+      <StickyNote position={[mapLinear(0.5, 0.8), 2.55, -3.8]} color="#fff740" size={mapLinear(0.21, 0.32)} />
 
       {/* Third Row - More scattered */}
-      <StickyNote position={[-1.2, 2.35, -3.8]} color="#fff740" size={0.30} />
-      <StickyNote position={[-0.5, 2.4, -3.78]} color="#fff740" size={0.32} />
-      <StickyNote position={[0.1, 2.3, -3.8]} color="#fff740" size={0.30} />
-      <StickyNote position={[0.6, 2.45, -3.78]} color="#fff740" size={0.29} />
+      <StickyNote position={[-mapLinear(0.7, 1.2), 2.05, -3.8]} color="#fff740" size={mapLinear(0.19, 0.30)} />
+      <StickyNote position={[-mapLinear(0.3, 0.5), 2.1, -3.78]} color="#fff740" size={mapLinear(0.20, 0.32)} />
+      <StickyNote position={[mapLinear(0.1, 0.1), 2.0, -3.8]} color="#fff740" size={mapLinear(0.19, 0.30)} />
+      <StickyNote position={[mapLinear(0.4, 0.6), 2.15, -3.78]} color="#fff740" size={mapLinear(0.18, 0.29)} />
 
       {/* Printer with papers on lower shelf - left side */}
-      <PrinterWithPaper position={[-7.5, 1.35, -3.2]} />
+      <PrinterWithPaper position={[mapLinear(-3.0, -7.5), 1.15, -3.2]} scale={[mapLinear(0.65, 1.0), mapLinear(0.65, 1.0), mapLinear(0.65, 1.0)]} />
 
       {/* Binders/Folders on lower shelf - center left */}
-      <BinderGroup position={[-4.5, 1.35, -3.25]} />
+      <BinderGroup position={[mapLinear(-1.7, -4.5), 1.15, -3.25]} scale={[mapLinear(0.7, 1.0), mapLinear(0.7, 1.0), mapLinear(0.7, 1.0)]} />
 
-      {/* Old CRT Monitor on lower shelf - left of calendar */}
-      <CRTMonitor position={[2.5, 1.35, -3.1]} />
+      {/* Old CRT Monitor on lower shelf - scaled down on mobile */}
+      <CRTMonitor position={[mapLinear(1.0, 2.5), 1.15, -3.1]} scale={[mapLinear(0.68, 1.0), mapLinear(0.68, 1.0), mapLinear(0.68, 1.0)]} />
 
       {/* Desk Calendar on lower shelf - right side */}
-      <DeskCalendar position={[5.3, 1.65, -3.0]} scale={[1.2, 1.2, 1.2]} />
+      <DeskCalendar position={[mapLinear(2.0, 5.3), 1.45, -3.0]} scale={[mapLinear(0.7, 1.2), mapLinear(0.7, 1.2), mapLinear(0.7, 1.2)]} />
 
       {/* Randomly stacked books on lower shelf - far right */}
-      <RandomBookStack position={[7.0, 1.35, -3.15]} />
+      <RandomBookStack position={[mapLinear(2.8, 7.0), 1.15, -3.15]} scale={[mapLinear(0.7, 1.0), mapLinear(0.7, 1.0), mapLinear(0.7, 1.0)]} />
 
-      {/* Photography Umbrella/Light Stand (right side) */}
-      <LightStand position={[7.5, -3, 1.5]} />
+      {/* Photography Umbrella/Light Stand (right side) — shown on desktop, hidden on mobile */}
+      {!isMobile && <LightStand position={[7.5, -3, 1.5]} />}
     </group>
   );
 }
@@ -251,11 +253,14 @@ function ArticleButton({ position = [0, 0, 0] as [number, number, number] }) {
   const [hovered, setHover] = useState(false);
   useCursor(hovered);
   const router = useRouter();
+  const { mapLinear } = useResponsiveCanvas();
+
+  const buttonScale = mapLinear(0.72, 1.0) * (hovered ? 1.05 : 1);
 
   return (
     <group
       position={position}
-      scale={hovered ? 1.05 : 1}
+      scale={[buttonScale, buttonScale, buttonScale]}
       onPointerOver={(e) => {
         e.stopPropagation();
         setHover(true);
@@ -320,9 +325,12 @@ function Printer({ position = [0, 0, 0] as [number, number, number] }) {
   );
 }
 
-function PrinterWithPaper({ position = [0, 0, 0] as [number, number, number] }) {
+function PrinterWithPaper({
+  position = [0, 0, 0] as [number, number, number],
+  scale = [1, 1, 1] as [number, number, number],
+}) {
   return (
-    <group position={position}>
+    <group position={position} scale={scale}>
       {/* Main Body */}
       <mesh castShadow={false}>
         <boxGeometry args={[1.2, 0.4, 0.6]} />
@@ -377,7 +385,10 @@ function BookStack({ position = [0, 0, 0] as [number, number, number] }) {
 }
 
 // Randomly stacked books with varied rotations and positions
-function RandomBookStack({ position = [0, 0, 0] as [number, number, number] }) {
+function RandomBookStack({
+  position = [0, 0, 0] as [number, number, number],
+  scale = [1, 1, 1] as [number, number, number],
+}) {
   const books = [
     { color: '#8b4513', width: 0.65, height: 0.09, depth: 0.45, xOffset: 0.05, zOffset: 0, rotation: 0.02 },
     { color: '#2f4f4f', width: 0.55, height: 0.08, depth: 0.4, xOffset: -0.08, zOffset: 0.03, rotation: -0.05 },
@@ -391,7 +402,7 @@ function RandomBookStack({ position = [0, 0, 0] as [number, number, number] }) {
   let currentHeight = 0;
 
   return (
-    <group position={position}>
+    <group position={position} scale={scale}>
       {books.map((book, i) => {
         const yPos = currentHeight + book.height / 2;
         currentHeight += book.height;
@@ -411,11 +422,14 @@ function RandomBookStack({ position = [0, 0, 0] as [number, number, number] }) {
   );
 }
 
-function BinderGroup({ position = [0, 0, 0] as [number, number, number] }) {
+function BinderGroup({
+  position = [0, 0, 0] as [number, number, number],
+  scale = [1, 1, 1] as [number, number, number],
+}) {
   const binderColors = ['#1e90ff', '#32cd32', '#ff6347', '#9370db', '#40e0d0', '#ffd700'];
 
   return (
-    <group position={position}>
+    <group position={position} scale={scale}>
       {binderColors.map((color, i) => (
         <mesh key={i} position={[i * 0.15, 0, 0]} castShadow={false}>
           <boxGeometry args={[0.12, 0.7, 0.35]} />
@@ -448,9 +462,12 @@ function CableCoil({ position = [0, 0, 0] as [number, number, number] }) {
   );
 }
 
-function CRTMonitor({ position = [0, 0, 0] as [number, number, number] }) {
+function CRTMonitor({
+  position = [0, 0, 0] as [number, number, number],
+  scale = [1, 1, 1] as [number, number, number],
+}) {
   return (
-    <group position={position}>
+    <group position={position} scale={scale}>
       {/* Monitor body - boxy CRT shape */}
       <mesh position={[0, 0.55, 0]} castShadow={false}>
         <boxGeometry args={[1.8, 1.5, 1.4]} />

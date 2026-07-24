@@ -2,6 +2,7 @@
 
 import { useRef } from 'react';
 import * as THREE from 'three';
+import { Text } from '@react-three/drei';
 
 interface DeskProps {
   position?: [number, number, number];
@@ -137,20 +138,7 @@ export default function Desk({
               <boxGeometry args={[drawerW + 0.02, drawerH + 0.02, 0.016]} />
               <meshLambertMaterial color={color} />
             </mesh>
-            {/* Drawer divider lines (3 drawers) */}
-            {[-drawerH / 3, 0, drawerH / 3].map((yOff, i) => (
-              <mesh key={`div-${i}`} position={[drawerX, drawerY + yOff, drawerD / 2 + 0.018]} castShadow>
-                <boxGeometry args={[drawerW - 0.06, 0.012, 0.004]} />
-                <meshLambertMaterial color="#2a2218" />
-              </mesh>
-            ))}
-            {/* Drawer handles (3) */}
-            {[-drawerH / 3, 0, drawerH / 3].map((yOff, i) => (
-              <mesh key={`handle-${i}`} position={[drawerX, drawerY + yOff, drawerD / 2 + 0.03]} castShadow>
-                <boxGeometry args={[0.22, 0.025, 0.02]} />
-                <meshLambertMaterial color={frameMetal} />
-              </mesh>
-            ))}
+            {/* Drawer handles removed to allow clean flush plate mounting */}
           </group>
         );
       })()}
@@ -331,10 +319,10 @@ export default function Desk({
         );
       })()}
 
-      {/* ═══ COFFEE MUG (chair side edge, near -Z) ═══ */}
+      {/* ═══ COFFEE MUG (shifted left per user request) ═══ */}
       {(() => {
         const surfY = deskY + topH / 2;
-        const mugX = 0.3;
+        const mugX = -0.25;
         const mugZ = -topD / 2 + 0.2; // chair side edge
         const mugR = 0.065;
         const mugH = 0.17;
@@ -384,6 +372,67 @@ export default function Desk({
               <cylinderGeometry args={[btlR - 0.008, btlR - 0.005, btlH * 0.6, 12]} />
               <meshLambertMaterial color="#a0d4f0" transparent opacity={0.5} />
             </mesh>
+          </group>
+        );
+      })()}
+
+      {/* ═══ EXECUTIVE OFFICER METALLIC NAMEPLATE (center front of desk) ═══ */}
+      {(() => {
+        const surfY = deskY + topH / 2;
+        const plateX = -0.05;
+        const plateZ = topD / 2 - 0.16;
+        return (
+          <group position={[plateX, surfY, plateZ]} rotation={[-0.22, 0, 0]}>
+            {/* Metallic desk stand base (low bottom feet) */}
+            <mesh position={[0, 0.015, 0]} castShadow receiveShadow>
+              <boxGeometry args={[0.76, 0.03, 0.10]} />
+              <meshStandardMaterial
+                color="#8a9098"
+                metalness={0.9}
+                roughness={0.2}
+              />
+            </mesh>
+
+            {/* Dark metal backing frame */}
+            <mesh position={[0, 0.08, 0.008]} castShadow>
+              <boxGeometry args={[0.74, 0.13, 0.012]} />
+              <meshStandardMaterial
+                color="#1a1c20"
+                metalness={0.9}
+                roughness={0.15}
+              />
+            </mesh>
+
+            {/* Brushed silver face plate */}
+            <mesh position={[0, 0.08, 0.018]} castShadow>
+              <boxGeometry args={[0.70, 0.11, 0.008]} />
+              <meshStandardMaterial
+                color="#e2e6eb"
+                metalness={0.8}
+                roughness={0.25}
+              />
+            </mesh>
+
+            {/* Gold/Brass corner accent pins */}
+            {[-0.31, 0.31].map((xPin, idx) => (
+              <mesh key={`pin-${idx}`} position={[xPin, 0.10, 0.024]}>
+                <cylinderGeometry args={[0.008, 0.008, 0.008, 12]} />
+                <meshStandardMaterial color="#d4af37" metalness={0.9} roughness={0.2} />
+              </mesh>
+            ))}
+
+            {/* Text: "AMIT KUMAR" (Placed cleanly at Z=0.032 in front of all metal surfaces) */}
+            <Text
+              position={[0, 0.08, 0.032]}
+              fontSize={0.070}
+              color="#050505"
+              anchorX="center"
+              anchorY="middle"
+              letterSpacing={0.08}
+              fontWeight="900"
+            >
+              AMIT KUMAR
+            </Text>
           </group>
         );
       })()}

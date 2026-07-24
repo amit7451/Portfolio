@@ -46,10 +46,10 @@ function ScrollCamera() {
   const scroll = useScroll();
   const { mapLinear } = useResponsiveCanvas();
 
-  const insideZ = mapLinear(22, 14);
-  const outsideZ = mapLinear(32, 26);
-  const heroY = 4.72;
-  const lookY = 3.72;
+  const insideZ = mapLinear(15.2, 14);
+  const outsideZ = mapLinear(24.0, 26);
+  const heroY = mapLinear(4.3, 4.72);
+  const lookY = mapLinear(3.9, 3.72);
   const floorsToTravel = FLOOR_COUNT - 1;
 
   useEffect(() => {
@@ -83,7 +83,7 @@ function ScrollCamera() {
     camera.lookAt(0, targetLookY, 0);
 
     if (camera instanceof THREE.PerspectiveCamera) {
-      camera.fov = mapLinear(65, 50);
+      camera.fov = mapLinear(45, 50);
       camera.updateProjectionMatrix();
     }
   });
