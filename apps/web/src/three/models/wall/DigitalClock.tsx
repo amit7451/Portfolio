@@ -43,8 +43,8 @@ export default function DigitalClock({
 
   return (
     <group ref={groupRef} position={position} rotation={rotation} scale={scale}>
-      {/* Clock Body - Black rounded frame */}
-      <mesh castShadow receiveShadow>
+      {/* Clock Body - Black rounded frame (bottom at Y=0) */}
+      <mesh position={[0, 0.45, 0]} castShadow receiveShadow>
         <boxGeometry args={[width, height, depth]} />
         <meshLambertMaterial
           color="#1a1a1a"
@@ -52,7 +52,7 @@ export default function DigitalClock({
       </mesh>
 
       {/* Inner frame border */}
-      <mesh position={[0, 0, depth / 2 - 0.01]}>
+      <mesh position={[0, 0.45, depth / 2 - 0.01]}>
         <boxGeometry args={[width - 0.06, height - 0.06, 0.02]} />
         <meshLambertMaterial
           color="#2a2a2a"
@@ -60,7 +60,7 @@ export default function DigitalClock({
       </mesh>
 
       {/* Display Screen - Dark background */}
-      <mesh position={[0, 0, depth / 2 + 0.001]}>
+      <mesh position={[0, 0.45, depth / 2 + 0.001]}>
         <planeGeometry args={[width - 0.12, height - 0.12]} />
         <meshLambertMaterial
           color="#0a0a0a"
@@ -68,7 +68,7 @@ export default function DigitalClock({
       </mesh>
 
       {/* AM/PM Indicator dot */}
-      <mesh position={[-1.1, 0.28, depth / 2 + 0.01]}>
+      <mesh position={[-1.1, 0.73, depth / 2 + 0.01]}>
         <circleGeometry args={[0.05, 16]} />
         <meshLambertMaterial
           color="#ff2200"
@@ -79,7 +79,7 @@ export default function DigitalClock({
 
       {/* Time Display - LED style red text */}
       <Text
-        position={[0, 0, depth / 2 + 0.01]}
+        position={[0, 0.45, depth / 2 + 0.01]}
         fontSize={0.5}
         color="#ff2200"
         anchorX="center"
@@ -97,7 +97,7 @@ export default function DigitalClock({
       </Text>
 
       {/* Subtle glow behind text */}
-      <mesh position={[0, 0, depth / 2 + 0.005]}>
+      <mesh position={[0, 0.45, depth / 2 + 0.005]}>
         <planeGeometry args={[2.2, 0.6]} />
         <meshLambertMaterial
           color="#ff0000"
@@ -110,7 +110,7 @@ export default function DigitalClock({
 
       {/* Brand text area at bottom */}
       <Text
-        position={[0.9, -0.32, depth / 2 + 0.01]}
+        position={[0.9, 0.13, depth / 2 + 0.01]}
         fontSize={0.07}
         color="#555555"
         anchorX="center"

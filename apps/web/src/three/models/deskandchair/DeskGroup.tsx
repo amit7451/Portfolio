@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useCallback } from 'react';
-import { RoundedBox, Outlines, useCursor, Text } from '@react-three/drei';
+import { useState, useCallback, useRef } from 'react';
+import { useFrame } from '@react-three/fiber';
+import { RoundedBox, useCursor, Text } from '@react-three/drei';
 import Desk from './Desk';
 import Chair from './Chair';
 import DeskLamp from './DeskLamp';
@@ -16,6 +17,7 @@ interface DeskGroupProps {
 
 /**
  * Interactive flat rectangular plate attached to the right wooden drawer of the desk
+ * Smooth animated lerp on hover
  */
 function DrawerPlateButton({
   pos,
@@ -32,6 +34,15 @@ function DrawerPlateButton({
 }) {
   const [hovered, setHovered] = useState(false);
   useCursor(hovered);
+  const groupRef = useRef<THREE.Group>(null);
+  const scaleRef = useRef(1);
+
+  useFrame((_, delta) => {
+    if (!groupRef.current) return;
+    const targetScale = hovered ? 1.045 : 1.0;
+    scaleRef.current = THREE.MathUtils.lerp(scaleRef.current, targetScale, Math.min(delta * 10, 0.2));
+    groupRef.current.scale.setScalar(scaleRef.current);
+  });
 
   const handleClick = useCallback(() => {
     if (link === 'download') {
@@ -48,8 +59,8 @@ function DrawerPlateButton({
 
   return (
     <group
+      ref={groupRef}
       position={pos}
-      scale={hovered ? 1.06 : 1}
       onPointerOver={(e) => {
         e.stopPropagation();
         setHovered(true);
@@ -70,10 +81,9 @@ function DrawerPlateButton({
       >
         <meshLambertMaterial
           color={color}
-          emissive={hovered ? '#00ff00' : color}
-          emissiveIntensity={hovered ? 0.35 : 0.08}
+          emissive={color}
+          emissiveIntensity={hovered ? 0.25 : 0.05}
         />
-        {hovered && <Outlines color="#00ff00" thickness={4} transparent opacity={0.9} />}
       </RoundedBox>
 
       {/* Bold Text with clean letter-spacing so letters NEVER touch or overlap */}
@@ -87,6 +97,107 @@ function DrawerPlateButton({
         fontWeight="bold"
       >
         {text}
+      </Text>
+    </group>
+  );
+}
+
+/**
+ * Interactive hinged white board for DoorDripp Pvt. Ltd. attached to front of desk
+ * Smooth animated lerp on hover
+ */
+function CompanyBoardButton({
+  pos = [-0.06, 1.30, 0.77] as [number, number, number],
+}) {
+  const [hovered, setHovered] = useState(false);
+  useCursor(hovered);
+  const groupRef = useRef<THREE.Group>(null);
+  const scaleRef = useRef(1);
+
+  useFrame((_, delta) => {
+    if (!groupRef.current) return;
+    const targetScale = hovered ? 1.038 : 1.0;
+    scaleRef.current = THREE.MathUtils.lerp(scaleRef.current, targetScale, Math.min(delta * 10, 0.2));
+    groupRef.current.scale.setScalar(scaleRef.current);
+  });
+
+  const handleClick = useCallback(() => {
+    window.open('https://doordripp.com/', '_blank');
+  }, []);
+
+  return (
+    <group
+      ref={groupRef}
+      position={pos}
+      onPointerOver={(e) => {
+        e.stopPropagation();
+        setHovered(true);
+      }}
+      onPointerOut={() => setHovered(false)}
+      onClick={(e) => {
+        e.stopPropagation();
+        handleClick();
+      }}
+    >
+      {/* Subtle black top hinge brackets attaching board to desk frame */}
+      {[-0.62, 0.62].map((xHinge, i) => (
+        <group key={`hinge-${i}`} position={[xHinge, 0.23, 0]}>
+          <mesh castShadow>
+            <boxGeometry args={[0.035, 0.05, 0.025]} />
+            <meshLambertMaterial color="#1a1a1a" />
+          </mesh>
+          <mesh position={[0, 0.025, 0]}>
+            <cylinderGeometry args={[0.012, 0.012, 0.05, 10]} />
+            <meshLambertMaterial color="#2a2a2a" />
+          </mesh>
+        </group>
+      ))}
+
+      {/* Main White Board Panel - Compacted height & width, top edge anchored to desk */}
+      <RoundedBox
+        args={[1.56, 0.48, 0.025]}
+        radius={0.04}
+        smoothness={4}
+        castShadow={false}
+        receiveShadow={false}
+      >
+        <meshLambertMaterial
+          color="#ffffff"
+          emissive="#ffffff"
+          emissiveIntensity={hovered ? 0.12 : 0.02}
+        />
+      </RoundedBox>
+
+      {/* Subtle border outline */}
+      <mesh position={[0, 0, 0.005]}>
+        <planeGeometry args={[1.54, 0.46]} />
+        <meshBasicMaterial color="#f2f2f2" />
+      </mesh>
+
+      {/* Line 1: CTO & Software Development Engineer */}
+      <Text
+        position={[0, 0.09, 0.018]}
+        fontSize={0.070}
+        color="#222222"
+        anchorX="center"
+        anchorY="middle"
+        letterSpacing={0.04}
+        fontWeight="bold"
+      >
+        CTO & Software Development Engineer
+      </Text>
+
+      {/* Line 2: DOORDRIPP PVT. LTD. */}
+      <Text
+        position={[0, -0.08, 0.018]}
+        fontSize={0.085}
+        color="#0a0a0a"
+        anchorX="center"
+        anchorY="middle"
+        letterSpacing={0.07}
+        fontWeight="900"
+      >
+        DOORDRIPP PVT. LTD.
       </Text>
     </group>
   );
@@ -133,7 +244,7 @@ export default function DeskGroup({
 
   const stoolPos = [mapLinear(2.0, 4.75), 0, mapLinear(0.8, 0.55)];
   const stoolScale = mapLinear(1.3, 1.42);
-  const deskScale = mapLinear(1.38, 1.8);
+  const deskScale = mapLinear(1.25, 1.8);
 
   return (
     <group position={position} rotation={rotation} scale={scale}>
@@ -145,12 +256,15 @@ export default function DeskGroup({
         {drawerPlates.map((plate, index) => (
           <DrawerPlateButton key={`drawer-plate-${index}`} {...plate} />
         ))}
+
+        {/* DoorDripp Pvt. Ltd. Hinged White Board attached flush under desk top edge */}
+        <CompanyBoardButton pos={[-0.06, 1.30, 0.77]} />
       </group>
 
       <Chair
         position={[0, 0, -3.5]}
         rotation={[0, Math.PI + 0.175, 0]}
-        scale={[mapLinear(1.3, 1.7), mapLinear(1.3, 1.7), mapLinear(1.3, 1.7)]}
+        scale={[mapLinear(1.15, 1.7), mapLinear(1.15, 1.7), mapLinear(1.15, 1.7)]}
         color="#1a1a1a"
       />
 

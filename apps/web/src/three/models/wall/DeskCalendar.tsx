@@ -81,39 +81,41 @@ export default function DeskCalendar({
 
   return (
     <group position={position} rotation={rotation} scale={scale}>
-      {/* --- STAND GEOMETRY --- */}
-      
-      {/* Base Foot */}
-      <mesh position={[0, -0.45, 0.2]} castShadow receiveShadow>
-        <boxGeometry args={[0.9, 0.05, 0.4]} />
-        <meshLambertMaterial color="#222222" />
-      </mesh>
+      <group position={[0, 0.50, 0]}>
+        {/* --- STAND GEOMETRY --- */}
+        
+        {/* Base Foot */}
+        <mesh position={[0, -0.45, 0.2]} castShadow receiveShadow>
+          <boxGeometry args={[0.9, 0.05, 0.4]} />
+          <meshLambertMaterial color="#222222" />
+        </mesh>
 
-      {/* Back Support (Angled) */}
-      <mesh position={[0, 0, 0]} rotation={[-0.1, 0, 0]} receiveShadow>
-        <boxGeometry args={[0.85, 1.0, 0.05]} />
-        <meshLambertMaterial color="#f0f0f0" />
-      </mesh>
+        {/* Back Support (Angled) */}
+        <mesh position={[0, 0, 0]} rotation={[-0.1, 0, 0]} receiveShadow>
+          <boxGeometry args={[0.85, 1.0, 0.05]} />
+          <meshLambertMaterial color="#f0f0f0" />
+        </mesh>
 
-      {/* --- CANVAS DISPLAY --- */}
-      {/* Placed slightly in front of the back support */}
-      <mesh position={[0, 0, 0.03]} rotation={[-0.1, 0, 0]}>
-        <planeGeometry args={[0.8, 0.9]} />
-        {/* toneMapped={false} ensures colors are vibrant and not washed out by scene lights */}
-        <meshBasicMaterial map={texture} toneMapped={false} />
-      </mesh>
+        {/* --- CANVAS DISPLAY --- */}
+        {/* Placed slightly in front of the back support */}
+        <mesh position={[0, 0, 0.03]} rotation={[-0.1, 0, 0]}>
+          <planeGeometry args={[0.8, 0.9]} />
+          {/* toneMapped={false} ensures colors are vibrant and not washed out by scene lights */}
+          <meshBasicMaterial map={texture} toneMapped={false} />
+        </mesh>
 
-      {/* --- BORDERS/BEZEL --- */}
-      {/* Top Bezel */}
-      <mesh position={[0, 0.47, 0.03]} rotation={[-0.1, 0, 0]}>
-        <boxGeometry args={[0.85, 0.06, 0.02]} />
-        <meshLambertMaterial color="#222222" />
-      </mesh>
-      {/* Bottom Bezel */}
-      <mesh position={[0, -0.47, 0.03]} rotation={[-0.1, 0, 0]}>
-        <boxGeometry args={[0.85, 0.06, 0.02]} />
-        <meshLambertMaterial color="#222222" />
-      </mesh>
+        {/* --- BORDERS/BEZEL --- */}
+        {/* Top Bezel */}
+        <mesh position={[0, 0.47, 0.03]} rotation={[-0.1, 0, 0]}>
+          <boxGeometry args={[0.85, 0.06, 0.02]} />
+          <meshLambertMaterial color="#222222" />
+        </mesh>
+        {/* Bottom Bezel */}
+        <mesh position={[0, -0.47, 0.03]} rotation={[-0.1, 0, 0]}>
+          <boxGeometry args={[0.85, 0.06, 0.02]} />
+          <meshLambertMaterial color="#222222" />
+        </mesh>
+      </group>
     </group>
   );
 }

@@ -185,17 +185,17 @@ function BuildingShell() {
 function BuildingLighting() {
   return (
     <>
-      {/* Low-cost consistent room lighting rig */}
-      <ambientLight intensity={0.45} color="#f7f8ff" />
+      {/* Symmetrical room lighting rig — equal warm illumination for left & right walls */}
+      <ambientLight intensity={0.55} color="#f7f8ff" />
       <directionalLight
         position={[10, 12, 8]}
-        intensity={0.7}
+        intensity={0.5}
         color="#fff5ea"
       />
       <directionalLight
-        position={[-9, 7, -6]}
-        intensity={0.3}
-        color="#d9e6ff"
+        position={[-10, 12, 8]}
+        intensity={0.5}
+        color="#fff5ea"
       />
     </>
   );

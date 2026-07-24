@@ -147,26 +147,26 @@ export default function WallDecorGroup({
         lightIntensity={0.4}
       />
 
-      {/* Toy Figurines on Upper Shelf - left side */}
-      <group position={[mapLinear(-2.0, -2.8), 5.35, -3.0]} scale={[mapLinear(0.85, 1.45), mapLinear(0.85, 1.45), mapLinear(0.85, 1.45)]}>
+      {/* Toy Figurines on Upper Shelf - left side (resting on shelf surface Y=5.275) */}
+      <group position={[mapLinear(-2.0, -2.8), 5.275, -3.0]} scale={[mapLinear(0.85, 1.45), mapLinear(0.85, 1.45), mapLinear(0.85, 1.45)]}>
         <TanjiroFigurine position={[0, 0, 0]} />
       </group>
-      <group position={[mapLinear(-1.3, -1.85), 5.35, -2.92]} scale={[mapLinear(0.8, 1.3), mapLinear(0.8, 1.3), mapLinear(0.8, 1.3)]}>
+      <group position={[mapLinear(-1.3, -1.85), 5.275, -2.92]} scale={[mapLinear(0.8, 1.3), mapLinear(0.8, 1.3), mapLinear(0.8, 1.3)]}>
         <ZenitsuFigurine position={[0, 0, 0]} />
       </group>
-      <group position={[mapLinear(-0.7, -1.15), 5.35, -3.06]} scale={[mapLinear(0.85, 1.55), mapLinear(0.85, 1.55), mapLinear(0.85, 1.55)]}>
+      <group position={[mapLinear(-0.7, -1.15), 5.275, -3.06]} scale={[mapLinear(0.85, 1.55), mapLinear(0.85, 1.55), mapLinear(0.85, 1.55)]}>
         <SpiderManFigurine position={[0, 0, 0]} />
       </group>
-      <group position={[mapLinear(-0.1, -0.25), 5.35, -2.88]} scale={[mapLinear(0.8, 1.35), mapLinear(0.8, 1.35), mapLinear(0.8, 1.35)]}>
+      <group position={[mapLinear(-0.1, -0.25), 5.275, -2.88]} scale={[mapLinear(0.8, 1.35), mapLinear(0.8, 1.35), mapLinear(0.8, 1.35)]}>
         <IronManFigurine position={[0, 0, 0]} />
       </group>
-      <group position={[mapLinear(0.4, 0.45), 5.35, -3.0]} scale={[mapLinear(0.85, 1.5), mapLinear(0.85, 1.5), mapLinear(0.85, 1.5)]}>
+      <group position={[mapLinear(0.4, 0.45), 5.275, -3.0]} scale={[mapLinear(0.85, 1.5), mapLinear(0.85, 1.5), mapLinear(0.85, 1.5)]}>
         <CaptainAmericaFigurine position={[0, 0, 0]} />
       </group>
 
-      {/* Digital Clock on Upper Shelf - right corner */}
+      {/* Digital Clock on Upper Shelf - right corner (resting on shelf surface Y=5.275) */}
       <DigitalClock
-        position={[mapLinear(1.3, 1.8), 5.55, -3.0]}
+        position={[mapLinear(1.3, 1.8), 5.275, -3.0]}
         scale={[mapLinear(0.4, 0.6), mapLinear(0.4, 0.6), mapLinear(0.4, 0.6)]}
       />
 
@@ -226,20 +226,20 @@ export default function WallDecorGroup({
       <StickyNote position={[mapLinear(0.1, 0.1), 2.0, -3.8]} color="#fff740" size={mapLinear(0.19, 0.30)} />
       <StickyNote position={[mapLinear(0.4, 0.6), 2.15, -3.78]} color="#fff740" size={mapLinear(0.18, 0.29)} />
 
-      {/* Printer with papers on lower shelf - left side */}
-      <PrinterWithPaper position={[mapLinear(-3.0, -7.5), 1.15, -3.2]} scale={[mapLinear(0.65, 1.0), mapLinear(0.65, 1.0), mapLinear(0.65, 1.0)]} />
+      {/* Printer with papers on lower shelf - left side (resting on shelf surface Y=0.875) */}
+      <PrinterWithPaper position={[mapLinear(-3.0, -7.5), 0.875, -3.2]} scale={[mapLinear(0.65, 1.0), mapLinear(0.65, 1.0), mapLinear(0.65, 1.0)]} />
 
-      {/* Binders/Folders on lower shelf - center left */}
-      <BinderGroup position={[mapLinear(-1.7, -4.5), 1.15, -3.25]} scale={[mapLinear(0.7, 1.0), mapLinear(0.7, 1.0), mapLinear(0.7, 1.0)]} />
+      {/* Binders/Folders on lower shelf - center left (resting on shelf surface Y=0.875) */}
+      <BinderGroup position={[mapLinear(-1.7, -4.5), 0.875, -3.25]} scale={[mapLinear(0.7, 1.0), mapLinear(0.7, 1.0), mapLinear(0.7, 1.0)]} />
 
-      {/* Old CRT Monitor on lower shelf - scaled down on mobile */}
-      <CRTMonitor position={[mapLinear(1.0, 2.5), 1.15, -3.1]} scale={[mapLinear(0.68, 1.0), mapLinear(0.68, 1.0), mapLinear(0.68, 1.0)]} />
+      {/* Old CRT Monitor on lower shelf - resting on shelf surface Y=0.875 */}
+      <CRTMonitor position={[mapLinear(1.0, 2.5), 0.875, -3.1]} scale={[mapLinear(0.68, 1.0), mapLinear(0.68, 1.0), mapLinear(0.68, 1.0)]} />
 
-      {/* Desk Calendar on lower shelf - right side */}
-      <DeskCalendar position={[mapLinear(2.0, 5.3), 1.45, -3.0]} scale={[mapLinear(0.7, 1.2), mapLinear(0.7, 1.2), mapLinear(0.7, 1.2)]} />
+      {/* Desk Calendar on lower shelf - right side (resting on shelf surface Y=0.875) */}
+      <DeskCalendar position={[mapLinear(2.0, 5.3), 0.875, -3.0]} scale={[mapLinear(0.7, 1.2), mapLinear(0.7, 1.2), mapLinear(0.7, 1.2)]} />
 
-      {/* Randomly stacked books on lower shelf - far right */}
-      <RandomBookStack position={[mapLinear(2.8, 7.0), 1.15, -3.15]} scale={[mapLinear(0.7, 1.0), mapLinear(0.7, 1.0), mapLinear(0.7, 1.0)]} />
+      {/* Randomly stacked books on lower shelf - far right (resting on shelf surface Y=0.875) */}
+      <RandomBookStack position={[mapLinear(2.8, 7.0), 0.875, -3.15]} scale={[mapLinear(0.7, 1.0), mapLinear(0.7, 1.0), mapLinear(0.7, 1.0)]} />
 
       {/* Photography Umbrella/Light Stand (right side) — shown on desktop, hidden on mobile */}
       {!isMobile && <LightStand position={[7.5, -3, 1.5]} />}
@@ -331,40 +331,42 @@ function PrinterWithPaper({
 }) {
   return (
     <group position={position} scale={scale}>
-      {/* Main Body */}
-      <mesh castShadow={false}>
-        <boxGeometry args={[1.2, 0.4, 0.6]} />
-        <meshLambertMaterial color="#2a2a2a" />
-      </mesh>
-      {/* Paper Tray */}
-      <mesh position={[0, 0.25, 0.1]} castShadow={false}>
-        <boxGeometry args={[0.8, 0.1, 0.4]} />
-        <meshLambertMaterial color="#1a1a1a" />
-      </mesh>
-      {/* Control Panel */}
-      <mesh position={[0.35, 0.2, 0.32]}>
-        <boxGeometry args={[0.3, 0.08, 0.02]} />
-        <meshLambertMaterial color="#333" />
-      </mesh>
-      {/* Display */}
-      <mesh position={[0.35, 0.22, 0.33]}>
-        <planeGeometry args={[0.15, 0.04]} />
-        <meshLambertMaterial color="#1a3a2a" emissive="#0a2015" emissiveIntensity={0.3} />
-      </mesh>
-      {/* White paper stack on top */}
-      <mesh position={[0, 0.35, 0.05]} castShadow={false}>
-        <boxGeometry args={[0.7, 0.08, 0.5]} />
-        <meshLambertMaterial color="#ffffff" />
-      </mesh>
-      {/* Output paper tray with papers */}
-      <mesh position={[0, 0.1, 0.45]} rotation={[-0.2, 0, 0]} castShadow={false}>
-        <boxGeometry args={[0.65, 0.02, 0.3]} />
-        <meshLambertMaterial color="#ffffff" />
-      </mesh>
-      <mesh position={[0, 0.12, 0.48]} rotation={[-0.15, 0, 0]} castShadow={false}>
-        <boxGeometry args={[0.65, 0.02, 0.28]} />
-        <meshLambertMaterial color="#f8f8f8" />
-      </mesh>
+      <group position={[0, 0.20, 0]}>
+        {/* Main Body */}
+        <mesh castShadow={false}>
+          <boxGeometry args={[1.2, 0.4, 0.6]} />
+          <meshLambertMaterial color="#2a2a2a" />
+        </mesh>
+        {/* Paper Tray */}
+        <mesh position={[0, 0.25, 0.1]} castShadow={false}>
+          <boxGeometry args={[0.8, 0.1, 0.4]} />
+          <meshLambertMaterial color="#1a1a1a" />
+        </mesh>
+        {/* Control Panel */}
+        <mesh position={[0.35, 0.2, 0.32]}>
+          <boxGeometry args={[0.3, 0.08, 0.02]} />
+          <meshLambertMaterial color="#333" />
+        </mesh>
+        {/* Display */}
+        <mesh position={[0.35, 0.22, 0.33]}>
+          <planeGeometry args={[0.15, 0.04]} />
+          <meshLambertMaterial color="#1a3a2a" emissive="#0a2015" emissiveIntensity={0.3} />
+        </mesh>
+        {/* White paper stack on top */}
+        <mesh position={[0, 0.35, 0.05]} castShadow={false}>
+          <boxGeometry args={[0.7, 0.08, 0.5]} />
+          <meshLambertMaterial color="#ffffff" />
+        </mesh>
+        {/* Output paper tray with papers */}
+        <mesh position={[0, 0.1, 0.45]} rotation={[-0.2, 0, 0]} castShadow={false}>
+          <boxGeometry args={[0.65, 0.02, 0.3]} />
+          <meshLambertMaterial color="#ffffff" />
+        </mesh>
+        <mesh position={[0, 0.12, 0.48]} rotation={[-0.15, 0, 0]} castShadow={false}>
+          <boxGeometry args={[0.65, 0.02, 0.28]} />
+          <meshLambertMaterial color="#f8f8f8" />
+        </mesh>
+      </group>
     </group>
   );
 }
@@ -430,12 +432,14 @@ function BinderGroup({
 
   return (
     <group position={position} scale={scale}>
-      {binderColors.map((color, i) => (
-        <mesh key={i} position={[i * 0.15, 0, 0]} castShadow={false}>
-          <boxGeometry args={[0.12, 0.7, 0.35]} />
-          <meshLambertMaterial color={color} />
-        </mesh>
-      ))}
+      <group position={[0, 0.35, 0]}>
+        {binderColors.map((color, i) => (
+          <mesh key={i} position={[i * 0.15, 0, 0]} castShadow={false}>
+            <boxGeometry args={[0.12, 0.7, 0.35]} />
+            <meshLambertMaterial color={color} />
+          </mesh>
+        ))}
+      </group>
     </group>
   );
 }
@@ -468,103 +472,105 @@ function CRTMonitor({
 }) {
   return (
     <group position={position} scale={scale}>
-      {/* Monitor body - boxy CRT shape */}
-      <mesh position={[0, 0.55, 0]} castShadow={false}>
-        <boxGeometry args={[1.8, 1.5, 1.4]} />
-        <meshLambertMaterial color="#c8c0b0" />
-      </mesh>
+      <group position={[0, 0.25, 0]}>
+        {/* Monitor body - boxy CRT shape */}
+        <mesh position={[0, 0.55, 0]} castShadow={false}>
+          <boxGeometry args={[1.8, 1.5, 1.4]} />
+          <meshLambertMaterial color="#c8c0b0" />
+        </mesh>
 
-      {/* Rear bulge (CRT tube) */}
-      <mesh position={[0, 0.55, -0.55]} castShadow={false}>
-        <boxGeometry args={[1.5, 1.2, 0.5]} />
-        <meshLambertMaterial color="#b8b0a0" />
-      </mesh>
+        {/* Rear bulge (CRT tube) */}
+        <mesh position={[0, 0.55, -0.55]} castShadow={false}>
+          <boxGeometry args={[1.5, 1.2, 0.5]} />
+          <meshLambertMaterial color="#b8b0a0" />
+        </mesh>
 
-      {/* Screen bezel - dark frame */}
-      <mesh position={[0, 0.6, 0.71]} castShadow={false}>
-        <boxGeometry args={[1.55, 1.25, 0.04]} />
-        <meshLambertMaterial color="#3a3a3a" />
-      </mesh>
+        {/* Screen bezel - dark frame */}
+        <mesh position={[0, 0.6, 0.71]} castShadow={false}>
+          <boxGeometry args={[1.55, 1.25, 0.04]} />
+          <meshLambertMaterial color="#3a3a3a" />
+        </mesh>
 
-      {/* Screen - black with green glow */}
-      <mesh position={[0, 0.6, 0.74]}>
-        <planeGeometry args={[1.3, 1.0]} />
-        <meshLambertMaterial
-          color="#001a00"
-          emissive="#001a00"
-          emissiveIntensity={0.3}
-        />
-      </mesh>
+        {/* Screen - black with green glow */}
+        <mesh position={[0, 0.6, 0.74]}>
+          <planeGeometry args={[1.3, 1.0]} />
+          <meshLambertMaterial
+            color="#001a00"
+            emissive="#001a00"
+            emissiveIntensity={0.3}
+          />
+        </mesh>
 
-      {/* Green scanlines / code lines on screen */}
-      {[
-        { y: 0.85, w: 0.9 },
-        { y: 0.78, w: 0.55 },
-        { y: 0.71, w: 1.05 },
-        { y: 0.64, w: 0.7 },
-        { y: 0.57, w: 0.85 },
-        { y: 0.50, w: 0.45 },
-        { y: 0.43, w: 1.1 },
-        { y: 0.36, w: 0.6 },
-        { y: 0.29, w: 0.95 },
-      ].map((line, i) => (
-        <mesh key={i} position={[-0.55 + line.w / 2, line.y, 0.75]}>
-          <planeGeometry args={[line.w, 0.035]} />
+        {/* Green scanlines / code lines on screen */}
+        {[
+          { y: 0.85, w: 0.9 },
+          { y: 0.78, w: 0.55 },
+          { y: 0.71, w: 1.05 },
+          { y: 0.64, w: 0.7 },
+          { y: 0.57, w: 0.85 },
+          { y: 0.50, w: 0.45 },
+          { y: 0.43, w: 1.1 },
+          { y: 0.36, w: 0.6 },
+          { y: 0.29, w: 0.95 },
+        ].map((line, i) => (
+          <mesh key={i} position={[-0.55 + line.w / 2, line.y, 0.75]}>
+            <planeGeometry args={[line.w, 0.035]} />
+            <meshLambertMaterial
+              color="#00ff41"
+              emissive="#00ff41"
+              emissiveIntensity={0.8}
+              transparent
+              opacity={0.6 + Math.random() * 0.3}
+            />
+          </mesh>
+        ))}
+
+        {/* Blinking cursor */}
+        <mesh position={[-0.45, 0.22, 0.75]}>
+          <planeGeometry args={[0.06, 0.045]} />
           <meshLambertMaterial
             color="#00ff41"
             emissive="#00ff41"
-            emissiveIntensity={0.8}
-            transparent
-            opacity={0.6 + Math.random() * 0.3}
+            emissiveIntensity={1.2}
           />
         </mesh>
-      ))}
 
-      {/* Blinking cursor */}
-      <mesh position={[-0.45, 0.22, 0.75]}>
-        <planeGeometry args={[0.06, 0.045]} />
-        <meshLambertMaterial
-          color="#00ff41"
-          emissive="#00ff41"
-          emissiveIntensity={1.2}
-        />
-      </mesh>
-
-      {/* Monitor stand/base */}
-      <mesh position={[0, -0.15, 0.1]} castShadow={false}>
-        <boxGeometry args={[0.6, 0.15, 0.6]} />
-        <meshLambertMaterial color="#b8b0a0" />
-      </mesh>
-
-      {/* Stand foot */}
-      <mesh position={[0, -0.22, 0.1]} castShadow={false}>
-        <boxGeometry args={[1.0, 0.06, 0.8]} />
-        <meshLambertMaterial color="#a8a090" />
-      </mesh>
-
-      {/* Power button */}
-      <mesh position={[0.6, 0.15, 0.72]}>
-        <cylinderGeometry args={[0.04, 0.04, 0.02, 12]} />
-        <meshLambertMaterial color="#2a2a2a" />
-      </mesh>
-
-      {/* Power LED */}
-      <mesh position={[0.6, 0.08, 0.72]}>
-        <sphereGeometry args={[0.02, 8, 8]} />
-        <meshLambertMaterial
-          color="#00cc00"
-          emissive="#00cc00"
-          emissiveIntensity={2}
-        />
-      </mesh>
-
-      {/* Ventilation slots on side */}
-      {Array.from({ length: 5 }).map((_, i) => (
-        <mesh key={i} position={[0.91, 0.35 + i * 0.12, 0]} castShadow={false}>
-          <boxGeometry args={[0.01, 0.04, 0.6]} />
-          <meshLambertMaterial color="#555" />
+        {/* Monitor stand/base */}
+        <mesh position={[0, -0.15, 0.1]} castShadow={false}>
+          <boxGeometry args={[0.6, 0.15, 0.6]} />
+          <meshLambertMaterial color="#b8b0a0" />
         </mesh>
-      ))}
+
+        {/* Stand foot */}
+        <mesh position={[0, -0.22, 0.1]} castShadow={false}>
+          <boxGeometry args={[1.0, 0.06, 0.8]} />
+          <meshLambertMaterial color="#a8a090" />
+        </mesh>
+
+        {/* Power button */}
+        <mesh position={[0.6, 0.15, 0.72]}>
+          <cylinderGeometry args={[0.04, 0.04, 0.02, 12]} />
+          <meshLambertMaterial color="#2a2a2a" />
+        </mesh>
+
+        {/* Power LED */}
+        <mesh position={[0.6, 0.08, 0.72]}>
+          <sphereGeometry args={[0.02, 8, 8]} />
+          <meshLambertMaterial
+            color="#00cc00"
+            emissive="#00cc00"
+            emissiveIntensity={2}
+          />
+        </mesh>
+
+        {/* Ventilation slots on side */}
+        {Array.from({ length: 5 }).map((_, i) => (
+          <mesh key={i} position={[0.91, 0.35 + i * 0.12, 0]} castShadow={false}>
+            <boxGeometry args={[0.01, 0.04, 0.6]} />
+            <meshLambertMaterial color="#555" />
+          </mesh>
+        ))}
+      </group>
     </group>
   );
 }
