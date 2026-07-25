@@ -156,12 +156,10 @@ export default function ProjectsRoom({
     targetProgress.current += 1;
   };
 
-  const handlePrev = () => {
-    pauseAutoSlide();
-    targetProgress.current -= 1;
-  };
-
   const handleSelectProject = (index: number) => {
+    // Ignore click navigation if user was performing a touch swipe gesture
+    if (totalDragDistance.current > 10) return;
+
     pauseAutoSlide();
     const project = PROJECTS_DATA[index];
     const total = PROJECTS_DATA.length;
@@ -179,29 +177,74 @@ export default function ProjectsRoom({
     }
   };
 
-  // Pointer drag gestures
-  const handlePointerDown = (e: any) => {
-    e.stopPropagation();
-    pauseAutoSlide();
-    dragStartX.current = e.clientX || e.touches?.[0]?.clientX || 0;
-  };
+  const totalDragDistance = useRef<number>(0);
 
-  const handlePointerMove = (e: any) => {
-    if (dragStartX.current === null) return;
-    const clientX = e.clientX || e.touches?.[0]?.clientX || 0;
-    const deltaX = clientX - dragStartX.current;
-    if (deltaX < -35) {
-      handleNext();
-      dragStartX.current = null;
-    } else if (deltaX > 35) {
-      handlePrev();
-      dragStartX.current = null;
-    }
-  };
+  // Dedicated Native Touch Listener for Mobile Smartphones (Nothing Phone, iPhones, Android)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
 
-  const handlePointerUp = () => {
-    dragStartX.current = null;
-  };
+    let startX = 0;
+    let startY = 0;
+    let startProgress = 0;
+    let isTouchActive = false;
+    let isHorizontalSwipe = false;
+
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches.length !== 1) return;
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+      startProgress = targetProgress.current;
+      isTouchActive = true;
+      isHorizontalSwipe = false;
+      totalDragDistance.current = 0;
+      pauseAutoSlide();
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (!isTouchActive || e.touches.length !== 1) return;
+      const currentX = e.touches[0].clientX;
+      const currentY = e.touches[0].clientY;
+      const deltaX = currentX - startX;
+      const deltaY = currentY - startY;
+
+      // Lock to horizontal swipe if movement is primarily horizontal
+      if (!isHorizontalSwipe && Math.abs(deltaX) > 8 && Math.abs(deltaX) > Math.abs(deltaY)) {
+        isHorizontalSwipe = true;
+      }
+
+      if (isHorizontalSwipe) {
+        if (e.cancelable) {
+          e.preventDefault(); // Stop mobile browser from canceling touch gesture or scrolling page!
+        }
+        totalDragDistance.current = Math.abs(deltaX);
+        const dragSensitivity = isSmallScreen ? 140 : 250;
+        targetProgress.current = startProgress - deltaX / dragSensitivity;
+      }
+    };
+
+    const handleTouchEnd = () => {
+      if (!isTouchActive) return;
+      isTouchActive = false;
+      if (isHorizontalSwipe) {
+        targetProgress.current = Math.round(targetProgress.current);
+      }
+      setTimeout(() => {
+        totalDragDistance.current = 0;
+      }, 120);
+    };
+
+    window.addEventListener('touchstart', handleTouchStart, { passive: true });
+    window.addEventListener('touchmove', handleTouchMove, { passive: false });
+    window.addEventListener('touchend', handleTouchEnd, { passive: true });
+    window.addEventListener('touchcancel', handleTouchEnd, { passive: true });
+
+    return () => {
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchend', handleTouchEnd);
+      window.removeEventListener('touchcancel', handleTouchEnd);
+    };
+  }, [isSmallScreen]);
 
   return (
     <group
@@ -209,10 +252,6 @@ export default function ProjectsRoom({
       position={position}
       rotation={rotation}
       scale={scale}
-      onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
-      onPointerUp={handlePointerUp}
-      onPointerLeave={handlePointerUp}
     >
       {/* ═══ BACK WALL ═══ */}
       <mesh position={[0, roomH / 2, backWallZ]}>
