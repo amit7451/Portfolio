@@ -259,7 +259,7 @@ function ScrollFallbackController() {
       // 300ms comfortable waiting time after user scroll stops
       idleTimeoutRef.current = setTimeout(() => {
         triggerFallbackSnap();
-      }, 300);
+      }, 500);
     };
 
     const handleTouchStart = () => {
@@ -271,7 +271,7 @@ function ScrollFallbackController() {
       if (idleTimeoutRef.current) clearTimeout(idleTimeoutRef.current);
       idleTimeoutRef.current = setTimeout(() => {
         triggerFallbackSnap();
-      }, 300);
+      }, 500);
     };
 
     const handlePointerDown = () => {
@@ -283,7 +283,7 @@ function ScrollFallbackController() {
       if (idleTimeoutRef.current) clearTimeout(idleTimeoutRef.current);
       idleTimeoutRef.current = setTimeout(() => {
         triggerFallbackSnap();
-      }, 300);
+      }, 500);
     };
 
     const handleNavigation = () => {
