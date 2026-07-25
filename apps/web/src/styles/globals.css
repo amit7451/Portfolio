@@ -111,3 +111,22 @@ div[style*="overflow: auto"]::-webkit-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* Mobile Bottom Navigation Overlay safe area and responsive rules */
+.bottom-nav-overlay {
+  position: fixed !important;
+  bottom: max(16px, calc(12px + env(safe-area-inset-bottom, 0px))) !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  z-index: 99999 !important;
+  pointer-events: auto !important;
+}
+
+@media screen and (max-width: 480px) {
+  .bottom-nav-overlay button span {
+    font-size: 10px;
+  }
+  .bottom-nav-overlay button {
+    padding: 6px 9px !important;
+  }
+}

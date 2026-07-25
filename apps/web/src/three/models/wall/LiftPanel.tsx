@@ -81,7 +81,7 @@ export default function LiftPanel({
   position = [0, 0, 0],
   rotation = [0, 0, 0],
 }: LiftPanelProps) {
-  const { isMobile } = useResponsiveCanvas();
+  const { shouldHideSideNav } = useResponsiveCanvas();
 
   // Filter out current floor to get 3 remote destinations
   const remoteFloors = useMemo(() => {
@@ -97,7 +97,7 @@ export default function LiftPanel({
     window.dispatchEvent(event);
   };
 
-  if (isMobile) return null;
+  if (shouldHideSideNav) return null;
 
   return (
     <group position={position} rotation={rotation}>

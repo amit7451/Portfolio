@@ -32,6 +32,7 @@ export function useResponsiveCanvas() {
 
   const aspectRatio = size.width / size.height;
   const isPortrait = aspectRatio < 1.0;
+  const shouldHideSideNav = isMobile || isTablet || size.width < 1024 || aspectRatio < 1.35;
 
   return {
     isMobile,
@@ -43,6 +44,7 @@ export function useResponsiveCanvas() {
     size,
     aspectRatio,
     isPortrait,
+    shouldHideSideNav,
   };
 }
 
@@ -72,11 +74,15 @@ export function useWindowSize() {
   const isMobile = windowSize.width < BREAKPOINTS.mobile;
   const isTablet = windowSize.width >= BREAKPOINTS.mobile && windowSize.width < BREAKPOINTS.tablet;
   const isDesktop = windowSize.width >= BREAKPOINTS.tablet;
+  const aspectRatio = windowSize.width / (windowSize.height || 1);
+  const shouldShowBottomNav = isMobile || isTablet || windowSize.width < 1024 || aspectRatio < 1.35;
 
   return {
     ...windowSize,
     isMobile,
     isTablet,
     isDesktop,
+    aspectRatio,
+    shouldShowBottomNav,
   };
 }

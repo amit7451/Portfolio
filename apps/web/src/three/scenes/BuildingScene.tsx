@@ -45,6 +45,7 @@ function ScrollCamera() {
   const { camera } = useThree();
   const scroll = useScroll();
   const { mapLinear } = useResponsiveCanvas();
+  const lastFloorRef = useRef<number>(0);
 
   const insideZ = mapLinear(15.2, 14);
   const outsideZ = mapLinear(24.0, 26);
@@ -70,6 +71,19 @@ function ScrollCamera() {
   useFrame(() => {
     const clampedOffset = Math.max(0, Math.min(1, scroll.offset));
     const floorProgress = clampedOffset * floorsToTravel;
+
+    const currentFloorIndex = Math.round(floorProgress);
+    if (lastFloorRef.current !== currentFloorIndex) {
+      lastFloorRef.current = currentFloorIndex;
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(
+          new CustomEvent('floorChanged', {
+            detail: { floorIndex: currentFloorIndex },
+          })
+        );
+      }
+    }
+
     const localProgress = floorProgress - Math.floor(floorProgress);
 
     const transitionCurve = Math.sin(localProgress * Math.PI);
@@ -262,7 +276,7 @@ function VisibilityCullingFloor({ floorIndex, children, position }: { floorIndex
 // BuildingScene — Main exported component
 // ────────────────────────────────────────────────────
 export default function BuildingScene() {
-  const { isMobile } = useWindowSize();
+  const { isMobile, shouldShowBottomNav } = useWindowSize();
 
   return (
     <div
@@ -387,8 +401,8 @@ export default function BuildingScene() {
         */}
         <div id="html-portal-root" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }} />
         
-        {/* Mobile Navigation Overlay */}
-        {isMobile && <MobileNavOverlay />}
+        {/* Navigation Overlay (Bottom Bar when Side Nav is cut off) */}
+        {shouldShowBottomNav && <MobileNavOverlay />}
       </div>
     </div>
   );
