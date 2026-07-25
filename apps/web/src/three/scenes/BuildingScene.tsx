@@ -216,8 +216,107 @@ function BuildingLighting() {
 }
 
 // ────────────────────────────────────────────────────
-// Loading fallback
+// ScrollFallbackController — Production-grade native smooth fallback
 // ────────────────────────────────────────────────────
+function ScrollFallbackController() {
+  const scroll = useScroll();
+  const isInteractingRef = useRef(false);
+  const isNavigatingRef = useRef(false);
+  const idleTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    const scrollEl = scroll.el;
+    if (!scrollEl) return;
+
+    const triggerFallbackSnap = () => {
+      if (isInteractingRef.current || isNavigatingRef.current) return;
+
+      const scrollMax = scrollEl.scrollHeight - scrollEl.clientHeight;
+      if (scrollMax <= 0) return;
+
+      const clampedOffset = Math.max(0, Math.min(1, scroll.offset));
+      // 4 floors total -> 3 travel steps (0, 1, 2, 3)
+      const nearestFloor = Math.round(clampedOffset * (FLOOR_COUNT - 1));
+      const targetOffset = nearestFloor / (FLOOR_COUNT - 1);
+      const targetScrollTop = targetOffset * scrollMax;
+
+      const distance = Math.abs(scrollEl.scrollTop - targetScrollTop);
+      // Only fallback if off-center by more than 4px
+      if (distance <= 4) return;
+
+      // Native browser-level hardware accelerated smooth scroll
+      scrollEl.scrollTo({
+        top: targetScrollTop,
+        behavior: 'smooth',
+      });
+    };
+
+    const handleScroll = () => {
+      if (idleTimeoutRef.current) {
+        clearTimeout(idleTimeoutRef.current);
+      }
+
+      // 300ms comfortable waiting time after user scroll stops
+      idleTimeoutRef.current = setTimeout(() => {
+        triggerFallbackSnap();
+      }, 300);
+    };
+
+    const handleTouchStart = () => {
+      isInteractingRef.current = true;
+    };
+
+    const handleTouchEnd = () => {
+      isInteractingRef.current = false;
+      if (idleTimeoutRef.current) clearTimeout(idleTimeoutRef.current);
+      idleTimeoutRef.current = setTimeout(() => {
+        triggerFallbackSnap();
+      }, 300);
+    };
+
+    const handlePointerDown = () => {
+      isInteractingRef.current = true;
+    };
+
+    const handlePointerUp = () => {
+      isInteractingRef.current = false;
+      if (idleTimeoutRef.current) clearTimeout(idleTimeoutRef.current);
+      idleTimeoutRef.current = setTimeout(() => {
+        triggerFallbackSnap();
+      }, 300);
+    };
+
+    const handleNavigation = () => {
+      isNavigatingRef.current = true;
+      if (idleTimeoutRef.current) clearTimeout(idleTimeoutRef.current);
+      setTimeout(() => {
+        isNavigatingRef.current = false;
+      }, 500);
+    };
+
+    scrollEl.addEventListener('scroll', handleScroll, { passive: true });
+    scrollEl.addEventListener('touchstart', handleTouchStart, { passive: true });
+    scrollEl.addEventListener('touchend', handleTouchEnd, { passive: true });
+    scrollEl.addEventListener('touchcancel', handleTouchEnd, { passive: true });
+    scrollEl.addEventListener('pointerdown', handlePointerDown, { passive: true });
+    scrollEl.addEventListener('pointerup', handlePointerUp, { passive: true });
+    window.addEventListener('navigationClicked', handleNavigation);
+
+    return () => {
+      scrollEl.removeEventListener('scroll', handleScroll);
+      scrollEl.removeEventListener('touchstart', handleTouchStart);
+      scrollEl.removeEventListener('touchend', handleTouchEnd);
+      scrollEl.removeEventListener('touchcancel', handleTouchEnd);
+      scrollEl.removeEventListener('pointerdown', handlePointerDown);
+      scrollEl.removeEventListener('pointerup', handlePointerUp);
+      window.removeEventListener('navigationClicked', handleNavigation);
+      if (idleTimeoutRef.current) clearTimeout(idleTimeoutRef.current);
+    };
+  }, [scroll.el, scroll]);
+
+  return null;
+}
+
 // ────────────────────────────────────────────────────
 // NavigationController — Handles navigation sign clicks
 // ────────────────────────────────────────────────────
@@ -313,11 +412,12 @@ export default function BuildingScene() {
         >
           <color attach="background" args={['#87CEEB']} />
 
-          {/* Tight damping for immediate scroll response */}
+          {/* Standard Drei damping for fluid hardware-accelerated camera motion */}
           <ScrollControls pages={4} damping={isMobile ? 0.2 : 0.08} eps={0.0001}>
           <Suspense fallback={null}>
               <ScrollCamera />
               <NavigationController />
+              <ScrollFallbackController />
               <BuildingLighting />
 
               {/* Minimal environment - reduced GPU load */}
