@@ -1,16 +1,15 @@
 'use client';
 
-import { useRef, useMemo, useState } from 'react';
+import { useRef, useMemo, useState, useEffect } from 'react';
 import * as THREE from 'three';
 import { useTexture, Text, RoundedBox } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import WallText from '../models/wall/WallText';
 import { useResponsiveCanvas } from '../../hooks/useResponsive';
 
-
 /**
  * ProjectsRoom — A floor module representing the "Projects" showcase.
- * Similar structure to the developer room but themed for project display.
+ * Features an infinite 3D circular swipe carousel for tables/cards and wall boards.
  */
 
 interface ProjectsRoomProps {
@@ -19,19 +18,74 @@ interface ProjectsRoomProps {
   scale?: [number, number, number];
 }
 
+const PROJECTS_DATA = [
+  {
+    id: 0,
+    slug: 'rentra',
+    title: 'Rentra',
+    subtitle: 'Flats & Hostels Near You',
+    line1: 'Rentra',
+    line2: 'Flats & Hostels',
+    line3: 'Near You',
+    techStack: ['Flutter', 'Firebase', 'Node.js', 'Maps APIs', 'OneSignal'],
+    titleBgColor: '#e63946',
+    titleTextColor: '#ffffff',
+    imagePath: '/3d/ProjectRoom/images/Rentra.webp',
+    github: 'https://github.com/amit7451/Rentra',
+    playstore: 'https://play.google.com/store/apps/details?id=com.rentra.app.rentra',
+    linkedin: 'https://linkedin.com/in/amit-devspace',
+    popupEvent: 'open-rentra-popup',
+  },
+  {
+    id: 1,
+    slug: 'gocab',
+    title: 'goCab',
+    subtitle: 'Real-Time Cab Booking',
+    line1: 'goCab',
+    line2: 'Real-Time Cab',
+    line3: 'Booking Web App',
+    techStack: ['React', 'Node', 'Express', 'Maps APIs', 'WebSockets'],
+    titleBgColor: '#1e56a0',
+    titleTextColor: '#ffd60a',
+    imagePath: '/3d/ProjectRoom/images/goCab.webp',
+    github: 'https://github.com/amit7451/goCab',
+    web: 'https://gocab-1-frontend.onrender.com',
+    linkedin: 'https://linkedin.com/in/amit-devspace',
+    popupEvent: 'open-gocab-popup',
+  },
+  {
+    id: 2,
+    slug: 'pdfsuite',
+    title: 'PDF Suite',
+    subtitle: 'Web-based PDF Platform',
+    line1: 'PDF Suite',
+    line2: 'Web-based PDF',
+    line3: 'Processing Platform',
+    techStack: ['FastAPI', 'pypdf', 'pdfplumber', 'Pillow', 'Docker'],
+    titleBgColor: '#e63946',
+    titleTextColor: '#ffffff',
+    imagePath: '/3d/ProjectRoom/images/pdf_suite.webp',
+    github: 'https://github.com/amit7451/PDF_Suite',
+    web: 'https://github.com/amit7451/PDF_Suite',
+    linkedin: 'https://linkedin.com/in/amit-devspace',
+    popupEvent: 'open-pdfsuite-popup',
+  },
+];
+
 export default function ProjectsRoom({
   position = [0, 0, 0],
   rotation = [0, 0, 0],
   scale = [1, 1, 1],
 }: ProjectsRoomProps) {
-  const groupRef = useRef<THREE.Group>(null);  
-  const { mapLinear } = useResponsiveCanvas();
+  const groupRef = useRef<THREE.Group>(null);
+  const { mapLinear, shouldHideSideNav, isMobile } = useResponsiveCanvas();
+  const isSmallScreen = shouldHideSideNav || isMobile;
+
   // Load textures for walls and ceiling
   const basePlasterTexture = useTexture('/3d/wall/textures/plaster.webp');
   const baseCeilingTexture = useTexture('/3d/wall/textures/ceiling_interior.webp');
   const baseFloorTexture = useTexture('/3d/wall/textures/floor.webp');
-  
-  // Configure wall texture with anisotropy to prevent flickering
+
   const wallTexture = useMemo(() => {
     const cloned = basePlasterTexture.clone();
     cloned.wrapS = cloned.wrapT = THREE.RepeatWrapping;
@@ -42,8 +96,7 @@ export default function ProjectsRoom({
     cloned.needsUpdate = true;
     return cloned;
   }, [basePlasterTexture]);
-  
-  // Configure ceiling texture with anisotropy
+
   const ceilingTexture = useMemo(() => {
     const cloned = baseCeilingTexture.clone();
     cloned.wrapS = cloned.wrapT = THREE.RepeatWrapping;
@@ -55,8 +108,7 @@ export default function ProjectsRoom({
     cloned.needsUpdate = true;
     return cloned;
   }, [baseCeilingTexture]);
-  
-  // Configure floor texture with anisotropy
+
   const floorTexture = useMemo(() => {
     const cloned = baseFloorTexture.clone();
     cloned.wrapS = cloned.wrapT = THREE.RepeatWrapping;
@@ -67,24 +119,101 @@ export default function ProjectsRoom({
     cloned.needsUpdate = true;
     return cloned;
   }, [baseFloorTexture]);
-  // Room dimensions (matching building room depth)
+
   const roomW = 20;
   const roomH = 12;
   const roomD = 32;
-  const backWallZ = -4; // Decorative back wall (content is visible from camera at Z=14)
-  const floorY = 0; // relative floor
-  const ceilY = roomH;
+  const backWallZ = -4;
 
-  const wallColor = '#e8e4e0';
-  const accentColor = '#2a6496';
+  // Carousel State & Controller
+  const targetProgress = useRef<number>(0);
+  const currentProgress = useRef<number>(0);
+  const isInteracting = useRef<boolean>(false);
+  const resumeTimer = useRef<NodeJS.Timeout | null>(null);
+  const dragStartX = useRef<number | null>(null);
 
-  const leftBoardX = mapLinear(-3.0, -6);
-  const rightBoardX = mapLinear(3.0, 6);
-  const leftTableX = mapLinear(-2.6, -5);
-  const rightTableX = mapLinear(2.6, 5);
+  // Auto-slide right every 6.0 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!isInteracting.current) {
+        targetProgress.current += 1;
+      }
+    }, 6000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const pauseAutoSlide = () => {
+    isInteracting.current = true;
+    if (resumeTimer.current) clearTimeout(resumeTimer.current);
+    resumeTimer.current = setTimeout(() => {
+      isInteracting.current = false;
+    }, 7500);
+  };
+
+  const handleNext = () => {
+    pauseAutoSlide();
+    targetProgress.current += 1;
+  };
+
+  const handlePrev = () => {
+    pauseAutoSlide();
+    targetProgress.current -= 1;
+  };
+
+  const handleSelectProject = (index: number) => {
+    pauseAutoSlide();
+    const project = PROJECTS_DATA[index];
+    const total = PROJECTS_DATA.length;
+    const currentNorm = ((currentProgress.current % total) + total) % total;
+    let diff = index - currentNorm;
+    if (diff > total / 2) diff -= total;
+    if (diff < -total / 2) diff += total;
+
+    if (Math.abs(diff) < 0.35) {
+      if (typeof window !== 'undefined' && project?.slug) {
+        window.location.href = '/' + project.slug;
+      }
+    } else {
+      targetProgress.current += diff;
+    }
+  };
+
+  // Pointer drag gestures
+  const handlePointerDown = (e: any) => {
+    e.stopPropagation();
+    pauseAutoSlide();
+    dragStartX.current = e.clientX || e.touches?.[0]?.clientX || 0;
+  };
+
+  const handlePointerMove = (e: any) => {
+    if (dragStartX.current === null) return;
+    const clientX = e.clientX || e.touches?.[0]?.clientX || 0;
+    const deltaX = clientX - dragStartX.current;
+    if (deltaX < -35) {
+      handleNext();
+      dragStartX.current = null;
+    } else if (deltaX > 35) {
+      handlePrev();
+      dragStartX.current = null;
+    }
+  };
+
+  const handlePointerUp = () => {
+    dragStartX.current = null;
+  };
 
   return (
-    <group ref={groupRef} position={position} rotation={rotation} scale={scale}>
+    <group
+      ref={groupRef}
+      position={position}
+      rotation={rotation}
+      scale={scale}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerLeave={handlePointerUp}
+    >
       {/* ═══ BACK WALL ═══ */}
       <mesh position={[0, roomH / 2, backWallZ]}>
         <planeGeometry args={[roomW, roomH]} />
@@ -131,52 +260,168 @@ export default function ProjectsRoom({
         />
       </mesh>
 
-      {/* ═══ "PROJECT ROOM" TITLE EMBEDDED IN WALL ═══ */}
+      {/* ═══ ADAPTIVE TITLE TEXT ("PROJECTS ROOM" -> "PROJECTS") ═══ */}
       <WallText
-        position={[0, roomH - 2, backWallZ + 0.1]}
+        key={isSmallScreen ? 'title-projects-only' : 'title-projects-room'}
+        position={[0, isSmallScreen ? roomH - 1.5 : roomH - 1.5, backWallZ + 0.1]}
         rotation={[0, 0, 0]}
         scale={[1, 1, 1]}
         color="#6b6560"
-        text="PROJECTS ROOM"
-        fontSize={0.9}
+        text={isSmallScreen ? "PROJECTS" : "PROJECTS ROOM"}
+        fontSize={isSmallScreen ? 0.65 : mapLinear(0.6, 0.9)}
         depth={0.06}
       />
 
-      {/* ═══ PROJECT DISPLAY BOARDS ═══ */}
-      {/* Left Project Board */}
-      <ProjectBoard
-        position={[leftBoardX, roomH / 2 + 1.5, backWallZ + 0.1]}
-        title="Rentra"
-        titleBgColor="#e63946"
-        titleTextColor="#ffffff"
-        imagePath="/3d/ProjectRoom/images/Rentra.webp"
+      {/* ═══ INFINITE 3D CIRCULAR CAROUSEL ═══ */}
+      <CarouselContainer
+        targetProgress={targetProgress}
+        currentProgress={currentProgress}
+        backWallZ={backWallZ}
+        roomH={roomH}
+        isSmallScreen={isSmallScreen}
+        mapLinear={mapLinear}
+        onSelectProject={handleSelectProject}
+        pauseAutoSlide={pauseAutoSlide}
       />
-
-      {/* Center Project Board */}
-      <ProjectBoard
-        position={[0, roomH / 2 + 1.5, backWallZ + 0.1]}
-        title="goCab"
-        titleBgColor="#1e56a0"
-        titleTextColor="#ffd60a"
-        imagePath="/3d/ProjectRoom/images/goCab.webp"
-      />
-
-      {/* Right Project Board */}
-      <ProjectBoard
-        position={[rightBoardX, roomH / 2 + 1.5, backWallZ + 0.1]}
-        title="pdfSuite"
-        titleBgColor="#e63946"
-        titleTextColor="#ffffff"
-        imagePath="/3d/ProjectRoom/images/pdf_suite.webp"
-      />
-
-      {/* ═══ PROJECT TABLES ═══ */}
-      <ProjectTable position={[leftTableX, 0, 4]} cardId={0} />
-      <ProjectTable position={[0, 0, 4]} cardId={1} />
-      <ProjectTable position={[rightTableX, 0, 4]} cardId={2} />
-
-      {/* ═══ ACCENT LIGHTING ═══ */}
     </group>
+  );
+}
+
+/* ─── Carousel Manager Component ─── */
+
+function CarouselContainer({
+  targetProgress,
+  currentProgress,
+  backWallZ,
+  roomH,
+  isSmallScreen,
+  mapLinear,
+  onSelectProject,
+  pauseAutoSlide,
+}: {
+  targetProgress: React.MutableRefObject<number>;
+  currentProgress: React.MutableRefObject<number>;
+  backWallZ: number;
+  roomH: number;
+  isSmallScreen: boolean;
+  mapLinear: (m: number, d: number) => number;
+  onSelectProject: (index: number) => void;
+  pauseAutoSlide: () => void;
+}) {
+  const [, setTick] = useState(0);
+
+  useFrame((_, delta) => {
+    const step = THREE.MathUtils.lerp(currentProgress.current, targetProgress.current, Math.min(1, delta * 7));
+    if (Math.abs(step - currentProgress.current) > 0.0001) {
+      currentProgress.current = step;
+      setTick((t) => (t + 1) % 1000);
+    }
+  });
+
+  const totalItems = PROJECTS_DATA.length;
+  const spacing = isSmallScreen ? mapLinear(2.9, 3.8) : mapLinear(4.0, 5.4);
+
+  return (
+    <>
+      {PROJECTS_DATA.map((project, i) => {
+        // Compute circular offset in range [-1.5, 1.5]
+        const normProgress = ((currentProgress.current % totalItems) + totalItems) % totalItems;
+        let offset = i - normProgress;
+        if (offset > totalItems / 2) offset -= totalItems;
+        if (offset < -totalItems / 2) offset += totalItems;
+
+        const absOffset = Math.abs(offset);
+
+        // Common horizontal X position for both wall board and table/card
+        const posX = offset * spacing;
+
+        // Wall Board transform (mounted high at Y=8.1 so center poster is 100% visible in main view)
+        const boardY = roomH / 2 + 2.1; // Y = 8.1
+        const boardZ = backWallZ + 0.1 - Math.pow(absOffset, 1.2) * 0.45;
+        const boardScale = isSmallScreen
+          ? Math.max(0.72, 1.1 - absOffset * 0.38)
+          : Math.max(0.82, 1.25 - absOffset * 0.42);
+
+        // Table & Card transform (center table moved forward to Z=3.6 towards camera)
+        const tableZ = 3.6 - Math.pow(absOffset, 1.2) * 2.0;
+        const tableScale = isSmallScreen
+          ? Math.max(0.72, 1.05 - absOffset * 0.33)
+          : Math.max(0.82, 1.2 - absOffset * 0.38);
+
+        const isCenter = absOffset < 0.3;
+
+        return (
+          <group key={project.id}>
+            {/* ═══ WALL IMAGE BOARD (Mounted high on back wall) ═══ */}
+            <ProjectBoard
+              position={[posX, boardY, boardZ]}
+              scale={[boardScale, boardScale, boardScale]}
+              title={project.title}
+              titleBgColor={project.titleBgColor}
+              titleTextColor={project.titleTextColor}
+              imagePath={project.imagePath}
+              isCenter={isCenter}
+              isSmallScreen={isSmallScreen}
+              slug={project.slug}
+              onClick={() => onSelectProject(i)}
+            />
+
+            {/* ═══ PROJECT TABLE & FLOATING CARD (Center table moved towards camera) ═══ */}
+            <ProjectTable
+              position={[posX, 0, tableZ]}
+              scale={[tableScale, tableScale, tableScale]}
+              project={project}
+              isCenter={isCenter}
+              isSmallScreen={isSmallScreen}
+              onClick={() => onSelectProject(i)}
+              pauseAutoSlide={pauseAutoSlide}
+            />
+          </group>
+        );
+      })}
+
+      {/* ═══ ELEGANT MINIMAL 3D DOT INDICATOR (3 Small Subtle Dots) ═══ */}
+      <group position={[0, 0.25, 4.3]}>
+        {PROJECTS_DATA.map((proj, idx) => {
+          const total = PROJECTS_DATA.length;
+          const normProgress = ((currentProgress.current % total) + total) % total;
+          let dist = Math.abs(idx - normProgress);
+          if (dist > total / 2) dist = total - dist;
+
+          // Smooth active factor lerp (1 = active, 0 = inactive)
+          const activeFactor = Math.max(0, 1 - dist * 1.5);
+          const dotRadius = 0.035 + activeFactor * 0.025; // 0.035 -> 0.06 (small & subtle)
+          const dotX = (idx - 1) * 0.22; // Compact spacing
+
+          return (
+            <group key={proj.id} position={[dotX, 0, 0]}>
+              {/* Fine outer cyan ring for active dot */}
+              {activeFactor > 0.1 && (
+                <mesh position={[0, 0, -0.005]}>
+                  <ringGeometry args={[dotRadius, dotRadius + 0.015, 32]} />
+                  <meshBasicMaterial color="#00ffff" transparent opacity={activeFactor * 0.9} />
+                </mesh>
+              )}
+
+              {/* Small round circle dot */}
+              <mesh
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSelectProject(idx);
+                }}
+              >
+                <circleGeometry args={[dotRadius, 32]} />
+                <meshBasicMaterial
+                  color={activeFactor > 0.4 ? "#00ffff" : "#ffffff"}
+                  transparent
+                  opacity={activeFactor > 0.4 ? 1.0 : 0.55}
+                />
+              </mesh>
+            </group>
+          );
+        })}
+      </group>
+    </>
   );
 }
 
@@ -184,46 +429,70 @@ export default function ProjectsRoom({
 
 function ProjectBoard({
   position,
+  scale,
   title,
   titleBgColor,
   titleTextColor,
   imagePath,
+  isCenter,
+  isSmallScreen,
+  slug,
+  onClick,
 }: {
   position: [number, number, number];
+  scale: [number, number, number];
   title: string;
   titleBgColor: string;
   titleTextColor: string;
   imagePath: string;
+  isCenter: boolean;
+  isSmallScreen: boolean;
+  slug: string;
+  onClick: () => void;
 }) {
   const imageTexture = useTexture(imagePath);
-  
+  const boardW = 3.8;
+  const boardH = 2.4;
+
   return (
-    <group position={position}>
-      {/* Board frame (thinner) */}
+    <group
+      position={position}
+      scale={scale}
+      onClick={(e) => {
+        e.stopPropagation();
+        if (typeof window !== 'undefined' && slug) {
+          window.location.href = '/' + slug;
+        } else {
+          onClick();
+        }
+      }}
+    >
+      {/* Board frame */}
       <mesh castShadow>
-        <boxGeometry args={[4, 3, 0.08]} />
-        <meshLambertMaterial color="#2a2a2a" />
+        <boxGeometry args={[boardW, boardH, 0.08]} />
+        <meshLambertMaterial color={isCenter ? "#3a3a3a" : "#222222"} />
       </mesh>
-      {/* Board surface with image (larger to reduce border) */}
-      <mesh position={[0, -0.15, 0.05]}>
-        <planeGeometry args={[3.85, 2.45]} />
-        <meshLambertMaterial
-          map={imageTexture}
-        />
+
+      {/* Board surface with image */}
+      <mesh position={[0, -0.12, 0.05]}>
+        <planeGeometry args={[boardW - 0.16, boardH - 0.52]} />
+        <meshLambertMaterial map={imageTexture} />
       </mesh>
+
       {/* Title bar background */}
-      <mesh position={[0, 1.35, 0.06]}>
-        <planeGeometry args={[3.9, 0.6]} />
+      <mesh position={[0, boardH / 2 - 0.26, 0.06]}>
+        <planeGeometry args={[boardW - 0.1, 0.46]} />
         <meshLambertMaterial
           color={titleBgColor}
           emissive={titleBgColor}
-          emissiveIntensity={0.3}
+          emissiveIntensity={isCenter ? 0.55 : 0.25}
         />
       </mesh>
+
       {/* Project Title Text */}
       <Text
-        position={[0, 1.35, 0.11]}
-        fontSize={0.35}
+        position={[0, boardH / 2 - 0.26, 0.11]}
+        fontSize={0.29}
         color={titleTextColor}
         anchorX="center"
         anchorY="middle"
@@ -237,17 +506,26 @@ function ProjectBoard({
 
 function ProjectTable({
   position,
-  cardId,
+  scale,
+  project,
+  isCenter,
+  isSmallScreen,
+  onClick,
+  pauseAutoSlide,
 }: {
   position: [number, number, number];
-  cardId: number;
+  scale: [number, number, number];
+  project: typeof PROJECTS_DATA[0];
+  isCenter: boolean;
+  isSmallScreen: boolean;
+  onClick: () => void;
+  pauseAutoSlide: () => void;
 }) {
-  const tableH = 1.8;
-  const tableRadius = 2.2;
-  const legRadius = 0.05;
+  const tableH = 1.5;
+  const tableRadius = isSmallScreen ? 2.05 : 2.35;
+  const legRadius = 0.045;
   const legHeight = tableH;
 
-  // 3 legs positioned in triangular formation
   const legPositions = useMemo(() => {
     const angleStep = (Math.PI * 2) / 3;
     const legDistance = tableRadius * 0.7;
@@ -262,14 +540,14 @@ function ProjectTable({
   }, [tableRadius, legHeight]);
 
   return (
-    <group position={position}>
-      {/* Rounded table top */}
+    <group position={position} scale={scale} onClick={onClick}>
+      {/* Table top */}
       <mesh position={[0, tableH, 0]} castShadow receiveShadow>
         <cylinderGeometry args={[tableRadius, tableRadius, 0.08, 32]} />
-        <meshLambertMaterial color="#5a4a3a" />
+        <meshLambertMaterial color={isCenter ? "#6a5a4a" : "#4a3a2a"} />
       </mesh>
-      
-      {/* 3 Legs in triangular formation */}
+
+      {/* 3 Legs */}
       {legPositions.map((pos, i) => (
         <mesh key={i} position={pos} castShadow>
           <cylinderGeometry args={[legRadius, legRadius * 0.8, legHeight, 16]} />
@@ -278,7 +556,14 @@ function ProjectTable({
       ))}
 
       {/* Floating Card */}
-      <FloatingCard tableHeight={tableH} tableRadius={tableRadius} cardId={cardId} />
+      <FloatingCard
+        tableHeight={tableH}
+        tableRadius={tableRadius}
+        project={project}
+        isCenter={isCenter}
+        isSmallScreen={isSmallScreen}
+        pauseAutoSlide={pauseAutoSlide}
+      />
     </group>
   );
 }
@@ -286,708 +571,257 @@ function ProjectTable({
 function FloatingCard({
   tableHeight,
   tableRadius,
-  cardId,
+  project,
+  isCenter,
+  isSmallScreen,
+  pauseAutoSlide,
 }: {
   tableHeight: number;
   tableRadius: number;
-  cardId: number;
+  project: typeof PROJECTS_DATA[0];
+  isCenter: boolean;
+  isSmallScreen: boolean;
+  pauseAutoSlide: () => void;
 }) {
-
   const cardRef = useRef<THREE.Group>(null);
   const [hovered, setHovered] = useState(false);
   const [buttonHovered, setButtonHovered] = useState<number | null>(null);
-  const mousePos = useRef({ x: 0, y: 0 });
   const targetRotation = useRef({ x: 0, y: 0, z: 0 });
-  
-  const cardWidth = 2.2;
-  const cardHeight = 3.5;
-  const cardDepth = 0.2;
-  const baseFloatHeight = tableHeight + 1.8;
-  
-  // Load textures for all cards (hooks must be called unconditionally)
+
+  const cardWidth = isSmallScreen ? 1.95 : 2.25;
+  const cardHeight = isSmallScreen ? 2.85 : 3.25;
+  const cardDepth = 0.18;
+  // Lift float height to tableHeight + 1.7 so the bottom of the card hovers clearly above table top
+  const baseFloatHeight = tableHeight + 1.7;
+
   const githubTexture = useTexture('/3d/ProjectRoom/images/github.webp');
   const playstoreTexture = useTexture('/3d/ProjectRoom/images/playstore.webp');
   const linkedinTexture = useTexture('/3d/ProjectRoom/images/linkedin.webp');
   const webTexture = useTexture('/3d/ProjectRoom/images/web.webp');
-  
-  // Random seed for each card
-  const seed = useMemo(() => cardId * 1.337, [cardId]);
-  
-  // Premium tilt settings
-  const MAX_TILT = 0.2; // ~11.5 degrees - controlled and premium
-  const SPRING_STIFFNESS = 0.18; // Medium stiffness
-  const SPRING_DAMPING = 0.85; // High damping for smooth motion
 
-  // Mouse move handler for premium 3D tilt
+  const seed = useMemo(() => project.id * 1.337, [project.id]);
+
+  const MAX_TILT = 0.18;
+  const SPRING_STIFFNESS = 0.18;
+  const SPRING_DAMPING = 0.85;
+
   const handlePointerMove = (event: any) => {
     if (!hovered || !cardRef.current) return;
-    
     const rect = event.target.getBoundingClientRect?.();
     if (rect) {
-      // Normalized cursor position (-1 to 1)
       const x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
       const y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-      
-      // Update target rotation with controlled amplitude
       targetRotation.current.x = y * MAX_TILT;
       targetRotation.current.y = x * MAX_TILT;
-      
-      mousePos.current.x = x;
-      mousePos.current.y = y;
     }
   };
 
   useFrame((state) => {
     if (cardRef.current) {
       const time = state.clock.getElapsedTime();
-      const dt = state.clock.getDelta();
-      
-      // Subtle random floating animation with unique timing
-      const floatOffset = Math.sin(time * 0.7 + seed) * 0.12 + Math.cos(time * 0.5 + seed * 0.5) * 0.08;
-      const hoverLiftOffset = hovered ? 0.3 : 0; // Subtle lift
+
+      const floatOffset = Math.sin(time * 0.7 + seed) * 0.06 + Math.cos(time * 0.5 + seed * 0.5) * 0.04;
+      const hoverLiftOffset = hovered ? 0.2 : 0;
       cardRef.current.position.y = baseFloatHeight + floatOffset + hoverLiftOffset;
-      
-      // Premium scale with subtle growth (1.05 max)
-      const targetScale = hovered ? 1.05 : 1;
+
+      const targetScale = hovered ? 1.04 : 1;
       const currentScale = cardRef.current.scale.x;
       const newScale = THREE.MathUtils.lerp(currentScale, targetScale, SPRING_STIFFNESS);
       cardRef.current.scale.set(newScale, newScale, newScale);
-      
-      // Spring-based rotation with high damping
+
       if (hovered) {
-        // Apply spring physics to rotation
-        cardRef.current.rotation.x = THREE.MathUtils.lerp(
-          cardRef.current.rotation.x,
-          targetRotation.current.x,
-          SPRING_STIFFNESS
-        );
-        cardRef.current.rotation.y = THREE.MathUtils.lerp(
-          cardRef.current.rotation.y,
-          targetRotation.current.y,
-          SPRING_STIFFNESS
-        );
-        cardRef.current.rotation.z = THREE.MathUtils.lerp(
-          cardRef.current.rotation.z,
-          0,
-          SPRING_STIFFNESS
-        );
+        cardRef.current.rotation.x = THREE.MathUtils.lerp(cardRef.current.rotation.x, targetRotation.current.x, SPRING_STIFFNESS);
+        cardRef.current.rotation.y = THREE.MathUtils.lerp(cardRef.current.rotation.y, targetRotation.current.y, SPRING_STIFFNESS);
+        cardRef.current.rotation.z = THREE.MathUtils.lerp(cardRef.current.rotation.z, 0, SPRING_STIFFNESS);
       } else {
-        // Smooth reset on mouse leave - gentle idle rotation
-        const idleRotation = Math.sin(time * 0.5 + seed) * 0.03; // Very subtle
+        const idleRotation = Math.sin(time * 0.5 + seed) * 0.025;
         targetRotation.current.x = 0;
         targetRotation.current.y = idleRotation;
         targetRotation.current.z = 0;
-        
-        // Smooth damped return to neutral
-        cardRef.current.rotation.x = THREE.MathUtils.lerp(
-          cardRef.current.rotation.x,
-          0,
-          SPRING_DAMPING * 0.12
-        );
-        cardRef.current.rotation.y = THREE.MathUtils.lerp(
-          cardRef.current.rotation.y,
-          idleRotation,
-          SPRING_DAMPING * 0.12
-        );
-        cardRef.current.rotation.z = THREE.MathUtils.lerp(
-          cardRef.current.rotation.z,
-          0,
-          SPRING_DAMPING * 0.12
-        );
+
+        cardRef.current.rotation.x = THREE.MathUtils.lerp(cardRef.current.rotation.x, 0, SPRING_DAMPING * 0.12);
+        cardRef.current.rotation.y = THREE.MathUtils.lerp(cardRef.current.rotation.y, idleRotation, SPRING_DAMPING * 0.12);
+        cardRef.current.rotation.z = THREE.MathUtils.lerp(cardRef.current.rotation.z, 0, SPRING_DAMPING * 0.12);
       }
     }
   });
 
+  const titleFont = isSmallScreen ? 0.17 : 0.19;
+  const lineFont = isSmallScreen ? 0.13 : 0.15;
+  const techFont = isSmallScreen ? 0.10 : 0.11;
+  const btnSize = isSmallScreen ? 0.31 : 0.35;
+  const btnOffset = isSmallScreen ? 0.50 : 0.56;
+
   return (
     <group ref={cardRef} position={[0, baseFloatHeight, 0]}>
-      {/* Enhanced circular glow with soft shadow */}
+      {/* Light glow for center card */}
       <pointLight
-        position={[0, -0.5, 0]}
-        intensity={hovered ? 1.8 : 0.8}
+        position={[0, -0.4, 0]}
+        intensity={isCenter ? (hovered ? 2.0 : 1.2) : 0.4}
         color="#00d9ff"
-        distance={tableRadius * 2}
+        distance={tableRadius * 2.0}
         decay={2}
       />
 
-      {/* Dark neon card body with gradient - rounded */}
+      {/* Card body */}
       <RoundedBox
         args={[cardWidth, cardHeight, cardDepth]}
-        radius={0.15}
+        radius={0.14}
         smoothness={4}
         castShadow
-        onPointerOver={() => setHovered(true)}
+        onPointerOver={() => {
+          setHovered(true);
+          pauseAutoSlide();
+        }}
         onPointerOut={() => setHovered(false)}
         onPointerMove={handlePointerMove}
         onClick={(e) => {
           if (typeof window === 'undefined') return;
-          if (cardId === 0) {
-            e.stopPropagation();
-            window.dispatchEvent(new CustomEvent('open-rentra-popup'));
-          }
-          if (cardId === 1) {
-            e.stopPropagation();
-            window.dispatchEvent(new CustomEvent('open-gocab-popup'));
-          }
-          if (cardId === 2) {
-            e.stopPropagation();
-            window.dispatchEvent(new CustomEvent('open-pdfsuite-popup'));
+          e.stopPropagation();
+          if (project.slug) {
+            window.location.href = '/' + project.slug;
           }
         }}
       >
         <meshLambertMaterial
-          color={hovered ? "#0a0a0a" : "#050505"}
+          color={isCenter ? (hovered ? "#0f0f18" : "#08080d") : "#040406"}
           emissive="#000000"
           emissiveIntensity={0.1}
         />
       </RoundedBox>
 
-      {/* Neon cyan left edge - rounded */}
-      <RoundedBox
-        args={[0.05, cardHeight, cardDepth + 0.02]}
-        radius={0.025}
-        smoothness={4}
-        position={[-cardWidth / 2, 0, 0]}
-      >
-        <meshLambertMaterial
-          color="#00d9ff"
-          emissive="#00d9ff"
-          emissiveIntensity={hovered ? 2.5 : 1.5}
-        />
+      {/* Neon cyan left edge */}
+      <RoundedBox args={[0.04, cardHeight, cardDepth + 0.02]} radius={0.02} smoothness={4} position={[-cardWidth / 2, 0, 0]}>
+        <meshLambertMaterial color="#00d9ff" emissive="#00d9ff" emissiveIntensity={isCenter ? (hovered ? 2.5 : 1.8) : 0.8} />
       </RoundedBox>
 
-      {/* Neon cyan right edge - rounded */}
-      <RoundedBox
-        args={[0.05, cardHeight, cardDepth + 0.02]}
-        radius={0.025}
-        smoothness={4}
-        position={[cardWidth / 2, 0, 0]}
-      >
-        <meshLambertMaterial
-          color="#00d9ff"
-          emissive="#00d9ff"
-          emissiveIntensity={hovered ? 2.5 : 1.5}
-        />
+      {/* Neon cyan right edge */}
+      <RoundedBox args={[0.04, cardHeight, cardDepth + 0.02]} radius={0.02} smoothness={4} position={[cardWidth / 2, 0, 0]}>
+        <meshLambertMaterial color="#00d9ff" emissive="#00d9ff" emissiveIntensity={isCenter ? (hovered ? 2.5 : 1.8) : 0.8} />
       </RoundedBox>
 
-      {/* Neon purple top edge - rounded */}
-      <RoundedBox
-        args={[cardWidth, 0.05, cardDepth + 0.02]}
-        radius={0.025}
-        smoothness={4}
-        position={[0, cardHeight / 2, 0]}
-      >
-        <meshLambertMaterial
-          color="#a855f7"
-          emissive="#a855f7"
-          emissiveIntensity={hovered ? 2.5 : 1.5}
-        />
+      {/* Neon purple top edge */}
+      <RoundedBox args={[cardWidth, 0.04, cardDepth + 0.02]} radius={0.02} smoothness={4} position={[0, cardHeight / 2, 0]}>
+        <meshLambertMaterial color="#a855f7" emissive="#a855f7" emissiveIntensity={isCenter ? (hovered ? 2.5 : 1.8) : 0.8} />
       </RoundedBox>
 
-      {/* Neon purple bottom edge - rounded */}
-      <RoundedBox
-        args={[cardWidth, 0.05, cardDepth + 0.02]}
-        radius={0.025}
-        smoothness={4}
-        position={[0, -cardHeight / 2, 0]}
-      >
-        <meshLambertMaterial
-          color="#a855f7"
-          emissive="#a855f7"
-          emissiveIntensity={hovered ? 2.5 : 1.5}
-        />
+      {/* Neon purple bottom edge */}
+      <RoundedBox args={[cardWidth, 0.04, cardDepth + 0.02]} radius={0.02} smoothness={4} position={[0, -cardHeight / 2, 0]}>
+        <meshLambertMaterial color="#a855f7" emissive="#a855f7" emissiveIntensity={isCenter ? (hovered ? 2.5 : 1.8) : 0.8} />
       </RoundedBox>
 
-      {/* Rentra Card Special Content */}
-      {cardId === 0 && (
-        <group position={[0, 0, cardDepth / 2 + 0.05]}>
-          {/* Title - Bold Green Heading Line 1 */}
-          <Text
-            position={[0, 1.4, 0]}
-            fontSize={0.2}
-            color="#00ff00"
-            anchorX="center"
-            anchorY="middle"
-            fontWeight="bold"
-            maxWidth={cardWidth - 0.2}
-            letterSpacing={0.02}
-          >
-            Rentra
-          </Text>
+      {/* Card Text Content */}
+      <group position={[0, 0, cardDepth / 2 + 0.04]}>
+        <Text position={[0, cardHeight / 2 - 0.38, 0]} fontSize={titleFont} color="#00ff00" anchorX="center" anchorY="middle" fontWeight="bold" maxWidth={cardWidth - 0.2}>
+          {project.line1}
+        </Text>
 
-          {/* Title - Line 2 */}
-          <Text
-            position={[0, 1.1, 0]}
-            fontSize={0.16}
-            color="#00ff00"
-            anchorX="center"
-            anchorY="middle"
-            fontWeight="bold"
-            maxWidth={cardWidth - 0.2}
-            lineHeight={1.1}
-          >
-            Flats & Hostels
-          </Text>
+        <Text position={[0, cardHeight / 2 - 0.65, 0]} fontSize={lineFont} color="#00ff00" anchorX="center" anchorY="middle" fontWeight="bold" maxWidth={cardWidth - 0.2}>
+          {project.line2}
+        </Text>
 
-          {/* Subtitle */}
-          <Text
-            position={[0, 0.85, 0]}
-            fontSize={0.15}
-            color="#00ff00"
-            anchorX="center"
-            anchorY="middle"
-            fontWeight="bold"
-            maxWidth={cardWidth - 0.2}
-          >
-            Near You
-          </Text>
+        <Text position={[0, cardHeight / 2 - 0.88, 0]} fontSize={lineFont} color="#00ff00" anchorX="center" anchorY="middle" fontWeight="bold" maxWidth={cardWidth - 0.2}>
+          {project.line3}
+        </Text>
 
-          {/* Tech Stack Header */}
-          <Text
-            position={[0, 0.45, 0]}
-            fontSize={0.13}
-            color="#00d9ff"
-            anchorX="center"
-            anchorY="middle"
-            fontWeight="600"
-          >
-            Tech Stack:
-          </Text>
+        <Text position={[0, cardHeight / 2 - 1.28, 0]} fontSize={techFont + 0.02} color="#00d9ff" anchorX="center" anchorY="middle" fontWeight="600">
+          Tech Stack:
+        </Text>
 
-          <Text
-            position={[0, 0.20, 0]}
-            fontSize={0.11}
-            color="#00d9ff"
-            anchorX="center"
-            anchorY="middle"
-            maxWidth={cardWidth - 0.1}
-            lineHeight={1.4}
-          >
-            Flutter • Firebase • Node.js
-          </Text>
+        <Text position={[0, cardHeight / 2 - 1.50, 0]} fontSize={techFont} color="#00d9ff" anchorX="center" anchorY="middle" maxWidth={cardWidth - 0.1} lineHeight={1.3}>
+          {project.techStack.slice(0, 3).join(' • ')}
+        </Text>
 
-          <Text
-            position={[0, 0.02, 0]}
-            fontSize={0.11}
-            color="#00d9ff"
-            anchorX="center"
-            anchorY="middle"
-            maxWidth={cardWidth - 0.1}
-            lineHeight={1.4}
-          >
-            Maps APIs • OneSignal
-          </Text>
+        <Text position={[0, cardHeight / 2 - 1.68, 0]} fontSize={techFont} color="#00d9ff" anchorX="center" anchorY="middle" maxWidth={cardWidth - 0.1} lineHeight={1.3}>
+          {project.techStack.slice(3).join(' • ')}
+        </Text>
 
-          {/* Three Squircle Link Buttons */}
+        {/* Buttons */}
+        <group position={[0, -cardHeight / 2 + 0.44, 0]}>
           {/* GitHub Button */}
-          <group position={[-0.55, -1.05, 0]}>
-            <mesh
-              onClick={() => window.open('https://github.com/amit7451/Rentra', '_blank')}
-              onPointerOver={() => setButtonHovered(0)}
-              onPointerOut={() => setButtonHovered(null)}
-            >
-              <RoundedBox args={[0.35, 0.35, 0.05]} radius={0.1} smoothness={4}>
-                <meshLambertMaterial
-                  color="#24292e"
-                  emissiveIntensity={buttonHovered === 0 ? 0.6 : 0.2}
-                  emissive={buttonHovered === 0 ? "#00ff00" : "#000000"}
-                />
-              </RoundedBox>
-            </mesh>
-            {/* Icon on top */}
-            <mesh position={[0, 0, 0.04]}>
-              <planeGeometry args={[0.28, 0.28]} />
-              <meshBasicMaterial
-                map={githubTexture}
-                transparent={true}
-                toneMapped={false}
-                side={THREE.DoubleSide}
-              />
-            </mesh>
-          </group>
+          {project.github && (
+            <group position={[-btnOffset, 0, 0]}>
+              <mesh
+                onClick={(e) => {
+                  e.stopPropagation();
+                  window.open(project.github, '_blank');
+                }}
+                onPointerOver={() => setButtonHovered(0)}
+                onPointerOut={() => setButtonHovered(null)}
+              >
+                <RoundedBox args={[btnSize, btnSize, 0.04]} radius={0.08} smoothness={4}>
+                  <meshLambertMaterial
+                    color="#24292e"
+                    emissiveIntensity={buttonHovered === 0 ? 0.6 : 0.2}
+                    emissive={buttonHovered === 0 ? "#00ff00" : "#000000"}
+                  />
+                </RoundedBox>
+              </mesh>
+              <mesh position={[0, 0, 0.03]}>
+                <planeGeometry args={[btnSize * 0.78, btnSize * 0.78]} />
+                <meshBasicMaterial map={githubTexture} transparent side={THREE.DoubleSide} toneMapped={false} />
+              </mesh>
+            </group>
+          )}
 
-          {/* PlayStore Button */}
-          <group position={[0, -1.05, 0]}>
-            <mesh
-              onClick={() => window.open('https://play.google.com/store/apps/details?id=com.rentra.app.rentra', '_blank')}
-              onPointerOver={() => setButtonHovered(1)}
-              onPointerOut={() => setButtonHovered(null)}
-            >
-              <RoundedBox args={[0.35, 0.35, 0.05]} radius={0.1} smoothness={4}>
-                <meshLambertMaterial
-                  color="#01875f"
-                  emissiveIntensity={buttonHovered === 1 ? 0.6 : 0.2}
-                  emissive={buttonHovered === 1 ? "#00ff00" : "#000000"}
+          {/* Main Action Button (PlayStore or Web) */}
+          {(project.playstore || project.web) && (
+            <group position={[0, 0, 0]}>
+              <mesh
+                onClick={(e) => {
+                  e.stopPropagation();
+                  window.open(project.playstore || project.web, '_blank');
+                }}
+                onPointerOver={() => setButtonHovered(1)}
+                onPointerOut={() => setButtonHovered(null)}
+              >
+                <RoundedBox args={[btnSize, btnSize, 0.04]} radius={0.08} smoothness={4}>
+                  <meshLambertMaterial
+                    color={project.playstore ? "#01875f" : "#0ea5e9"}
+                    emissiveIntensity={buttonHovered === 1 ? 0.6 : 0.2}
+                    emissive={buttonHovered === 1 ? "#00ff00" : "#000000"}
+                  />
+                </RoundedBox>
+              </mesh>
+              <mesh position={[0, 0, 0.03]}>
+                <planeGeometry args={[btnSize * 0.78, btnSize * 0.78]} />
+                <meshBasicMaterial
+                  map={project.playstore ? playstoreTexture : webTexture}
+                  transparent
+                  side={THREE.DoubleSide}
+                  toneMapped={false}
                 />
-              </RoundedBox>
-            </mesh>
-            {/* Icon on top */}
-            <mesh position={[0, 0, 0.04]}>
-              <planeGeometry args={[0.28, 0.28]} />
-              <meshBasicMaterial
-                map={playstoreTexture}
-                transparent={true}
-                toneMapped={false}
-                side={THREE.DoubleSide}
-              />
-            </mesh>
-          </group>
+              </mesh>
+            </group>
+          )}
 
           {/* LinkedIn Button */}
-          <group position={[0.55, -1.05, 0]}>
-            <mesh
-              onClick={() => window.open('https://linkedin.com/in/amit-devspace', '_blank')}
-              onPointerOver={() => setButtonHovered(2)}
-              onPointerOut={() => setButtonHovered(null)}
-            >
-              <RoundedBox args={[0.35, 0.35, 0.05]} radius={0.1} smoothness={4}>
-                <meshLambertMaterial
-                  color="#0a66c2"
-                  emissiveIntensity={buttonHovered === 2 ? 0.6 : 0.2}
-                  emissive={buttonHovered === 2 ? "#0a66c2" : "#000000"}
-                />
-              </RoundedBox>
-            </mesh>
-            {/* Icon on top */}
-            <mesh position={[0, 0, 0.04]}>
-              <planeGeometry args={[0.28, 0.28]} />
-              <meshBasicMaterial
-                map={linkedinTexture}
-                transparent={true}
-                toneMapped={false}
-                side={THREE.DoubleSide}
-              />
-            </mesh>
-          </group>
+          {project.linkedin && (
+            <group position={[btnOffset, 0, 0]}>
+              <mesh
+                onClick={(e) => {
+                  e.stopPropagation();
+                  window.open(project.linkedin, '_blank');
+                }}
+                onPointerOver={() => setButtonHovered(2)}
+                onPointerOut={() => setButtonHovered(null)}
+              >
+                <RoundedBox args={[btnSize, btnSize, 0.04]} radius={0.08} smoothness={4}>
+                  <meshLambertMaterial
+                    color="#0a66c2"
+                    emissiveIntensity={buttonHovered === 2 ? 0.6 : 0.2}
+                    emissive={buttonHovered === 2 ? "#0a66c2" : "#000000"}
+                  />
+                </RoundedBox>
+              </mesh>
+              <mesh position={[0, 0, 0.03]}>
+                <planeGeometry args={[btnSize * 0.78, btnSize * 0.78]} />
+                <meshBasicMaterial map={linkedinTexture} transparent side={THREE.DoubleSide} toneMapped={false} />
+              </mesh>
+            </group>
+          )}
         </group>
-      )}
-
-      {/* goCab Card Special Content */}
-      {cardId === 1 && (
-        <group position={[0, 0, cardDepth / 2 + 0.05]}>
-          {/* Title - Bold Green Heading Line 1 */}
-          <Text
-            position={[0, 1.4, 0]}
-            fontSize={0.2}
-            color="#00ff00"
-            anchorX="center"
-            anchorY="middle"
-            fontWeight="bold"
-            maxWidth={cardWidth - 0.2}
-            letterSpacing={0.02}
-          >
-            goCab
-          </Text>
-
-          {/* Title - Line 2 */}
-          <Text
-            position={[0, 1.1, 0]}
-            fontSize={0.14}
-            color="#00ff00"
-            anchorX="center"
-            anchorY="middle"
-            fontWeight="bold"
-            maxWidth={cardWidth - 0.2}
-            lineHeight={1.1}
-          >
-            Real-Time Cab
-          </Text>
-
-          {/* Subtitle */}
-          <Text
-            position={[0, 0.88, 0]}
-            fontSize={0.13}
-            color="#00ff00"
-            anchorX="center"
-            anchorY="middle"
-            fontWeight="bold"
-            maxWidth={cardWidth - 0.2}
-          >
-            Booking Web App
-          </Text>
-
-          {/* Tech Stack Header */}
-          <Text
-            position={[0, 0.45, 0]}
-            fontSize={0.13}
-            color="#00d9ff"
-            anchorX="center"
-            anchorY="middle"
-            fontWeight="600"
-          >
-            Tech Stack:
-          </Text>
-
-          <Text
-            position={[0, 0.20, 0]}
-            fontSize={0.11}
-            color="#00d9ff"
-            anchorX="center"
-            anchorY="middle"
-            maxWidth={cardWidth - 0.1}
-            lineHeight={1.4}
-          >
-            React • Node • Express
-          </Text>
-
-          <Text
-            position={[0, 0.02, 0]}
-            fontSize={0.11}
-            color="#00d9ff"
-            anchorX="center"
-            anchorY="middle"
-            maxWidth={cardWidth - 0.1}
-            lineHeight={1.4}
-          >
-            Maps APIs • WebSockets
-          </Text>
-
-          {/* Three Squircle Link Buttons */}
-          {/* GitHub Button */}
-          <group position={[-0.55, -1.05, 0]}>
-            <mesh
-              onClick={() => window.open('https://github.com/amit7451/goCab', '_blank')}
-              onPointerOver={() => setButtonHovered(3)}
-              onPointerOut={() => setButtonHovered(null)}
-            >
-              <RoundedBox args={[0.35, 0.35, 0.05]} radius={0.1} smoothness={4}>
-                <meshLambertMaterial
-                  color="#24292e"
-                  emissiveIntensity={buttonHovered === 3 ? 0.6 : 0.2}
-                  emissive={buttonHovered === 3 ? "#00ff00" : "#000000"}
-                />
-              </RoundedBox>
-            </mesh>
-            {/* Icon on top */}
-            <mesh position={[0, 0, 0.04]}>
-              <planeGeometry args={[0.28, 0.28]} />
-              <meshBasicMaterial
-                map={githubTexture}
-                transparent={true}
-                toneMapped={false}
-                side={THREE.DoubleSide}
-              />
-            </mesh>
-          </group>
-
-          {/* Web Button */}
-          <group position={[0, -1.05, 0]}>
-            <mesh
-              onClick={() => window.open('https://gocab-1-frontend.onrender.com', '_blank')}
-              onPointerOver={() => setButtonHovered(4)}
-              onPointerOut={() => setButtonHovered(null)}
-            >
-              <RoundedBox args={[0.35, 0.35, 0.05]} radius={0.1} smoothness={4}>
-                <meshLambertMaterial
-                  color="#0ea5e9"
-                  emissiveIntensity={buttonHovered === 4 ? 0.6 : 0.2}
-                  emissive={buttonHovered === 4 ? "#00ff00" : "#000000"}
-                />
-              </RoundedBox>
-            </mesh>
-            {/* Icon on top */}
-            <mesh position={[0, 0, 0.04]}>
-              <planeGeometry args={[0.28, 0.28]} />
-              <meshBasicMaterial
-                map={webTexture}
-                transparent={true}
-                toneMapped={false}
-                side={THREE.DoubleSide}
-              />
-            </mesh>
-          </group>
-
-          {/* LinkedIn Button */}
-          <group position={[0.55, -1.05, 0]}>
-            <mesh
-              onClick={() => window.open('https://linkedin.com/in/amit-devspace', '_blank')}
-              onPointerOver={() => setButtonHovered(5)}
-              onPointerOut={() => setButtonHovered(null)}
-            >
-              <RoundedBox args={[0.35, 0.35, 0.05]} radius={0.1} smoothness={4}>
-                <meshLambertMaterial
-                  color="#0a66c2"
-                  emissiveIntensity={buttonHovered === 5 ? 0.6 : 0.2}
-                  emissive={buttonHovered === 5 ? "#0a66c2" : "#000000"}
-                />
-              </RoundedBox>
-            </mesh>
-            {/* Icon on top */}
-            <mesh position={[0, 0, 0.04]}>
-              <planeGeometry args={[0.28, 0.28]} />
-              <meshBasicMaterial
-                map={linkedinTexture}
-                transparent={true}
-                toneMapped={false}
-                side={THREE.DoubleSide}
-              />
-            </mesh>
-          </group>
-        </group>
-      )}
-
-      {/* PDF Suite Card Special Content */}
-      {cardId === 2 && (
-        <group position={[0, 0, cardDepth / 2 + 0.05]}>
-          {/* Title - Bold Green Heading Line 1 */}
-          <Text
-            position={[0, 1.4, 0]}
-            fontSize={0.18}
-            color="#00ff00"
-            anchorX="center"
-            anchorY="middle"
-            fontWeight="bold"
-            maxWidth={cardWidth - 0.2}
-            letterSpacing={0.02}
-          >
-            PDF Suite
-          </Text>
-
-          {/* Title - Line 2 */}
-          <Text
-            position={[0, 1.12, 0]}
-            fontSize={0.13}
-            color="#00ff00"
-            anchorX="center"
-            anchorY="middle"
-            fontWeight="bold"
-            maxWidth={cardWidth - 0.2}
-            lineHeight={1.1}
-          >
-            Web-based PDF
-          </Text>
-
-          {/* Subtitle */}
-          <Text
-            position={[0, 0.9, 0]}
-            fontSize={0.12}
-            color="#00ff00"
-            anchorX="center"
-            anchorY="middle"
-            fontWeight="bold"
-            maxWidth={cardWidth - 0.2}
-          >
-            Processing Platform
-          </Text>
-
-          {/* Tech Stack Header */}
-          <Text
-            position={[0, 0.45, 0]}
-            fontSize={0.13}
-            color="#00d9ff"
-            anchorX="center"
-            anchorY="middle"
-            fontWeight="600"
-          >
-            Tech Stack:
-          </Text>
-
-          <Text
-            position={[0, 0.20, 0]}
-            fontSize={0.11}
-            color="#00d9ff"
-            anchorX="center"
-            anchorY="middle"
-            maxWidth={cardWidth - 0.1}
-            lineHeight={1.4}
-          >
-            FastAPI • pypdf • pdfplumber
-          </Text>
-
-          <Text
-            position={[0, 0.02, 0]}
-            fontSize={0.11}
-            color="#00d9ff"
-            anchorX="center"
-            anchorY="middle"
-            maxWidth={cardWidth - 0.1}
-            lineHeight={1.4}
-          >
-            pdf2image • Pillow • Docker
-          </Text>
-
-          {/* Three Squircle Link Buttons */}
-          {/* GitHub Button */}
-          <group position={[-0.55, -1.05, 0]}>
-            <mesh
-              onClick={() => window.open('https://github.com/amit7451/PDF_Suite', '_blank')}
-              onPointerOver={() => setButtonHovered(6)}
-              onPointerOut={() => setButtonHovered(null)}
-            >
-              <RoundedBox args={[0.35, 0.35, 0.05]} radius={0.1} smoothness={4}>
-                <meshLambertMaterial
-                  color="#24292e"
-                  emissiveIntensity={buttonHovered === 6 ? 0.6 : 0.2}
-                  emissive={buttonHovered === 6 ? "#00ff00" : "#000000"}
-                />
-              </RoundedBox>
-            </mesh>
-            {/* Icon on top */}
-            <mesh position={[0, 0, 0.04]}>
-              <planeGeometry args={[0.28, 0.28]} />
-              <meshBasicMaterial
-                map={githubTexture}
-                transparent={true}
-                toneMapped={false}
-                side={THREE.DoubleSide}
-              />
-            </mesh>
-          </group>
-
-          {/* Web Button */}
-          <group position={[0, -1.05, 0]}>
-            <mesh
-              onClick={() => window.open('https://github.com/amit7451/PDF_Suite', '_blank')}
-              onPointerOver={() => setButtonHovered(7)}
-              onPointerOut={() => setButtonHovered(null)}
-            >
-              <RoundedBox args={[0.35, 0.35, 0.05]} radius={0.1} smoothness={4}>
-                <meshLambertMaterial
-                  color="#0ea5e9"
-                  emissiveIntensity={buttonHovered === 7 ? 0.6 : 0.2}
-                  emissive={buttonHovered === 7 ? "#00ff00" : "#000000"}
-                />
-              </RoundedBox>
-            </mesh>
-            {/* Icon on top */}
-            <mesh position={[0, 0, 0.04]}>
-              <planeGeometry args={[0.28, 0.28]} />
-              <meshBasicMaterial
-                map={webTexture}
-                transparent={true}
-                toneMapped={false}
-                side={THREE.DoubleSide}
-              />
-            </mesh>
-          </group>
-
-          {/* LinkedIn Button */}
-          <group position={[0.55, -1.05, 0]}>
-            <mesh
-              onClick={() => window.open('https://linkedin.com/in/amit-devspace', '_blank')}
-              onPointerOver={() => setButtonHovered(8)}
-              onPointerOut={() => setButtonHovered(null)}
-            >
-              <RoundedBox args={[0.35, 0.35, 0.05]} radius={0.1} smoothness={4}>
-                <meshLambertMaterial
-                  color="#0a66c2"
-                  emissiveIntensity={buttonHovered === 8 ? 0.6 : 0.2}
-                  emissive={buttonHovered === 8 ? "#0a66c2" : "#000000"}
-                />
-              </RoundedBox>
-            </mesh>
-            {/* Icon on top */}
-            <mesh position={[0, 0, 0.04]}>
-              <planeGeometry args={[0.28, 0.28]} />
-              <meshBasicMaterial
-                map={linkedinTexture}
-                transparent={true}
-                toneMapped={false}
-                side={THREE.DoubleSide}
-              />
-            </mesh>
-          </group>
-        </group>
-      )}
+      </group>
     </group>
   );
 }

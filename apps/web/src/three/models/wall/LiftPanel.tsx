@@ -124,31 +124,65 @@ export default function LiftPanel({
         </group>
       </group>
 
-      {/* ─── DIGITAL DISPLAY TOP (Black Screen) ─── */}
-      <group position={[0, 1.2, 0.02]}>
-        {/* Screen Bezel/Background */}
-        <mesh position={[0, 0, 0]}>
-          <boxGeometry args={[1.2, 0.8, 0.1]} />
-          <meshLambertMaterial color="#111111" />
-        </mesh>
-        
-        {/* Screen content area */}
-        <mesh position={[0, 0, 0.06]}>
-            <planeGeometry args={[1.0, 0.6]} />
-            <meshBasicMaterial color="#000000" />
-        </mesh>
+      {/* ─── DIGITAL DISPLAY TOP (Black Screen — Clickable to center current floor) ─── */}
+      <DisplayTop
+        currentFloorIndex={currentFloorIndex}
+        onNavigate={handleFloorClick}
+      />
+    </group>
+  );
+}
 
-        {/* Floor Indicator Text */}
-        <Text
-          position={[0, 0, 0.08]}
-          fontSize={0.25}
-          color="#ff0000"
-          anchorX="center"
-          anchorY="middle"
-        >
-          {FLOOR_NAMES[currentFloorIndex]}
-        </Text>
-      </group>
+function DisplayTop({
+  currentFloorIndex,
+  onNavigate,
+}: {
+  currentFloorIndex: number;
+  onNavigate: (index: number) => void;
+}) {
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <group
+      position={[0, 1.2, 0.02]}
+      scale={hovered ? 1.05 : 1}
+      onPointerOver={() => setHovered(true)}
+      onPointerOut={() => setHovered(false)}
+      onClick={(e) => {
+        e.stopPropagation();
+        onNavigate(currentFloorIndex);
+      }}
+    >
+      {/* Screen Bezel/Background */}
+      <mesh position={[0, 0, 0]}>
+        <boxGeometry args={[1.2, 0.8, 0.1]} />
+        <meshLambertMaterial color={hovered ? "#222222" : "#111111"} />
+      </mesh>
+      
+      {/* Screen content area */}
+      <mesh position={[0, 0, 0.06]}>
+        <planeGeometry args={[1.0, 0.6]} />
+        <meshBasicMaterial color={hovered ? "#0a0a0a" : "#000000"} />
+      </mesh>
+
+      {/* Subtle Red Glow outline on hover */}
+      {hovered && (
+        <mesh position={[0, 0, 0.05]}>
+          <planeGeometry args={[1.05, 0.65]} />
+          <meshBasicMaterial color="#ff0000" transparent opacity={0.3} />
+        </mesh>
+      )}
+
+      {/* Floor Indicator Text */}
+      <Text
+        position={[0, 0, 0.08]}
+        fontSize={0.25}
+        color={hovered ? "#ff4444" : "#ff0000"}
+        anchorX="center"
+        anchorY="middle"
+      >
+        {FLOOR_NAMES[currentFloorIndex]}
+      </Text>
     </group>
   );
 }
