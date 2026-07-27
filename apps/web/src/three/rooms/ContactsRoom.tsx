@@ -188,7 +188,7 @@ function ContactBoard({ position }: { position: [number, number, number] }) {
 
   return (
     <group position={position}>
-      <mesh castShadow={false}>
+      <mesh>
         <boxGeometry args={[16, 8, 0.08]} />
         <meshLambertMaterial color="#2a2a2a" />
       </mesh>

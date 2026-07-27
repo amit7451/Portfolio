@@ -40,7 +40,6 @@ export default function WallText({
           height={depth}
           curveSegments={4}
           bevelEnabled={false}
-          castShadow={false}
         >
           {text}
           <meshLambertMaterial

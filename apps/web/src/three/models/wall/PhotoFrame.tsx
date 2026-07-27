@@ -59,31 +59,31 @@ export default function PhotoFrame({
   return (
     <group ref={groupRef} position={position} rotation={rotation} scale={scale}>
       {/* Frame Border - Top */}
-      <mesh position={[0, height / 2 - frameThickness / 2, frameDepth / 2]} castShadow>
+      <mesh position={[0, height / 2 - frameThickness / 2, frameDepth / 2]}>
         <boxGeometry args={[width, frameThickness, frameDepth]} />
         <meshLambertMaterial color={frameColor} />
       </mesh>
 
       {/* Frame Border - Bottom */}
-      <mesh position={[0, -height / 2 + frameThickness / 2, frameDepth / 2]} castShadow>
+      <mesh position={[0, -height / 2 + frameThickness / 2, frameDepth / 2]}>
         <boxGeometry args={[width, frameThickness, frameDepth]} />
         <meshLambertMaterial color={frameColor} />
       </mesh>
 
       {/* Frame Border - Left */}
-      <mesh position={[-width / 2 + frameThickness / 2, 0, frameDepth / 2]} castShadow>
+      <mesh position={[-width / 2 + frameThickness / 2, 0, frameDepth / 2]}>
         <boxGeometry args={[frameThickness, height - frameThickness * 2, frameDepth]} />
         <meshLambertMaterial color={frameColor} />
       </mesh>
 
       {/* Frame Border - Right */}
-      <mesh position={[width / 2 - frameThickness / 2, 0, frameDepth / 2]} castShadow>
+      <mesh position={[width / 2 - frameThickness / 2, 0, frameDepth / 2]}>
         <boxGeometry args={[frameThickness, height - frameThickness * 2, frameDepth]} />
         <meshLambertMaterial color={frameColor} />
       </mesh>
 
       {/* Inner mat/border */}
-      <mesh position={[0, 0, 0.02]} receiveShadow>
+      <mesh position={[0, 0, 0.02]}>
         <planeGeometry args={[innerWidth, innerHeight]} />
         <meshLambertMaterial color="#f5f0e6" />
       </mesh>

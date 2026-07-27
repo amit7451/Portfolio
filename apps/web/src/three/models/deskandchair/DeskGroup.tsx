@@ -76,8 +76,6 @@ function DrawerPlateButton({
         args={[0.84, 0.18, 0.02]}
         radius={0.03}
         smoothness={4}
-        castShadow={false}
-        receiveShadow={false}
       >
         <meshLambertMaterial
           color={color}
@@ -142,7 +140,7 @@ function CompanyBoardButton({
       {/* Subtle black top hinge brackets attaching board to desk frame */}
       {[-0.62, 0.62].map((xHinge, i) => (
         <group key={`hinge-${i}`} position={[xHinge, 0.23, 0]}>
-          <mesh castShadow>
+          <mesh>
             <boxGeometry args={[0.035, 0.05, 0.025]} />
             <meshLambertMaterial color="#1a1a1a" />
           </mesh>
@@ -158,8 +156,6 @@ function CompanyBoardButton({
         args={[1.56, 0.48, 0.025]}
         radius={0.04}
         smoothness={4}
-        castShadow={false}
-        receiveShadow={false}
       >
         <meshLambertMaterial
           color="#ffffff"
@@ -271,12 +267,12 @@ export default function DeskGroup({
       {/* ═══ Plain wooden stool — shown on desktop, hidden on mobile so it never gets cut off ═══ */}
       {!isMobile && (
         <group position={stoolPos as [number, number, number]} scale={[stoolScale, stoolScale, stoolScale]}>
-          <mesh position={[0, 0.9, 0]} castShadow={false} receiveShadow={false}>
+          <mesh position={[0, 0.9, 0]}>
             <cylinderGeometry args={[0.58, 0.62, 0.12, 32]} />
             <meshLambertMaterial color="#6e4a2f" />
           </mesh>
 
-          <mesh position={[0, 0.82, 0]} castShadow={false}>
+          <mesh position={[0, 0.82, 0]}>
             <cylinderGeometry args={[0.46, 0.5, 0.06, 28]} />
             <meshLambertMaterial color="#5a3b26" />
           </mesh>
@@ -287,13 +283,13 @@ export default function DeskGroup({
             [0.3, 0.4, -0.3],
             [-0.3, 0.4, -0.3],
           ].map((legPos, idx) => (
-            <mesh key={`stool-leg-${idx}`} position={legPos as [number, number, number]} castShadow={false}>
+            <mesh key={`stool-leg-${idx}`} position={legPos as [number, number, number]}>
               <cylinderGeometry args={[0.05, 0.06, 0.78, 18]} />
               <meshLambertMaterial color="#5a3b26" />
             </mesh>
           ))}
 
-          <mesh position={[0, 0.1, 0]} castShadow={false}>
+          <mesh position={[0, 0.1, 0]}>
             <cylinderGeometry args={[0.34, 0.36, 0.05, 24]} />
             <meshLambertMaterial color="#4b301f" />
           </mesh>

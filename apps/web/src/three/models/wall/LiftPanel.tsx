@@ -103,7 +103,7 @@ export default function LiftPanel({
     <group position={position} rotation={rotation}>
       {/* ─── MAIN PANEL BODY (Silver) ─── */}
       <group position={[0, -0.6, 0]}>
-        <mesh castShadow receiveShadow>
+        <mesh>
             <boxGeometry args={[1.2, 2.5, 0.1]} />
             <meshLambertMaterial
             color="#c0c0c0"

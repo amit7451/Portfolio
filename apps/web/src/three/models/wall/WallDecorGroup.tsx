@@ -302,12 +302,12 @@ function Printer({ position = [0, 0, 0] as [number, number, number] }) {
   return (
     <group position={position}>
       {/* Main Body */}
-      <mesh castShadow={false}>
+      <mesh>
         <boxGeometry args={[1.2, 0.4, 0.6]} />
         <meshLambertMaterial color="#2a2a2a" />
       </mesh>
       {/* Paper Tray */}
-      <mesh position={[0, 0.25, 0.1]} castShadow={false}>
+      <mesh position={[0, 0.25, 0.1]}>
         <boxGeometry args={[0.8, 0.1, 0.4]} />
         <meshLambertMaterial color="#1a1a1a" />
       </mesh>
@@ -333,12 +333,12 @@ function PrinterWithPaper({
     <group position={position} scale={scale}>
       <group position={[0, 0.20, 0]}>
         {/* Main Body */}
-        <mesh castShadow={false}>
+        <mesh>
           <boxGeometry args={[1.2, 0.4, 0.6]} />
           <meshLambertMaterial color="#2a2a2a" />
         </mesh>
         {/* Paper Tray */}
-        <mesh position={[0, 0.25, 0.1]} castShadow={false}>
+        <mesh position={[0, 0.25, 0.1]}>
           <boxGeometry args={[0.8, 0.1, 0.4]} />
           <meshLambertMaterial color="#1a1a1a" />
         </mesh>
@@ -353,16 +353,16 @@ function PrinterWithPaper({
           <meshLambertMaterial color="#1a3a2a" emissive="#0a2015" emissiveIntensity={0.3} />
         </mesh>
         {/* White paper stack on top */}
-        <mesh position={[0, 0.35, 0.05]} castShadow={false}>
+        <mesh position={[0, 0.35, 0.05]}>
           <boxGeometry args={[0.7, 0.08, 0.5]} />
           <meshLambertMaterial color="#ffffff" />
         </mesh>
         {/* Output paper tray with papers */}
-        <mesh position={[0, 0.1, 0.45]} rotation={[-0.2, 0, 0]} castShadow={false}>
+        <mesh position={[0, 0.1, 0.45]} rotation={[-0.2, 0, 0]}>
           <boxGeometry args={[0.65, 0.02, 0.3]} />
           <meshLambertMaterial color="#ffffff" />
         </mesh>
-        <mesh position={[0, 0.12, 0.48]} rotation={[-0.15, 0, 0]} castShadow={false}>
+        <mesh position={[0, 0.12, 0.48]} rotation={[-0.15, 0, 0]}>
           <boxGeometry args={[0.65, 0.02, 0.28]} />
           <meshLambertMaterial color="#f8f8f8" />
         </mesh>
@@ -377,7 +377,7 @@ function BookStack({ position = [0, 0, 0] as [number, number, number] }) {
   return (
     <group position={position}>
       {bookColors.map((color, i) => (
-        <mesh key={i} position={[0, i * 0.08, 0]} castShadow={false}>
+        <mesh key={i} position={[0, i * 0.08, 0]}>
           <boxGeometry args={[0.6, 0.07, 0.4]} />
           <meshLambertMaterial color={color} />
         </mesh>
@@ -413,7 +413,6 @@ function RandomBookStack({
             key={i}
             position={[book.xOffset, yPos, book.zOffset]}
             rotation={[0, book.rotation, 0]}
-            castShadow={false}
           >
             <boxGeometry args={[book.width, book.height, book.depth]} />
             <meshLambertMaterial color={book.color} />
@@ -434,7 +433,7 @@ function BinderGroup({
     <group position={position} scale={scale}>
       <group position={[0, 0.35, 0]}>
         {binderColors.map((color, i) => (
-          <mesh key={i} position={[i * 0.15, 0, 0]} castShadow={false}>
+          <mesh key={i} position={[i * 0.15, 0, 0]}>
             <boxGeometry args={[0.12, 0.7, 0.35]} />
             <meshLambertMaterial color={color} />
           </mesh>
@@ -448,12 +447,12 @@ function CableCoil({ position = [0, 0, 0] as [number, number, number] }) {
   return (
     <group position={position}>
       {/* Coiled cable simplified as torus */}
-      <mesh rotation={[Math.PI / 2, 0, 0]} castShadow={false}>
+      <mesh rotation={[Math.PI / 2, 0, 0]}>
         <torusGeometry args={[0.15, 0.02, 8, 24]} />
         <meshLambertMaterial color="#1a1a1a" />
       </mesh>
       {/* Inner coils */}
-      <mesh position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0.3]} castShadow={false}>
+      <mesh position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0.3]}>
         <torusGeometry args={[0.1, 0.02, 8, 24]} />
         <meshLambertMaterial color="#1a1a1a" />
       </mesh>
@@ -474,19 +473,19 @@ function CRTMonitor({
     <group position={position} scale={scale}>
       <group position={[0, 0.25, 0]}>
         {/* Monitor body - boxy CRT shape */}
-        <mesh position={[0, 0.55, 0]} castShadow={false}>
+        <mesh position={[0, 0.55, 0]}>
           <boxGeometry args={[1.8, 1.5, 1.4]} />
           <meshLambertMaterial color="#c8c0b0" />
         </mesh>
 
         {/* Rear bulge (CRT tube) */}
-        <mesh position={[0, 0.55, -0.55]} castShadow={false}>
+        <mesh position={[0, 0.55, -0.55]}>
           <boxGeometry args={[1.5, 1.2, 0.5]} />
           <meshLambertMaterial color="#b8b0a0" />
         </mesh>
 
         {/* Screen bezel - dark frame */}
-        <mesh position={[0, 0.6, 0.71]} castShadow={false}>
+        <mesh position={[0, 0.6, 0.71]}>
           <boxGeometry args={[1.55, 1.25, 0.04]} />
           <meshLambertMaterial color="#3a3a3a" />
         </mesh>
@@ -536,13 +535,13 @@ function CRTMonitor({
         </mesh>
 
         {/* Monitor stand/base */}
-        <mesh position={[0, -0.15, 0.1]} castShadow={false}>
+        <mesh position={[0, -0.15, 0.1]}>
           <boxGeometry args={[0.6, 0.15, 0.6]} />
           <meshLambertMaterial color="#b8b0a0" />
         </mesh>
 
         {/* Stand foot */}
-        <mesh position={[0, -0.22, 0.1]} castShadow={false}>
+        <mesh position={[0, -0.22, 0.1]}>
           <boxGeometry args={[1.0, 0.06, 0.8]} />
           <meshLambertMaterial color="#a8a090" />
         </mesh>
@@ -565,7 +564,7 @@ function CRTMonitor({
 
         {/* Ventilation slots on side */}
         {Array.from({ length: 5 }).map((_, i) => (
-          <mesh key={i} position={[0.91, 0.35 + i * 0.12, 0]} castShadow={false}>
+          <mesh key={i} position={[0.91, 0.35 + i * 0.12, 0]}>
             <boxGeometry args={[0.01, 0.04, 0.6]} />
             <meshLambertMaterial color="#555" />
           </mesh>
@@ -587,17 +586,17 @@ function LightStand({ position = [0, 0, 0] as [number, number, number] }) {
       onPointerOut={() => setHovered(false)}
     >
       {/* Stand Base */}
-      <mesh position={[0, 0.05, 0]} castShadow={false}>
+      <mesh position={[0, 0.05, 0]}>
         <cylinderGeometry args={[0.4, 0.5, 0.1]} />
         <meshLambertMaterial color="#1a1a1a" />
       </mesh>
       {/* Stand Pole */}
-      <mesh position={[0, 2.5, 0]} castShadow={false}>
+      <mesh position={[0, 2.5, 0]}>
         <cylinderGeometry args={[0.03, 0.04, 5]} />
         <meshLambertMaterial color="#2a2a2a" />
       </mesh>
       {/* Shade — glows warm amber on hover */}
-      <mesh position={[0, 5.3, 0]} rotation={[0.3, 0, 0]} castShadow={false}>
+      <mesh position={[0, 5.3, 0]} rotation={[0.3, 0, 0]}>
         <coneGeometry args={[1.2, 0.8, 8, 1, true]} />
         <meshLambertMaterial
           color={hovered ? '#ffe8b0' : '#f5f5f5'}

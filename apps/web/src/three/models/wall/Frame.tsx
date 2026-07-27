@@ -40,31 +40,31 @@ export default function Frame({
   return (
     <group ref={groupRef} position={position} rotation={rotation} scale={scale}>
       {/* Frame Border - Top */}
-      <mesh position={[0, height / 2 - frameThickness / 2, frameDepth / 2]} castShadow>
+      <mesh position={[0, height / 2 - frameThickness / 2, frameDepth / 2]}>
         <boxGeometry args={[width, frameThickness, frameDepth]} />
         <meshLambertMaterial color={frameColor} />
       </mesh>
 
       {/* Frame Border - Bottom */}
-      <mesh position={[0, -height / 2 + frameThickness / 2, frameDepth / 2]} castShadow>
+      <mesh position={[0, -height / 2 + frameThickness / 2, frameDepth / 2]}>
         <boxGeometry args={[width, frameThickness, frameDepth]} />
         <meshLambertMaterial color={frameColor} />
       </mesh>
 
       {/* Frame Border - Left */}
-      <mesh position={[-width / 2 + frameThickness / 2, 0, frameDepth / 2]} castShadow>
+      <mesh position={[-width / 2 + frameThickness / 2, 0, frameDepth / 2]}>
         <boxGeometry args={[frameThickness, height - frameThickness * 2, frameDepth]} />
         <meshLambertMaterial color={frameColor} />
       </mesh>
 
       {/* Frame Border - Right */}
-      <mesh position={[width / 2 - frameThickness / 2, 0, frameDepth / 2]} castShadow>
+      <mesh position={[width / 2 - frameThickness / 2, 0, frameDepth / 2]}>
         <boxGeometry args={[frameThickness, height - frameThickness * 2, frameDepth]} />
         <meshLambertMaterial color={frameColor} />
       </mesh>
 
       {/* Back Panel / Mat */}
-      <mesh position={[0, 0, 0.01]} receiveShadow>
+      <mesh position={[0, 0, 0.01]}>
         <planeGeometry args={[innerWidth + 0.02, innerHeight + 0.02]} />
         <meshLambertMaterial color="#e8e4de" />
       </mesh>

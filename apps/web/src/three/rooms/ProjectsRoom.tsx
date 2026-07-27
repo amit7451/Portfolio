@@ -347,14 +347,104 @@ function CarouselContainer({
   onSelectProject: (index: number) => void;
   pauseAutoSlide: () => void;
 }) {
-  const [, setTick] = useState(0);
+  const boardGroupRefs = useRef<(THREE.Group | null)[]>([]);
+  const boardFrameMatRefs = useRef<(THREE.MeshLambertMaterial | null)[]>([]);
+  const titleBarMatRefs = useRef<(THREE.MeshLambertMaterial | null)[]>([]);
+
+  const tableGroupRefs = useRef<(THREE.Group | null)[]>([]);
+  const tableTopMatRefs = useRef<(THREE.MeshLambertMaterial | null)[]>([]);
+
+  const dotRingMeshRefs = useRef<(THREE.Mesh | null)[]>([]);
+  const dotRingMatRefs = useRef<(THREE.MeshBasicMaterial | null)[]>([]);
+  const dotCircleMeshRefs = useRef<(THREE.Mesh | null)[]>([]);
+  const dotCircleMatRefs = useRef<(THREE.MeshBasicMaterial | null)[]>([]);
 
   useFrame((_, delta) => {
     const step = THREE.MathUtils.lerp(currentProgress.current, targetProgress.current, Math.min(1, delta * 7));
-    if (Math.abs(step - currentProgress.current) > 0.0001) {
-      currentProgress.current = step;
-      setTick((t) => (t + 1) % 1000);
-    }
+    currentProgress.current = step;
+
+    const totalItems = PROJECTS_DATA.length;
+    const spacing = isSmallScreen ? mapLinear(2.9, 3.8) : mapLinear(4.0, 5.4);
+    const normProgress = ((step % totalItems) + totalItems) % totalItems;
+
+    PROJECTS_DATA.forEach((_, i) => {
+      let offset = i - normProgress;
+      if (offset > totalItems / 2) offset -= totalItems;
+      if (offset < -totalItems / 2) offset += totalItems;
+
+      const absOffset = Math.abs(offset);
+      const posX = offset * spacing;
+
+      const boardY = roomH / 2 + 2.1;
+      const boardZ = backWallZ + 0.1 - Math.pow(absOffset, 1.2) * 0.45;
+      const boardScale = isSmallScreen
+        ? Math.max(0.72, 1.1 - absOffset * 0.38)
+        : Math.max(0.82, 1.25 - absOffset * 0.42);
+
+      const tableZ = 3.6 - Math.pow(absOffset, 1.2) * 2.0;
+      const tableScale = isSmallScreen
+        ? Math.max(0.72, 1.05 - absOffset * 0.33)
+        : Math.max(0.82, 1.2 - absOffset * 0.38);
+
+      const isCenter = absOffset < 0.3;
+
+      const boardGroup = boardGroupRefs.current[i];
+      if (boardGroup) {
+        boardGroup.position.set(posX, boardY, boardZ);
+        boardGroup.scale.set(boardScale, boardScale, boardScale);
+      }
+
+      const boardFrameMat = boardFrameMatRefs.current[i];
+      if (boardFrameMat) {
+        boardFrameMat.color.set(isCenter ? "#3a3a3a" : "#222222");
+      }
+
+      const titleBarMat = titleBarMatRefs.current[i];
+      if (titleBarMat) {
+        titleBarMat.emissiveIntensity = isCenter ? 0.55 : 0.25;
+      }
+
+      const tableGroup = tableGroupRefs.current[i];
+      if (tableGroup) {
+        tableGroup.position.set(posX, 0, tableZ);
+        tableGroup.scale.set(tableScale, tableScale, tableScale);
+      }
+
+      const tableTopMat = tableTopMatRefs.current[i];
+      if (tableTopMat) {
+        tableTopMat.color.set(isCenter ? "#6a5a4a" : "#4a3a2a");
+      }
+
+      // ─── Dot Indicators Update ───
+      let dist = Math.abs(i - normProgress);
+      if (dist > totalItems / 2) dist = totalItems - dist;
+
+      const activeFactor = Math.max(0, 1 - dist * 1.5);
+      const dotRadius = 0.035 + activeFactor * 0.025;
+      const dotScale = dotRadius / 0.035;
+
+      const ringMesh = dotRingMeshRefs.current[i];
+      if (ringMesh) {
+        ringMesh.visible = activeFactor > 0.1;
+        ringMesh.scale.set(dotScale, dotScale, 1);
+      }
+
+      const ringMat = dotRingMatRefs.current[i];
+      if (ringMat) {
+        ringMat.opacity = activeFactor * 0.9;
+      }
+
+      const circleMesh = dotCircleMeshRefs.current[i];
+      if (circleMesh) {
+        circleMesh.scale.set(dotScale, dotScale, 1);
+      }
+
+      const circleMat = dotCircleMatRefs.current[i];
+      if (circleMat) {
+        circleMat.color.set(activeFactor > 0.4 ? "#00ffff" : "#ffffff");
+        circleMat.opacity = activeFactor > 0.4 ? 1.0 : 0.55;
+      }
+    });
   });
 
   const totalItems = PROJECTS_DATA.length;
@@ -363,25 +453,20 @@ function CarouselContainer({
   return (
     <>
       {PROJECTS_DATA.map((project, i) => {
-        // Compute circular offset in range [-1.5, 1.5]
+        // Initial setup for first frame render before useFrame runs
         const normProgress = ((currentProgress.current % totalItems) + totalItems) % totalItems;
         let offset = i - normProgress;
         if (offset > totalItems / 2) offset -= totalItems;
         if (offset < -totalItems / 2) offset += totalItems;
 
         const absOffset = Math.abs(offset);
-
-        // Common horizontal X position for both wall board and table/card
         const posX = offset * spacing;
-
-        // Wall Board transform (mounted high at Y=8.1 so center poster is 100% visible in main view)
-        const boardY = roomH / 2 + 2.1; // Y = 8.1
+        const boardY = roomH / 2 + 2.1;
         const boardZ = backWallZ + 0.1 - Math.pow(absOffset, 1.2) * 0.45;
         const boardScale = isSmallScreen
           ? Math.max(0.72, 1.1 - absOffset * 0.38)
           : Math.max(0.82, 1.25 - absOffset * 0.42);
 
-        // Table & Card transform (center table moved forward to Z=3.6 towards camera)
         const tableZ = 3.6 - Math.pow(absOffset, 1.2) * 2.0;
         const tableScale = isSmallScreen
           ? Math.max(0.72, 1.05 - absOffset * 0.33)
@@ -393,6 +478,9 @@ function CarouselContainer({
           <group key={project.id}>
             {/* ═══ WALL IMAGE BOARD (Mounted high on back wall) ═══ */}
             <ProjectBoard
+              boardGroupRef={(el) => { boardGroupRefs.current[i] = el; }}
+              boardFrameMatRef={(el) => { boardFrameMatRefs.current[i] = el; }}
+              titleBarMatRef={(el) => { titleBarMatRefs.current[i] = el; }}
               position={[posX, boardY, boardZ]}
               scale={[boardScale, boardScale, boardScale]}
               title={project.title}
@@ -407,9 +495,14 @@ function CarouselContainer({
 
             {/* ═══ PROJECT TABLE & FLOATING CARD (Center table moved towards camera) ═══ */}
             <ProjectTable
+              tableGroupRef={(el) => { tableGroupRefs.current[i] = el; }}
+              tableTopMatRef={(el) => { tableTopMatRefs.current[i] = el; }}
               position={[posX, 0, tableZ]}
               scale={[tableScale, tableScale, tableScale]}
               project={project}
+              projectIndex={i}
+              currentProgress={currentProgress}
+              totalItems={totalItems}
               isCenter={isCenter}
               isSmallScreen={isSmallScreen}
               onClick={() => onSelectProject(i)}
@@ -427,30 +520,41 @@ function CarouselContainer({
           let dist = Math.abs(idx - normProgress);
           if (dist > total / 2) dist = total - dist;
 
-          // Smooth active factor lerp (1 = active, 0 = inactive)
           const activeFactor = Math.max(0, 1 - dist * 1.5);
-          const dotRadius = 0.035 + activeFactor * 0.025; // 0.035 -> 0.06 (small & subtle)
-          const dotX = (idx - 1) * 0.22; // Compact spacing
+          const dotRadius = 0.035 + activeFactor * 0.025;
+          const dotScale = dotRadius / 0.035;
+          const dotX = (idx - 1) * 0.22;
 
           return (
             <group key={proj.id} position={[dotX, 0, 0]}>
               {/* Fine outer cyan ring for active dot */}
-              {activeFactor > 0.1 && (
-                <mesh position={[0, 0, -0.005]}>
-                  <ringGeometry args={[dotRadius, dotRadius + 0.015, 32]} />
-                  <meshBasicMaterial color="#00ffff" transparent opacity={activeFactor * 0.9} />
-                </mesh>
-              )}
+              <mesh
+                ref={(el) => { dotRingMeshRefs.current[idx] = el; }}
+                position={[0, 0, -0.005]}
+                scale={[dotScale, dotScale, 1]}
+                visible={activeFactor > 0.1}
+              >
+                <ringGeometry args={[0.035, 0.05, 32]} />
+                <meshBasicMaterial
+                  ref={(el) => { dotRingMatRefs.current[idx] = el; }}
+                  color="#00ffff"
+                  transparent
+                  opacity={activeFactor * 0.9}
+                />
+              </mesh>
 
               {/* Small round circle dot */}
               <mesh
+                ref={(el) => { dotCircleMeshRefs.current[idx] = el; }}
+                scale={[dotScale, dotScale, 1]}
                 onClick={(e) => {
                   e.stopPropagation();
                   onSelectProject(idx);
                 }}
               >
-                <circleGeometry args={[dotRadius, 32]} />
+                <circleGeometry args={[0.035, 32]} />
                 <meshBasicMaterial
+                  ref={(el) => { dotCircleMatRefs.current[idx] = el; }}
                   color={activeFactor > 0.4 ? "#00ffff" : "#ffffff"}
                   transparent
                   opacity={activeFactor > 0.4 ? 1.0 : 0.55}
@@ -467,6 +571,9 @@ function CarouselContainer({
 /* ─── Sub-components ─── */
 
 function ProjectBoard({
+  boardGroupRef,
+  boardFrameMatRef,
+  titleBarMatRef,
   position,
   scale,
   title,
@@ -478,6 +585,9 @@ function ProjectBoard({
   slug,
   onClick,
 }: {
+  boardGroupRef?: (el: THREE.Group | null) => void;
+  boardFrameMatRef?: (el: THREE.MeshLambertMaterial | null) => void;
+  titleBarMatRef?: (el: THREE.MeshLambertMaterial | null) => void;
   position: [number, number, number];
   scale: [number, number, number];
   title: string;
@@ -495,6 +605,7 @@ function ProjectBoard({
 
   return (
     <group
+      ref={boardGroupRef}
       position={position}
       scale={scale}
       onClick={(e) => {
@@ -507,9 +618,9 @@ function ProjectBoard({
       }}
     >
       {/* Board frame */}
-      <mesh castShadow>
+      <mesh>
         <boxGeometry args={[boardW, boardH, 0.08]} />
-        <meshLambertMaterial color={isCenter ? "#3a3a3a" : "#222222"} />
+        <meshLambertMaterial ref={boardFrameMatRef} color={isCenter ? "#3a3a3a" : "#222222"} />
       </mesh>
 
       {/* Board surface with image */}
@@ -522,6 +633,7 @@ function ProjectBoard({
       <mesh position={[0, boardH / 2 - 0.26, 0.06]}>
         <planeGeometry args={[boardW - 0.1, 0.46]} />
         <meshLambertMaterial
+          ref={titleBarMatRef}
           color={titleBgColor}
           emissive={titleBgColor}
           emissiveIntensity={isCenter ? 0.55 : 0.25}
@@ -544,17 +656,27 @@ function ProjectBoard({
 }
 
 function ProjectTable({
+  tableGroupRef,
+  tableTopMatRef,
   position,
   scale,
   project,
+  projectIndex,
+  currentProgress,
+  totalItems,
   isCenter,
   isSmallScreen,
   onClick,
   pauseAutoSlide,
 }: {
+  tableGroupRef?: (el: THREE.Group | null) => void;
+  tableTopMatRef?: (el: THREE.MeshLambertMaterial | null) => void;
   position: [number, number, number];
   scale: [number, number, number];
   project: typeof PROJECTS_DATA[0];
+  projectIndex: number;
+  currentProgress: React.MutableRefObject<number>;
+  totalItems: number;
   isCenter: boolean;
   isSmallScreen: boolean;
   onClick: () => void;
@@ -579,16 +701,16 @@ function ProjectTable({
   }, [tableRadius, legHeight]);
 
   return (
-    <group position={position} scale={scale} onClick={onClick}>
+    <group ref={tableGroupRef} position={position} scale={scale} onClick={onClick}>
       {/* Table top */}
-      <mesh position={[0, tableH, 0]} castShadow receiveShadow>
+      <mesh position={[0, tableH, 0]}>
         <cylinderGeometry args={[tableRadius, tableRadius, 0.08, 32]} />
-        <meshLambertMaterial color={isCenter ? "#6a5a4a" : "#4a3a2a"} />
+        <meshLambertMaterial ref={tableTopMatRef} color={isCenter ? "#6a5a4a" : "#4a3a2a"} />
       </mesh>
 
       {/* 3 Legs */}
       {legPositions.map((pos, i) => (
-        <mesh key={i} position={pos} castShadow>
+        <mesh key={i} position={pos}>
           <cylinderGeometry args={[legRadius, legRadius * 0.8, legHeight, 16]} />
           <meshLambertMaterial color="#2a2a2a" />
         </mesh>
@@ -599,6 +721,9 @@ function ProjectTable({
         tableHeight={tableH}
         tableRadius={tableRadius}
         project={project}
+        projectIndex={projectIndex}
+        currentProgress={currentProgress}
+        totalItems={totalItems}
         isCenter={isCenter}
         isSmallScreen={isSmallScreen}
         pauseAutoSlide={pauseAutoSlide}
@@ -611,6 +736,9 @@ function FloatingCard({
   tableHeight,
   tableRadius,
   project,
+  projectIndex,
+  currentProgress,
+  totalItems,
   isCenter,
   isSmallScreen,
   pauseAutoSlide,
@@ -618,11 +746,21 @@ function FloatingCard({
   tableHeight: number;
   tableRadius: number;
   project: typeof PROJECTS_DATA[0];
+  projectIndex: number;
+  currentProgress: React.MutableRefObject<number>;
+  totalItems: number;
   isCenter: boolean;
   isSmallScreen: boolean;
   pauseAutoSlide: () => void;
 }) {
   const cardRef = useRef<THREE.Group>(null);
+  const lightRef = useRef<THREE.PointLight>(null);
+  const cardBodyMatRef = useRef<THREE.MeshLambertMaterial>(null);
+  const cyanEdge1MatRef = useRef<THREE.MeshLambertMaterial>(null);
+  const cyanEdge2MatRef = useRef<THREE.MeshLambertMaterial>(null);
+  const purpleEdge1MatRef = useRef<THREE.MeshLambertMaterial>(null);
+  const purpleEdge2MatRef = useRef<THREE.MeshLambertMaterial>(null);
+
   const [hovered, setHovered] = useState(false);
   const [buttonHovered, setButtonHovered] = useState<number | null>(null);
   const targetRotation = useRef({ x: 0, y: 0, z: 0 });
@@ -659,6 +797,13 @@ function FloatingCard({
     if (cardRef.current) {
       const time = state.clock.getElapsedTime();
 
+      // Compute dynamic isCenter inside useFrame without triggering React state re-render
+      const normProgress = ((currentProgress.current % totalItems) + totalItems) % totalItems;
+      let offset = projectIndex - normProgress;
+      if (offset > totalItems / 2) offset -= totalItems;
+      if (offset < -totalItems / 2) offset += totalItems;
+      const dynamicIsCenter = Math.abs(offset) < 0.3;
+
       const floatOffset = Math.sin(time * 0.7 + seed) * 0.06 + Math.cos(time * 0.5 + seed * 0.5) * 0.04;
       const hoverLiftOffset = hovered ? 0.2 : 0;
       cardRef.current.position.y = baseFloatHeight + floatOffset + hoverLiftOffset;
@@ -682,6 +827,19 @@ function FloatingCard({
         cardRef.current.rotation.y = THREE.MathUtils.lerp(cardRef.current.rotation.y, idleRotation, SPRING_DAMPING * 0.12);
         cardRef.current.rotation.z = THREE.MathUtils.lerp(cardRef.current.rotation.z, 0, SPRING_DAMPING * 0.12);
       }
+
+      // Imperative light & material updates
+      if (lightRef.current) {
+        lightRef.current.intensity = dynamicIsCenter ? (hovered ? 2.0 : 1.2) : 0.4;
+      }
+      if (cardBodyMatRef.current) {
+        cardBodyMatRef.current.color.set(dynamicIsCenter ? (hovered ? "#0f0f18" : "#08080d") : "#040406");
+      }
+      const edgeEmissive = dynamicIsCenter ? (hovered ? 2.5 : 1.8) : 0.8;
+      if (cyanEdge1MatRef.current) cyanEdge1MatRef.current.emissiveIntensity = edgeEmissive;
+      if (cyanEdge2MatRef.current) cyanEdge2MatRef.current.emissiveIntensity = edgeEmissive;
+      if (purpleEdge1MatRef.current) purpleEdge1MatRef.current.emissiveIntensity = edgeEmissive;
+      if (purpleEdge2MatRef.current) purpleEdge2MatRef.current.emissiveIntensity = edgeEmissive;
     }
   });
 
@@ -695,6 +853,7 @@ function FloatingCard({
     <group ref={cardRef} position={[0, baseFloatHeight, 0]}>
       {/* Light glow for center card */}
       <pointLight
+        ref={lightRef}
         position={[0, -0.4, 0]}
         intensity={isCenter ? (hovered ? 2.0 : 1.2) : 0.4}
         color="#00d9ff"
@@ -707,7 +866,6 @@ function FloatingCard({
         args={[cardWidth, cardHeight, cardDepth]}
         radius={0.14}
         smoothness={4}
-        castShadow
         onPointerOver={() => {
           setHovered(true);
           pauseAutoSlide();
@@ -723,6 +881,7 @@ function FloatingCard({
         }}
       >
         <meshLambertMaterial
+          ref={cardBodyMatRef}
           color={isCenter ? (hovered ? "#0f0f18" : "#08080d") : "#040406"}
           emissive="#000000"
           emissiveIntensity={0.1}
@@ -731,22 +890,22 @@ function FloatingCard({
 
       {/* Neon cyan left edge */}
       <RoundedBox args={[0.04, cardHeight, cardDepth + 0.02]} radius={0.02} smoothness={4} position={[-cardWidth / 2, 0, 0]}>
-        <meshLambertMaterial color="#00d9ff" emissive="#00d9ff" emissiveIntensity={isCenter ? (hovered ? 2.5 : 1.8) : 0.8} />
+        <meshLambertMaterial ref={cyanEdge1MatRef} color="#00d9ff" emissive="#00d9ff" emissiveIntensity={isCenter ? (hovered ? 2.5 : 1.8) : 0.8} />
       </RoundedBox>
 
       {/* Neon cyan right edge */}
       <RoundedBox args={[0.04, cardHeight, cardDepth + 0.02]} radius={0.02} smoothness={4} position={[cardWidth / 2, 0, 0]}>
-        <meshLambertMaterial color="#00d9ff" emissive="#00d9ff" emissiveIntensity={isCenter ? (hovered ? 2.5 : 1.8) : 0.8} />
+        <meshLambertMaterial ref={cyanEdge2MatRef} color="#00d9ff" emissive="#00d9ff" emissiveIntensity={isCenter ? (hovered ? 2.5 : 1.8) : 0.8} />
       </RoundedBox>
 
       {/* Neon purple top edge */}
       <RoundedBox args={[cardWidth, 0.04, cardDepth + 0.02]} radius={0.02} smoothness={4} position={[0, cardHeight / 2, 0]}>
-        <meshLambertMaterial color="#a855f7" emissive="#a855f7" emissiveIntensity={isCenter ? (hovered ? 2.5 : 1.8) : 0.8} />
+        <meshLambertMaterial ref={purpleEdge1MatRef} color="#a855f7" emissive="#a855f7" emissiveIntensity={isCenter ? (hovered ? 2.5 : 1.8) : 0.8} />
       </RoundedBox>
 
       {/* Neon purple bottom edge */}
       <RoundedBox args={[cardWidth, 0.04, cardDepth + 0.02]} radius={0.02} smoothness={4} position={[0, -cardHeight / 2, 0]}>
-        <meshLambertMaterial color="#a855f7" emissive="#a855f7" emissiveIntensity={isCenter ? (hovered ? 2.5 : 1.8) : 0.8} />
+        <meshLambertMaterial ref={purpleEdge2MatRef} color="#a855f7" emissive="#a855f7" emissiveIntensity={isCenter ? (hovered ? 2.5 : 1.8) : 0.8} />
       </RoundedBox>
 
       {/* Card Text Content */}

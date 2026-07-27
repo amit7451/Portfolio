@@ -24,14 +24,13 @@ export default function DeskLamp({
         <group position={position} scale={[scale, scale, scale]}>
 
             {/* ── Base plate ── */}
-            <mesh castShadow={false} receiveShadow={false} position={[0, 0.015, 0]}>
+            <mesh position={[0, 0.015, 0]}>
                 <cylinderGeometry args={[0.11, 0.13, 0.03, 20]} />
                 <meshLambertMaterial color="#1e1e1e" />
             </mesh>
 
             {/* ── ON/OFF Button (white cylinder on base) ── */}
             <mesh
-                castShadow={false}
                 position={[0.04, 0.045, 0.06]}
                 onClick={(e) => {
                     e.stopPropagation();
@@ -52,26 +51,25 @@ export default function DeskLamp({
             </mesh>
 
             {/* ── Pole ── */}
-            <mesh castShadow={false} position={[0, 0.24, 0]}>
+            <mesh position={[0, 0.24, 0]}>
                 <cylinderGeometry args={[0.013, 0.016, 0.44, 10]} />
                 <meshLambertMaterial color="#2e2e2e" />
             </mesh>
 
             {/* ── Elbow joint ── */}
-            <mesh castShadow={false} position={[0, 0.46, 0]}>
+            <mesh position={[0, 0.46, 0]}>
                 <sphereGeometry args={[0.022, 10, 10]} />
                 <meshLambertMaterial color="#3a3a3a" />
             </mesh>
 
             {/* ── Arm ── */}
-            <mesh castShadow={false} position={[0.12, 0.5, 0]} rotation={[0, 0, -0.45]}>
+            <mesh position={[0.12, 0.5, 0]} rotation={[0, 0, -0.45]}>
                 <cylinderGeometry args={[0.01, 0.01, 0.26, 8]} />
                 <meshLambertMaterial color="#2e2e2e" />
             </mesh>
 
             {/* ── Shade (open cone — DoubleSide so interior is visible) ── */}
             <mesh
-                castShadow={false}
                 position={[0.22, 0.45, 0]}
                 rotation={[0, 0, Math.PI / 2]}
             >

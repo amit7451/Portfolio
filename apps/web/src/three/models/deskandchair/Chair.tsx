@@ -40,13 +40,13 @@ export default function Chair({
     <group ref={groupRef} position={position} rotation={rotation} scale={scale}>
       {/* ═══ 5-STAR BASE ═══ */}
       {/* Central column */}
-      <mesh position={[0, 0.5, 0]} castShadow>
+      <mesh position={[0, 0.5, 0]}>
         <cylinderGeometry args={[0.06, 0.06, 0.7, 12]} />
         <meshLambertMaterial color={baseMetal} />
       </mesh>
 
       {/* Gas lift cylinder */}
-      <mesh position={[0, 0.85, 0]} castShadow>
+      <mesh position={[0, 0.85, 0]}>
         <cylinderGeometry args={[0.04, 0.06, 0.3, 12]} />
         <meshLambertMaterial color="#444" />
       </mesh>
@@ -65,13 +65,12 @@ export default function Chair({
             <mesh
               position={[cx, 0.12, cz]}
               rotation={[0, -rad, 0]}
-              castShadow
             >
               <boxGeometry args={[0.06, 0.06, armLen]} />
               <meshLambertMaterial color={baseMetal} />
             </mesh>
             {/* Caster wheel */}
-            <mesh position={[ex, 0.04, ez]} castShadow>
+            <mesh position={[ex, 0.04, ez]}>
               <sphereGeometry args={[0.05, 8, 8]} />
               <meshLambertMaterial color="#222" />
             </mesh>
@@ -81,55 +80,55 @@ export default function Chair({
 
       {/* ═══ SEAT ═══ */}
       {/* Seat cushion */}
-      <mesh position={[0, seatY, 0]} castShadow receiveShadow>
+      <mesh position={[0, seatY, 0]}>
         <boxGeometry args={[seatW, seatH, seatD]} />
         <meshLambertMaterial color={cushionColor} />
       </mesh>
 
       {/* Seat cushion top (slight rounding illusion) */}
-      <mesh position={[0, seatY + 0.04, 0]} castShadow>
+      <mesh position={[0, seatY + 0.04, 0]}>
         <boxGeometry args={[seatW - 0.06, 0.02, seatD - 0.06]} />
         <meshLambertMaterial color={cushionColor} />
       </mesh>
 
       {/* ═══ BACKREST ═══ */}
       {/* Main back panel */}
-      <mesh position={[0, seatY + backH / 2 + 0.1, -seatD / 2 + 0.03]} castShadow>
+      <mesh position={[0, seatY + backH / 2 + 0.1, -seatD / 2 + 0.03]}>
         <boxGeometry args={[backW, backH, backThick]} />
         <meshLambertMaterial color={cushionColor} />
       </mesh>
 
       {/* Lumbar support bump */}
-      <mesh position={[0, seatY + 0.35, -seatD / 2 + 0.07]} castShadow>
+      <mesh position={[0, seatY + 0.35, -seatD / 2 + 0.07]}>
         <boxGeometry args={[backW - 0.15, 0.3, 0.04]} />
         <meshLambertMaterial color={cushionColor} />
       </mesh>
 
       {/* Back frame (visible behind cushion) */}
-      <mesh position={[0, seatY + backH / 2 + 0.1, -seatD / 2 - 0.02]} castShadow>
+      <mesh position={[0, seatY + backH / 2 + 0.1, -seatD / 2 - 0.02]}>
         <boxGeometry args={[backW + 0.04, backH + 0.04, 0.03]} />
         <meshLambertMaterial color={frameMetal} />
       </mesh>
 
       {/* ═══ ARMRESTS ═══ */}
       {/* Left armrest pad */}
-      <mesh position={[-seatW / 2 + 0.02, seatY + armH + 0.08, -0.1]} castShadow>
+      <mesh position={[-seatW / 2 + 0.02, seatY + armH + 0.08, -0.1]}>
         <boxGeometry args={[armW + 0.04, 0.04, armD]} />
         <meshLambertMaterial color={cushionColor} />
       </mesh>
       {/* Left armrest support */}
-      <mesh position={[-seatW / 2 + 0.02, seatY + armH / 2 + 0.04, -0.1]} castShadow>
+      <mesh position={[-seatW / 2 + 0.02, seatY + armH / 2 + 0.04, -0.1]}>
         <boxGeometry args={[armW, armH, 0.06]} />
         <meshLambertMaterial color={frameMetal} />
       </mesh>
 
       {/* Right armrest pad */}
-      <mesh position={[seatW / 2 - 0.02, seatY + armH + 0.08, -0.1]} castShadow>
+      <mesh position={[seatW / 2 - 0.02, seatY + armH + 0.08, -0.1]}>
         <boxGeometry args={[armW + 0.04, 0.04, armD]} />
         <meshLambertMaterial color={cushionColor} />
       </mesh>
       {/* Right armrest support */}
-      <mesh position={[seatW / 2 - 0.02, seatY + armH / 2 + 0.04, -0.1]} castShadow>
+      <mesh position={[seatW / 2 - 0.02, seatY + armH / 2 + 0.04, -0.1]}>
         <boxGeometry args={[armW, armH, 0.06]} />
         <meshLambertMaterial color={frameMetal} />
       </mesh>

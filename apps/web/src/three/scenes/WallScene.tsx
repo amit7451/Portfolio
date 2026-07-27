@@ -126,7 +126,6 @@ function SceneLighting() {
         position={[3, 10, 8]}
         intensity={1.0}
         color="#ffffff"
-        castShadow
         shadow-mapSize-width={4096}
         shadow-mapSize-height={4096}
         shadow-camera-far={50}
@@ -143,7 +142,6 @@ function SceneLighting() {
         position={[0, 6, 6]}
         intensity={0.5}
         color="#fff5e8"
-        castShadow
         shadow-mapSize-width={2048}
         shadow-mapSize-height={2048}
         shadow-camera-far={30}

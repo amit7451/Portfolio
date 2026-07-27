@@ -44,7 +44,7 @@ export default function Wardrobe({
     <group ref={groupRef} position={position} rotation={rotation} scale={scale}>
       
       {/* Main Body (Frame) */}
-      <mesh position={[0, height / 2, 0]} castShadow receiveShadow>
+      <mesh position={[0, height / 2, 0]}>
         <boxGeometry args={[width, height, depth]} />
         <meshLambertMaterial 
           color={woodColor} 
@@ -59,7 +59,7 @@ export default function Wardrobe({
       ].map((xPos, index) => (
         <group key={`door-${index}`} position={[xPos, height / 2, depth / 2 + 0.01]}>
           {/* Door Panel */}
-          <mesh castShadow receiveShadow>
+          <mesh>
             <boxGeometry args={[doorWidth, doorHeight, 0.02]} />
             <meshLambertMaterial 
               color="#6b4c3e" // Slightly lighter than frame
@@ -67,7 +67,7 @@ export default function Wardrobe({
           </mesh>
 
           {/* Door Detailing - Beveled edges simulation (Inset) */}
-          <mesh position={[0, 0, 0.015]} receiveShadow>
+          <mesh position={[0, 0, 0.015]}>
              <boxGeometry args={[doorWidth - 0.1, doorHeight - 0.1, 0.005]} />
              <meshLambertMaterial color="#5e4134" />
           </mesh>
@@ -79,8 +79,7 @@ export default function Wardrobe({
               index === 1 ? -doorWidth/2 + 0.08 : doorWidth/2 - 0.08, 
               -1.0, // Lowered handle position (approx 1m from floor in real scale)
               0.03
-            ]} 
-            castShadow
+            ]}
           >
             <boxGeometry args={[handleWidth, handleLength, handleDepth]} />
             <meshLambertMaterial color="#222222" />
@@ -89,7 +88,7 @@ export default function Wardrobe({
       ))}
 
       {/* ═══ TOP MOULDING / CORNICE ═══ */}
-      <mesh position={[0, height, 0.05]} castShadow>
+      <mesh position={[0, height, 0.05]}>
         <boxGeometry args={[width + 0.1, 0.2, depth + 0.1]} />
         <meshLambertMaterial color="#4a3b32" />
       </mesh>

@@ -1,7 +1,6 @@
 'use client';
 
-import { useRef, useMemo } from 'react';
-import { useFrame } from '@react-three/fiber';
+import { useMemo, useCallback, useEffect } from 'react';
 import * as THREE from 'three';
 
 interface DeskCalendarProps {
@@ -29,7 +28,7 @@ export default function DeskCalendar({
     return { canvas, texture };
   }, []);
 
-  useFrame(() => {
+  const drawCalendar = useCallback(() => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
@@ -77,7 +76,13 @@ export default function DeskCalendar({
 
     // Notify Three.js that texture changed
     texture.needsUpdate = true;
-  });
+  }, [canvas, texture]);
+
+  useEffect(() => {
+    drawCalendar();
+    const interval = setInterval(drawCalendar, 60_000);
+    return () => clearInterval(interval);
+  }, [drawCalendar]);
 
   return (
     <group position={position} rotation={rotation} scale={scale}>
@@ -85,13 +90,13 @@ export default function DeskCalendar({
         {/* --- STAND GEOMETRY --- */}
         
         {/* Base Foot */}
-        <mesh position={[0, -0.45, 0.2]} castShadow receiveShadow>
+        <mesh position={[0, -0.45, 0.2]}>
           <boxGeometry args={[0.9, 0.05, 0.4]} />
           <meshLambertMaterial color="#222222" />
         </mesh>
 
         {/* Back Support (Angled) */}
-        <mesh position={[0, 0, 0]} rotation={[-0.1, 0, 0]} receiveShadow>
+        <mesh position={[0, 0, 0]} rotation={[-0.1, 0, 0]}>
           <boxGeometry args={[0.85, 1.0, 0.05]} />
           <meshLambertMaterial color="#f0f0f0" />
         </mesh>

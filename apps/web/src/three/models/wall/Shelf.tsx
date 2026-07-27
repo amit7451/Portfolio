@@ -39,8 +39,6 @@ export default function Shelf({
       {/* Main Shelf Surface */}
       <mesh
         ref={shelfRef}
-        castShadow
-        receiveShadow
         position={[0, 0, 0]}
       >
         <boxGeometry args={[length, thickness, depth]} />
@@ -52,7 +50,6 @@ export default function Shelf({
       {/* Shelf Front Edge */}
       <mesh
         position={[0, -thickness / 2 - 0.02, depth / 2 - 0.02]}
-        castShadow
       >
         <boxGeometry args={[length, 0.04, 0.08]} />
         <meshLambertMaterial
@@ -76,7 +73,6 @@ export default function Shelf({
       {/* Shelf Bracket Left */}
       <mesh
         position={[-length / 2 + 0.3, -0.15, -depth / 4]}
-        castShadow
       >
         <boxGeometry args={[0.08, 0.3, 0.08]} />
         <meshLambertMaterial
@@ -87,7 +83,6 @@ export default function Shelf({
       {/* Shelf Bracket Right */}
       <mesh
         position={[length / 2 - 0.3, -0.15, -depth / 4]}
-        castShadow
       >
         <boxGeometry args={[0.08, 0.3, 0.08]} />
         <meshLambertMaterial

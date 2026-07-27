@@ -44,7 +44,7 @@ export default function DigitalClock({
   return (
     <group ref={groupRef} position={position} rotation={rotation} scale={scale}>
       {/* Clock Body - Black rounded frame (bottom at Y=0) */}
-      <mesh position={[0, 0.45, 0]} castShadow receiveShadow>
+      <mesh position={[0, 0.45, 0]}>
         <boxGeometry args={[width, height, depth]} />
         <meshLambertMaterial
           color="#1a1a1a"

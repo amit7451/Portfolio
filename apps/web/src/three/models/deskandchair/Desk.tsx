@@ -34,13 +34,13 @@ export default function Desk({
   return (
     <group ref={groupRef} position={position} rotation={rotation} scale={scale}>
       {/* ═══ DESKTOP SURFACE ═══ */}
-      <mesh position={[0, deskY, 0]} castShadow receiveShadow>
+      <mesh position={[0, deskY, 0]}>
         <boxGeometry args={[topW, topH, topD]} />
         <meshLambertMaterial color={color} />
       </mesh>
 
       {/* Subtle edge banding on front */}
-      <mesh position={[0, deskY, topD / 2 + 0.005]} castShadow>
+      <mesh position={[0, deskY, topD / 2 + 0.005]}>
         <boxGeometry args={[topW, topH, 0.01]} />
         <meshLambertMaterial color="#4a4038" />
       </mesh>
@@ -53,68 +53,68 @@ export default function Desk({
         [-topW / 2 + 0.15, legH / 2, topD / 2 - 0.12],
         [topW / 2 - 0.15, legH / 2, topD / 2 - 0.12],
       ].map((pos, i) => (
-        <mesh key={`leg-${i}`} position={pos as [number, number, number]} castShadow>
+        <mesh key={`leg-${i}`} position={pos as [number, number, number]}>
           <boxGeometry args={[legW, legH, legD]} />
           <meshLambertMaterial color={darkMetal} />
         </mesh>
       ))}
 
       {/* Front cross-bar (under desktop, front) */}
-      <mesh position={[0, legH - 0.1, topD / 2 - 0.12]} castShadow>
+      <mesh position={[0, legH - 0.1, topD / 2 - 0.12]}>
         <boxGeometry args={[topW - 0.3, 0.06, 0.06]} />
         <meshLambertMaterial color={frameMetal} />
       </mesh>
 
       {/* Back cross-bar */}
-      <mesh position={[0, legH - 0.1, -topD / 2 + 0.12]} castShadow>
+      <mesh position={[0, legH - 0.1, -topD / 2 + 0.12]}>
         <boxGeometry args={[topW - 0.3, 0.06, 0.06]} />
         <meshLambertMaterial color={frameMetal} />
       </mesh>
 
       {/* Left side bar */}
-      <mesh position={[-topW / 2 + 0.15, legH - 0.1, 0]} castShadow>
+      <mesh position={[-topW / 2 + 0.15, legH - 0.1, 0]}>
         <boxGeometry args={[0.06, 0.06, topD - 0.24]} />
         <meshLambertMaterial color={frameMetal} />
       </mesh>
 
       {/* Right side bar */}
-      <mesh position={[topW / 2 - 0.15, legH - 0.1, 0]} castShadow>
+      <mesh position={[topW / 2 - 0.15, legH - 0.1, 0]}>
         <boxGeometry args={[0.06, 0.06, topD - 0.24]} />
         <meshLambertMaterial color={frameMetal} />
       </mesh>
 
       {/* ═══ KEYBOARD TRAY (optional subtle pull-out) ═══ */}
-      <mesh position={[0, deskY - 0.18, 0.15]} castShadow>
+      <mesh position={[0, deskY - 0.18, 0.15]}>
         <boxGeometry args={[1.8, 0.03, 0.8]} />
         <meshLambertMaterial color="#2e2822" />
       </mesh>
 
       {/* Tray rail left */}
-      <mesh position={[-0.85, deskY - 0.1, 0.15]} castShadow>
+      <mesh position={[-0.85, deskY - 0.1, 0.15]}>
         <boxGeometry args={[0.04, 0.04, 0.75]} />
         <meshLambertMaterial color={frameMetal} />
       </mesh>
 
       {/* Tray rail right */}
-      <mesh position={[0.85, deskY - 0.1, 0.15]} castShadow>
+      <mesh position={[0.85, deskY - 0.1, 0.15]}>
         <boxGeometry args={[0.04, 0.04, 0.75]} />
         <meshLambertMaterial color={frameMetal} />
       </mesh>
 
       {/* ═══ CABLE MANAGEMENT TRAY (under desk, back) ═══ */}
-      <mesh position={[0, legH - 0.35, -topD / 2 + 0.25]} castShadow>
+      <mesh position={[0, legH - 0.35, -topD / 2 + 0.25]}>
         <boxGeometry args={[2.0, 0.04, 0.3]} />
         <meshLambertMaterial color={frameMetal} />
       </mesh>
 
       {/* Side bracket left */}
-      <mesh position={[-1.0, legH - 0.25, -topD / 2 + 0.25]} castShadow>
+      <mesh position={[-1.0, legH - 0.25, -topD / 2 + 0.25]}>
         <boxGeometry args={[0.04, 0.15, 0.04]} />
         <meshLambertMaterial color={frameMetal} />
       </mesh>
 
       {/* Side bracket right */}
-      <mesh position={[1.0, legH - 0.25, -topD / 2 + 0.25]} castShadow>
+      <mesh position={[1.0, legH - 0.25, -topD / 2 + 0.25]}>
         <boxGeometry args={[0.04, 0.15, 0.04]} />
         <meshLambertMaterial color={frameMetal} />
       </mesh>
@@ -129,12 +129,12 @@ export default function Desk({
         return (
           <group>
             {/* Main drawer body */}
-            <mesh position={[drawerX, drawerY, 0]} castShadow receiveShadow>
+            <mesh position={[drawerX, drawerY, 0]}>
               <boxGeometry args={[drawerW, drawerH, drawerD]} />
               <meshLambertMaterial color={color} />
             </mesh>
             {/* Front face panel — slightly protruding for depth */}
-            <mesh position={[drawerX, drawerY, drawerD / 2 + 0.008]} castShadow>
+            <mesh position={[drawerX, drawerY, drawerD / 2 + 0.008]}>
               <boxGeometry args={[drawerW + 0.02, drawerH + 0.02, 0.016]} />
               <meshLambertMaterial color={color} />
             </mesh>
@@ -155,17 +155,17 @@ export default function Desk({
         return (
           <group position={[monX, monBaseY, topD / 2 - 0.4]} rotation={[0, monAngle, 0]}>
             {/* Monitor stand base */}
-            <mesh position={[0, 0.015, 0.08]} castShadow receiveShadow>
+            <mesh position={[0, 0.015, 0.08]}>
               <boxGeometry args={[0.22, 0.015, 0.16]} />
               <meshLambertMaterial color="#222222" />
             </mesh>
             {/* Monitor stand neck */}
-            <mesh position={[0, 0.14, 0.05]} castShadow>
+            <mesh position={[0, 0.14, 0.05]}>
               <boxGeometry args={[0.04, 0.25, 0.04]} />
               <meshLambertMaterial color="#2a2a2a" />
             </mesh>
             {/* Screen frame (black bezel) */}
-            <mesh position={[0, 0.28 + monH / 2, 0]} castShadow>
+            <mesh position={[0, 0.28 + monH / 2, 0]}>
               <boxGeometry args={[monW + bezelW * 2, monH + bezelW * 2, monThick]} />
               <meshLambertMaterial color="#222222" />
             </mesh>
@@ -182,7 +182,7 @@ export default function Desk({
             
             {/* ═══ BACK PANEL (visible to viewer) ═══ */}
             {/* Main back panel with lighter gray for visibility */}
-            <mesh position={[0, 0.28 + monH / 2, -monThick / 2 - 0.005]} castShadow>
+            <mesh position={[0, 0.28 + monH / 2, -monThick / 2 - 0.005]}>
               <boxGeometry args={[monW + bezelW * 1.5, monH + bezelW * 1.5, 0.01]} />
               <meshLambertMaterial color="#505050" />
             </mesh>
@@ -194,7 +194,7 @@ export default function Desk({
             </mesh>
 
             {/* VESA mount plate - lighter for contrast */}
-            <mesh position={[0, 0.28 + monH / 2, -monThick / 2 - 0.008]} castShadow>
+            <mesh position={[0, 0.28 + monH / 2, -monThick / 2 - 0.008]}>
               <boxGeometry args={[0.25, 0.25, 0.008]} />
               <meshLambertMaterial color="#606060" />
             </mesh>
@@ -203,28 +203,28 @@ export default function Desk({
             {[
               [-0.08, 0.08], [0.08, 0.08], [-0.08, -0.08], [0.08, -0.08]
             ].map((pos, i) => (
-              <mesh key={i} position={[pos[0], 0.28 + monH / 2 + pos[1], -monThick / 2 - 0.012]} castShadow>
+              <mesh key={i} position={[pos[0], 0.28 + monH / 2 + pos[1], -monThick / 2 - 0.012]}>
                 <cylinderGeometry args={[0.012, 0.012, 0.015, 12]} />
                 <meshLambertMaterial color="#222222" />
               </mesh>
             ))}
 
             {/* Ventilation panel - right side */}
-            <mesh position={[0.25, 0.28 + monH / 2, -monThick / 2 - 0.008]} castShadow>
+            <mesh position={[0.25, 0.28 + monH / 2, -monThick / 2 - 0.008]}>
               <boxGeometry args={[0.18, 0.3, 0.006]} />
               <meshLambertMaterial color="#444444" />
             </mesh>
 
             {/* Ventilation grilles - dark contrast */}
             {Array.from({ length: 12 }, (_, i) => (
-              <mesh key={`vent-${i}`} position={[0.25, 0.28 + monH / 2 - 0.12 + i * 0.02, -monThick / 2 - 0.01]} castShadow>
+              <mesh key={`vent-${i}`} position={[0.25, 0.28 + monH / 2 - 0.12 + i * 0.02, -monThick / 2 - 0.01]}>
                 <boxGeometry args={[0.15, 0.004, 0.003]} />
                 <meshLambertMaterial color="#1a1a1a" />
               </mesh>
             ))}
 
             {/* I/O panel - lighter */}
-            <mesh position={[-0.28, 0.28 + monH / 2 - 0.08, -monThick / 2 - 0.008]} castShadow>
+            <mesh position={[-0.28, 0.28 + monH / 2 - 0.08, -monThick / 2 - 0.008]}>
               <boxGeometry args={[0.12, 0.16, 0.006]} />
               <meshLambertMaterial color="#444444" />
             </mesh>
@@ -241,15 +241,15 @@ export default function Desk({
             </mesh>
 
             {/* ═══ CABLES going from back of monitor down into desk ═══ */}
-            <mesh position={[-0.1, 0.12, -monThick / 2 - 0.03]} castShadow>
+            <mesh position={[-0.1, 0.12, -monThick / 2 - 0.03]}>
               <cylinderGeometry args={[0.01, 0.01, 0.3, 8]} />
               <meshLambertMaterial color="#1a1a1a" />
             </mesh>
-            <mesh position={[0.06, 0.12, -monThick / 2 - 0.05]} castShadow>
+            <mesh position={[0.06, 0.12, -monThick / 2 - 0.05]}>
               <cylinderGeometry args={[0.008, 0.008, 0.3, 8]} />
               <meshLambertMaterial color="#222222" />
             </mesh>
-            <mesh position={[0, -0.01, -0.15]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+            <mesh position={[0, -0.01, -0.15]} rotation={[Math.PI / 2, 0, 0]}>
               <cylinderGeometry args={[0.01, 0.01, 0.25, 8]} />
               <meshLambertMaterial color="#1a1a1a" />
             </mesh>
@@ -267,7 +267,7 @@ export default function Desk({
         const kbZ = -0.15; // pushed toward chair side (-Z)
         return (
           <group position={[kbX, kbY, kbZ]} rotation={[0, 0.15, 0]}>
-            <mesh castShadow receiveShadow>
+            <mesh>
               <boxGeometry args={[kbW, kbH, kbD]} />
               <meshLambertMaterial color="#2a2a2a" />
             </mesh>
@@ -309,7 +309,7 @@ export default function Desk({
               const y = stackY + p.h / 2;
               stackY += p.h;
               return (
-                <mesh key={`paper-${i}`} position={[p.x, y, p.z]} rotation={[0, p.rot, 0]} castShadow receiveShadow>
+                <mesh key={`paper-${i}`} position={[p.x, y, p.z]} rotation={[0, p.rot, 0]}>
                   <boxGeometry args={[p.w, p.h, p.d]} />
                   <meshLambertMaterial color={p.color} />
                 </mesh>
@@ -329,12 +329,12 @@ export default function Desk({
         return (
           <group position={[mugX, surfY, mugZ]}>
             {/* Mug body — simple cylinder */}
-            <mesh position={[0, mugH / 2, 0]} castShadow receiveShadow>
+            <mesh position={[0, mugH / 2, 0]}>
               <cylinderGeometry args={[mugR, mugR, mugH, 20]} />
               <meshLambertMaterial color="#f0ece4" />
             </mesh>
             {/* Handle — half-torus on the side */}
-            <mesh position={[mugR + 0.025, mugH * 0.5, 0]} rotation={[0, Math.PI / 2, 0]} castShadow>
+            <mesh position={[mugR + 0.025, mugH * 0.5, 0]} rotation={[0, Math.PI / 2, 0]}>
               <torusGeometry args={[0.035, 0.01, 8, 12, Math.PI]} />
               <meshLambertMaterial color="#f0ece4" />
             </mesh>
@@ -356,15 +356,15 @@ export default function Desk({
         const btlH = 0.42;
         return (
           <group position={[btlX, surfY, btlZ]}>
-            <mesh position={[0, btlH / 2, 0]} castShadow receiveShadow>
+            <mesh position={[0, btlH / 2, 0]}>
               <cylinderGeometry args={[btlR, btlR * 1.05, btlH, 16]} />
               <meshLambertMaterial color="#c8e8f8" transparent opacity={0.75} />
             </mesh>
-            <mesh position={[0, btlH + 0.02, 0]} castShadow>
+            <mesh position={[0, btlH + 0.02, 0]}>
               <cylinderGeometry args={[btlR * 0.6, btlR * 0.7, 0.06, 12]} />
               <meshLambertMaterial color="#555555" />
             </mesh>
-            <mesh position={[0, btlH - 0.02, 0]} castShadow>
+            <mesh position={[0, btlH - 0.02, 0]}>
               <cylinderGeometry args={[btlR * 0.55, btlR, 0.06, 12]} />
               <meshLambertMaterial color="#c8e8f8" transparent opacity={0.75} />
             </mesh>
@@ -384,7 +384,7 @@ export default function Desk({
         return (
           <group position={[plateX, surfY, plateZ]} rotation={[-0.22, 0, 0]}>
             {/* Metallic desk stand base (low bottom feet) */}
-            <mesh position={[0, 0.015, 0]} castShadow receiveShadow>
+            <mesh position={[0, 0.015, 0]}>
               <boxGeometry args={[0.76, 0.03, 0.10]} />
               <meshStandardMaterial
                 color="#8a9098"
@@ -394,7 +394,7 @@ export default function Desk({
             </mesh>
 
             {/* Dark metal backing frame */}
-            <mesh position={[0, 0.08, 0.008]} castShadow>
+            <mesh position={[0, 0.08, 0.008]}>
               <boxGeometry args={[0.74, 0.13, 0.012]} />
               <meshStandardMaterial
                 color="#1a1c20"
@@ -404,7 +404,7 @@ export default function Desk({
             </mesh>
 
             {/* Brushed silver face plate */}
-            <mesh position={[0, 0.08, 0.018]} castShadow>
+            <mesh position={[0, 0.08, 0.018]}>
               <boxGeometry args={[0.70, 0.11, 0.008]} />
               <meshStandardMaterial
                 color="#e2e6eb"
@@ -446,49 +446,49 @@ export default function Desk({
             {/* ── Batman Figure (left-front) ── */}
             <group position={[-0.55, surfY, frontZ]}>
               {/* Base */}
-              <mesh position={[0, 0.01, 0]} castShadow>
+              <mesh position={[0, 0.01, 0]}>
                 <cylinderGeometry args={[0.07, 0.08, 0.02, 12]} />
                 <meshLambertMaterial color="#111111" />
               </mesh>
               {/* Legs */}
-              <mesh position={[-0.025, 0.07, 0]} castShadow>
+              <mesh position={[-0.025, 0.07, 0]}>
                 <boxGeometry args={[0.04, 0.1, 0.05]} />
                 <meshLambertMaterial color="#1a1a1a" />
               </mesh>
-              <mesh position={[0.025, 0.07, 0]} castShadow>
+              <mesh position={[0.025, 0.07, 0]}>
                 <boxGeometry args={[0.04, 0.1, 0.05]} />
                 <meshLambertMaterial color="#1a1a1a" />
               </mesh>
               {/* Torso */}
-              <mesh position={[0, 0.17, 0]} castShadow>
+              <mesh position={[0, 0.17, 0]}>
                 <boxGeometry args={[0.1, 0.12, 0.07]} />
                 <meshLambertMaterial color="#1c1c1c" />
               </mesh>
               {/* Belt (yellow) */}
-              <mesh position={[0, 0.12, 0.036]} castShadow>
+              <mesh position={[0, 0.12, 0.036]}>
                 <boxGeometry args={[0.1, 0.018, 0.006]} />
                 <meshLambertMaterial color="#f0c040" />
               </mesh>
               {/* Arms */}
-              <mesh position={[-0.07, 0.17, 0]} castShadow>
+              <mesh position={[-0.07, 0.17, 0]}>
                 <boxGeometry args={[0.03, 0.1, 0.04]} />
                 <meshLambertMaterial color="#1a1a1a" />
               </mesh>
-              <mesh position={[0.07, 0.17, 0]} castShadow>
+              <mesh position={[0.07, 0.17, 0]}>
                 <boxGeometry args={[0.03, 0.1, 0.04]} />
                 <meshLambertMaterial color="#1a1a1a" />
               </mesh>
               {/* Head */}
-              <mesh position={[0, 0.26, 0]} castShadow>
+              <mesh position={[0, 0.26, 0]}>
                 <boxGeometry args={[0.065, 0.065, 0.06]} />
                 <meshLambertMaterial color="#1a1a1a" />
               </mesh>
               {/* Bat-ears */}
-              <mesh position={[-0.025, 0.305, 0]} castShadow>
+              <mesh position={[-0.025, 0.305, 0]}>
                 <boxGeometry args={[0.012, 0.03, 0.012]} />
                 <meshLambertMaterial color="#0a0a0a" />
               </mesh>
-              <mesh position={[0.025, 0.305, 0]} castShadow>
+              <mesh position={[0.025, 0.305, 0]}>
                 <boxGeometry args={[0.012, 0.03, 0.012]} />
                 <meshLambertMaterial color="#0a0a0a" />
               </mesh>
@@ -502,7 +502,7 @@ export default function Desk({
                 <meshLambertMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={0.3} />
               </mesh>
               {/* Cape (back) */}
-              <mesh position={[0, 0.14, -0.045]} castShadow>
+              <mesh position={[0, 0.14, -0.045]}>
                 <boxGeometry args={[0.1, 0.2, 0.015]} />
                 <meshLambertMaterial color="#111111" />
               </mesh>
@@ -511,21 +511,21 @@ export default function Desk({
             {/* ── Iron Man Figure (right-front) ── */}
             <group position={[0.4, surfY, frontZ - 0.03]}>
               {/* Base */}
-              <mesh position={[0, 0.01, 0]} castShadow>
+              <mesh position={[0, 0.01, 0]}>
                 <cylinderGeometry args={[0.07, 0.08, 0.02, 12]} />
                 <meshLambertMaterial color="#222222" />
               </mesh>
               {/* Legs */}
-              <mesh position={[-0.025, 0.07, 0]} castShadow>
+              <mesh position={[-0.025, 0.07, 0]}>
                 <boxGeometry args={[0.04, 0.1, 0.05]} />
                 <meshLambertMaterial color="#8b1a1a" />
               </mesh>
-              <mesh position={[0.025, 0.07, 0]} castShadow>
+              <mesh position={[0.025, 0.07, 0]}>
                 <boxGeometry args={[0.04, 0.1, 0.05]} />
                 <meshLambertMaterial color="#8b1a1a" />
               </mesh>
               {/* Torso */}
-              <mesh position={[0, 0.17, 0]} castShadow>
+              <mesh position={[0, 0.17, 0]}>
                 <boxGeometry args={[0.1, 0.12, 0.07]} />
                 <meshLambertMaterial color="#cc2222" />
               </mesh>
@@ -535,25 +535,25 @@ export default function Desk({
                 <meshLambertMaterial color="#80dfff" emissive="#40c0ff" emissiveIntensity={2} />
               </mesh>
               {/* Arms */}
-              <mesh position={[-0.07, 0.17, 0]} castShadow>
+              <mesh position={[-0.07, 0.17, 0]}>
                 <boxGeometry args={[0.03, 0.1, 0.04]} />
                 <meshLambertMaterial color="#cc2222" />
               </mesh>
-              <mesh position={[0.07, 0.17, 0]} castShadow>
+              <mesh position={[0.07, 0.17, 0]}>
                 <boxGeometry args={[0.03, 0.1, 0.04]} />
                 <meshLambertMaterial color="#cc2222" />
               </mesh>
               {/* Gold shoulder accents */}
-              <mesh position={[-0.065, 0.215, 0]} castShadow>
+              <mesh position={[-0.065, 0.215, 0]}>
                 <boxGeometry args={[0.035, 0.02, 0.045]} />
                 <meshLambertMaterial color="#d4a017" />
               </mesh>
-              <mesh position={[0.065, 0.215, 0]} castShadow>
+              <mesh position={[0.065, 0.215, 0]}>
                 <boxGeometry args={[0.035, 0.02, 0.045]} />
                 <meshLambertMaterial color="#d4a017" />
               </mesh>
               {/* Head / Helmet */}
-              <mesh position={[0, 0.26, 0]} castShadow>
+              <mesh position={[0, 0.26, 0]}>
                 <boxGeometry args={[0.065, 0.065, 0.06]} />
                 <meshLambertMaterial color="#cc2222" />
               </mesh>
