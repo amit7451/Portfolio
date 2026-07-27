@@ -4,6 +4,7 @@ import { useRef, useMemo, useState, useEffect } from 'react';
 import * as THREE from 'three';
 import { useTexture, Text, RoundedBox } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
+import { useRouter } from 'next/navigation';
 import RoomShell from '../components/RoomShell';
 import WallText from '../models/wall/WallText';
 import { useResponsiveCanvas } from '../../hooks/useResponsive';
@@ -78,6 +79,7 @@ export default function ProjectsRoom({
   rotation = [0, 0, 0],
   scale = [1, 1, 1],
 }: ProjectsRoomProps) {
+  const router = useRouter();
   const groupRef = useRef<THREE.Group>(null);
   const { mapLinear, shouldHideSideNav, isMobile } = useResponsiveCanvas();
   const isSmallScreen = shouldHideSideNav || isMobile;
@@ -131,8 +133,8 @@ export default function ProjectsRoom({
     if (diff < -total / 2) diff += total;
 
     if (Math.abs(diff) < 0.35) {
-      if (typeof window !== 'undefined' && project?.slug) {
-        window.location.href = '/' + project.slug;
+      if (project?.slug) {
+        router.push('/' + project.slug);
       }
     } else {
       targetProgress.current += diff;
@@ -518,6 +520,7 @@ function ProjectBoard({
   slug: string;
   onClick: () => void;
 }) {
+  const router = useRouter();
   const imageTexture = useTexture(imagePath);
   const boardW = 3.8;
   const boardH = 2.4;
@@ -529,8 +532,8 @@ function ProjectBoard({
       scale={scale}
       onClick={(e) => {
         e.stopPropagation();
-        if (typeof window !== 'undefined' && slug) {
-          window.location.href = '/' + slug;
+        if (slug) {
+          router.push('/' + slug);
         } else {
           onClick();
         }
@@ -672,6 +675,7 @@ function FloatingCard({
   isSmallScreen: boolean;
   pauseAutoSlide: () => void;
 }) {
+  const router = useRouter();
   const cardRef = useRef<THREE.Group>(null);
   const lightRef = useRef<THREE.PointLight>(null);
   const cardBodyMatRef = useRef<THREE.MeshLambertMaterial>(null);
@@ -785,6 +789,7 @@ function FloatingCard({
         args={[cardWidth, cardHeight, cardDepth]}
         radius={0.14}
         smoothness={4}
+        castShadow
         onPointerOver={() => {
           setHovered(true);
           pauseAutoSlide();
@@ -792,10 +797,9 @@ function FloatingCard({
         onPointerOut={() => setHovered(false)}
         onPointerMove={handlePointerMove}
         onClick={(e) => {
-          if (typeof window === 'undefined') return;
           e.stopPropagation();
           if (project.slug) {
-            window.location.href = '/' + project.slug;
+            router.push('/' + project.slug);
           }
         }}
       >
