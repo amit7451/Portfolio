@@ -126,7 +126,7 @@ If any required SMTP variable is missing, the API returns a server error and the
 
 ## 3D Scene Structure
 
-The homepage uses a dynamic import for the main 3D scene to avoid server-side rendering issues. The 3D code is split into focused layers:
+The homepage uses a dynamic import for the main 3D scene to avoid server-side rendering issues. The 3D code is split into focused layers: 
 
 - `src/three/scenes` contains the scene entry points
 - `src/three/rooms` contains room-level compositions such as About, Contacts, and Projects
@@ -150,3 +150,5 @@ This separation keeps the scene reusable and makes it easier to optimize or repl
 ## License
 
 No explicit license file is included in this repository.
+
+Optimised 1
