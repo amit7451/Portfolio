@@ -5,7 +5,6 @@ import { useFrame } from '@react-three/fiber';
 import { RoundedBox, useCursor, Text } from '@react-three/drei';
 import Desk from './Desk';
 import Chair from './Chair';
-import DeskLamp from './DeskLamp';
 import * as THREE from 'three';
 import { useResponsiveCanvas } from '../../../hooks/useResponsive';
 

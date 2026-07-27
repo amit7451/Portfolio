@@ -246,33 +246,6 @@ function ArticleButton({ position = [0, 0, 0] as [number, number, number] }) {
   );
 }
 
-function Printer({ position = [0, 0, 0] as [number, number, number] }) {
-  return (
-    <group position={position}>
-      {/* Main Body */}
-      <mesh>
-        <boxGeometry args={[1.2, 0.4, 0.6]} />
-        <meshLambertMaterial color="#2a2a2a" />
-      </mesh>
-      {/* Paper Tray */}
-      <mesh position={[0, 0.25, 0.1]}>
-        <boxGeometry args={[0.8, 0.1, 0.4]} />
-        <meshLambertMaterial color="#1a1a1a" />
-      </mesh>
-      {/* Control Panel */}
-      <mesh position={[0.35, 0.2, 0.32]}>
-        <boxGeometry args={[0.3, 0.08, 0.02]} />
-        <meshLambertMaterial color="#333" />
-      </mesh>
-      {/* Display */}
-      <mesh position={[0.35, 0.22, 0.33]}>
-        <planeGeometry args={[0.15, 0.04]} />
-        <meshLambertMaterial color="#1a3a2a" emissive="#0a2015" emissiveIntensity={0.3} />
-      </mesh>
-    </group>
-  );
-}
-
 function PrinterWithPaper({
   position = [0, 0, 0] as [number, number, number],
   scale = [1, 1, 1] as [number, number, number],
@@ -315,21 +288,6 @@ function PrinterWithPaper({
           <meshLambertMaterial color="#f8f8f8" />
         </mesh>
       </group>
-    </group>
-  );
-}
-
-function BookStack({ position = [0, 0, 0] as [number, number, number] }) {
-  const bookColors = ['#8b4513', '#2f4f4f', '#4a4a8a', '#8b0000', '#006400'];
-
-  return (
-    <group position={position}>
-      {bookColors.map((color, i) => (
-        <mesh key={i} position={[0, i * 0.08, 0]}>
-          <boxGeometry args={[0.6, 0.07, 0.4]} />
-          <meshLambertMaterial color={color} />
-        </mesh>
-      ))}
     </group>
   );
 }
