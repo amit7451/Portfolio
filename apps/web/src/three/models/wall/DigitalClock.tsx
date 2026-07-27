@@ -1,7 +1,8 @@
 'use client';
 
-import { useRef, useState, useEffect } from 'react';
+import { useRef } from 'react';
 import { Text } from '@react-three/drei';
+import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
 interface DigitalClockProps {
@@ -18,22 +19,23 @@ export default function DigitalClock({
   visible = true,
 }: DigitalClockProps) {
   const groupRef = useRef<THREE.Group>(null);
-  const [time, setTime] = useState('00:00:00');
-  
-  // Update time every second
-  useEffect(() => {
-    const updateTime = () => {
-      const now = new Date();
-      const hours = now.getHours().toString().padStart(2, '0');
-      const minutes = now.getMinutes().toString().padStart(2, '0');
-      const seconds = now.getSeconds().toString().padStart(2, '0');
-      setTime(`${hours}:${minutes}:${seconds}`);
-    };
-    
-    updateTime();
-    const interval = setInterval(updateTime, 1000);
-    return () => clearInterval(interval);
-  }, []);
+  const textRef = useRef<any>(null);
+  const lastTimeRef = useRef<string>('');
+
+  useFrame(() => {
+    const now = new Date();
+    const hours = now.getHours().toString().padStart(2, '0');
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    const seconds = now.getSeconds().toString().padStart(2, '0');
+    const formatted = `${hours}:${minutes}:${seconds}`;
+
+    if (formatted !== lastTimeRef.current) {
+      lastTimeRef.current = formatted;
+      if (textRef.current) {
+        textRef.current.text = formatted;
+      }
+    }
+  });
 
   if (!visible) return null;
 
@@ -79,6 +81,7 @@ export default function DigitalClock({
 
       {/* Time Display - LED style red text */}
       <Text
+        ref={textRef}
         position={[0, 0.45, depth / 2 + 0.01]}
         fontSize={0.5}
         color="#ff2200"
@@ -87,7 +90,7 @@ export default function DigitalClock({
         characters="0123456789:"
         letterSpacing={0.08}
       >
-        {time}
+        00:00:00
         <meshLambertMaterial
           color="#ff2200"
           emissive="#ff2200"
