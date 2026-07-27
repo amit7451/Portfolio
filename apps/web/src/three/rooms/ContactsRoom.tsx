@@ -4,6 +4,7 @@ import { Html, Text, useTexture, useScroll } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { CSSProperties, ChangeEvent, FormEvent, useMemo, useRef, useState, useEffect } from 'react';
 import * as THREE from 'three';
+import RoomShell from '../components/RoomShell';
 import WallText from '../models/wall/WallText';
 
 interface ContactsRoomProps {
@@ -18,43 +19,6 @@ export default function ContactsRoom({
   scale = [1, 1, 1],
 }: ContactsRoomProps) {
   const groupRef = useRef<THREE.Group>(null);
-  const basePlasterTexture = useTexture('/3d/wall/textures/plaster.webp');
-  const baseCeilingTexture = useTexture('/3d/wall/textures/ceiling_interior.webp');
-  const baseFloorTexture = useTexture('/3d/wall/textures/floor.webp');
-
-  const wallTexture = useMemo(() => {
-    const cloned = basePlasterTexture.clone();
-    cloned.wrapS = cloned.wrapT = THREE.RepeatWrapping;
-    cloned.repeat.set(6, 3);
-    cloned.magFilter = THREE.LinearFilter;
-    cloned.minFilter = THREE.LinearMipmapLinearFilter;
-    cloned.anisotropy = 4;
-    cloned.needsUpdate = true;
-    return cloned;
-  }, [basePlasterTexture]);
-
-  const ceilingTexture = useMemo(() => {
-    const cloned = baseCeilingTexture.clone();
-    cloned.wrapS = cloned.wrapT = THREE.RepeatWrapping;
-    cloned.repeat.set(5, 5.5);
-    cloned.magFilter = THREE.LinearFilter;
-    cloned.minFilter = THREE.LinearMipmapLinearFilter;
-    cloned.anisotropy = 4;
-    cloned.colorSpace = THREE.SRGBColorSpace;
-    cloned.needsUpdate = true;
-    return cloned;
-  }, [baseCeilingTexture]);
-
-  const floorTexture = useMemo(() => {
-    const cloned = baseFloorTexture.clone();
-    cloned.wrapS = cloned.wrapT = THREE.RepeatWrapping;
-    cloned.repeat.set(4, 11);
-    cloned.magFilter = THREE.LinearFilter;
-    cloned.minFilter = THREE.LinearMipmapLinearFilter;
-    cloned.anisotropy = 4;
-    cloned.needsUpdate = true;
-    return cloned;
-  }, [baseFloorTexture]);
 
   const roomW = 20;
   const roomH = 12;
@@ -63,42 +27,7 @@ export default function ContactsRoom({
 
   return (
     <group ref={groupRef} position={position} rotation={rotation} scale={scale}>
-      <mesh position={[0, roomH / 2, backWallZ]}>
-        <planeGeometry args={[roomW, roomH]} />
-        <meshLambertMaterial map={wallTexture} color="#e8e4e0" />
-      </mesh>
-
-      <mesh position={[-roomW / 2, roomH / 2, 0]} rotation={[0, Math.PI / 2, 0]}>
-        <planeGeometry args={[roomD, roomH]} />
-        <meshLambertMaterial
-          map={wallTexture}
-          color="#e8e4e0"
-          polygonOffset
-          polygonOffsetFactor={-1}
-          polygonOffsetUnits={-1}
-        />
-      </mesh>
-
-      <mesh position={[roomW / 2, roomH / 2, 0]} rotation={[0, -Math.PI / 2, 0]}>
-        <planeGeometry args={[roomD, roomH]} />
-        <meshLambertMaterial
-          map={wallTexture}
-          color="#e8e4e0"
-          polygonOffset
-          polygonOffsetFactor={-1}
-          polygonOffsetUnits={-1}
-        />
-      </mesh>
-
-      <mesh position={[0, 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[roomW, roomD]} />
-        <meshLambertMaterial map={floorTexture} color="#b8a88a" />
-      </mesh>
-
-      <mesh position={[0, roomH - 0.3, 0]} rotation={[Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[roomW, roomD]} />
-        <meshBasicMaterial map={ceilingTexture} color="#f5f5f5" side={THREE.DoubleSide} />
-      </mesh>
+      <RoomShell roomW={roomW} roomH={roomH} roomD={roomD} backWallZ={backWallZ} />
 
       <WallText
         position={[0, roomH - 1.5, backWallZ + 0.1]}

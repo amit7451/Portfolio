@@ -5,9 +5,7 @@ import * as THREE from 'three';
 import { useTexture, useCursor, RoundedBox, Text } from '@react-three/drei';
 import { useRouter } from 'next/navigation';
 import { useResponsiveCanvas } from '../../../hooks/useResponsive';
-import WallBase from './WallBase';
-import FloorBase from './FloorBase';
-import SideWall from './SideWall';
+import RoomShell from '../../components/RoomShell';
 import WallText from './WallText';
 import Shelf from './Shelf';
 import Frame from './Frame';
@@ -33,53 +31,26 @@ export default function WallDecorGroup({
 }: WallDecorGroupProps) {
   const groupRef = useRef<THREE.Group>(null);
   const { mapLinear, isMobile } = useResponsiveCanvas();
-  const baseCeilingTexture = useTexture('/3d/wall/textures/ceiling_interior.webp');
-
-  // Clone and configure ceiling texture with anisotropy to prevent flickering
-  const ceilingTexture = useMemo(() => {
-    const cloned = baseCeilingTexture.clone();
-    cloned.wrapS = cloned.wrapT = THREE.RepeatWrapping;
-    cloned.repeat.set(5, 5.5);
-    cloned.magFilter = THREE.LinearFilter;
-    cloned.minFilter = THREE.LinearMipmapLinearFilter;
-    cloned.anisotropy = 4;
-    cloned.colorSpace = THREE.SRGBColorSpace;
-    cloned.needsUpdate = true;
-    return cloned;
-  }, [baseCeilingTexture]);
 
   if (!visible) return null;
 
   return (
     <group ref={groupRef} position={position} rotation={rotation} scale={scale}>
-      {/* Background Wall - main back wall - shifted up to align top with viewport top */}
-      <WallBase
-        position={[0, 3, -4]}
-        width={20}
-        height={12}
-        color="#f5f2ed"
-      />
-
-      {/* Left Side Wall - creates room depth */}
-      <SideWall
-        position={[-10, 3, 6]}
-        width={22}
-        height={12}
-        color="#ebe8e3"
-        side="left"
-        textureRepeatX={8}
-        textureRepeatY={4}
-      />
-
-      {/* Right Side Wall - creates room depth */}
-      <SideWall
-        position={[10, 3, 6]}
-        width={22}
-        height={12}
-        color="#ebe8e3"
-        side="right"
-        textureRepeatX={8}
-        textureRepeatY={4}
+      {/* ═══ ROOM SHELL (Walls, Floor & Ceiling) ═══ */}
+      <RoomShell
+        roomW={20}
+        roomH={12}
+        roomD={22}
+        backWallZ={-4}
+        sideWallZ={6}
+        centerOffsetY={3}
+        floorY={-3}
+        ceilingY={8.5}
+        wallColor="#f5f2ed"
+        sideWallColor="#ebe8e3"
+        floorColor="#d4c4a8"
+        wallRepeatX={8}
+        wallRepeatY={4}
       />
 
       {/* Wardrobe - Left Side Wall */}
@@ -88,29 +59,6 @@ export default function WallDecorGroup({
         rotation={[0, Math.PI / 2, 0]}
         scale={[1, 1, 1]}
       />
-
-      {/* Floor - wooden floor extending forward */}
-      <FloorBase
-        position={[0, -3, 6]}
-        width={20}
-        depth={22}
-        color="#d4c4a8"
-        textureRepeatX={4}
-        textureRepeatY={11}
-      />
-
-      {/* Ceiling - textured ceiling matching floor size */}
-      <mesh
-        position={[0, 8.5, 6]}
-        rotation={[Math.PI / 2, 0, 0]}
-      >
-        <planeGeometry args={[20, 22]} />
-        <meshBasicMaterial
-          map={ceilingTexture}
-          color="#f5f5f5"
-          side={THREE.DoubleSide}
-        />
-      </mesh>
 
       {/* Main Title Text - restored to original high wall position Y=7.5 */}
       <WallText
