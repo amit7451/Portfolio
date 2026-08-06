@@ -95,7 +95,6 @@ const CERTIFICATIONS: Record<string, CertificationData> = {
     validationNumber: '4f39eba719154a409e5e19e278bdcc4b',
     verifyUrl: 'https://aws.amazon.com/verification',
     image: '/3d/AboutRoom/images/awsmlassociate.webp',
-    pdfDownload: '/3d/AboutRoom/AWSMLASSOCIATE.pdf',
     description:
       'Advanced technical certification proving expertise in building, training, tuning, and deploying scalable Machine Learning solutions using AWS AI/ML infrastructure.',
     overview:
