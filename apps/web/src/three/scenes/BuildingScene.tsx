@@ -54,17 +54,29 @@ function ScrollCamera() {
   const floorsToTravel = FLOOR_COUNT - 1;
 
   useEffect(() => {
-    // Check if '?contact=true' is in the URL when scene mounts
-    if (typeof window !== 'undefined' && window.location.search.includes('contact=true')) {
-      // Auto-scroll to the bottom of the ScrollControls element slowly
-      setTimeout(() => {
-        if (scroll.el) {
-          scroll.el.scrollTo({
-            top: scroll.el.scrollHeight,
-            behavior: 'smooth'
-          });
-        }
-      }, 500); // 500ms delay to let the initial scene render
+    if (typeof window !== 'undefined') {
+      const search = window.location.search;
+      if (search.includes('contact=true')) {
+        setTimeout(() => {
+          if (scroll.el) {
+            scroll.el.scrollTo({
+              top: scroll.el.scrollHeight,
+              behavior: 'smooth',
+            });
+          }
+        }, 500);
+      } else if (search.includes('room=about') || search.includes('about=true')) {
+        setTimeout(() => {
+          if (scroll.el) {
+            // Floor 2 is at index 2 out of 3 floor spaces (2/3 of total scroll height)
+            const targetScroll = (scroll.el.scrollHeight - scroll.el.clientHeight) * (2 / 3);
+            scroll.el.scrollTo({
+              top: targetScroll,
+              behavior: 'smooth',
+            });
+          }
+        }, 500);
+      }
     }
   }, [scroll.el]);
 

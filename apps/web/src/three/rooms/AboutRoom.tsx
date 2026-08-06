@@ -1,9 +1,11 @@
 'use client';
 
-import { useRef, useMemo } from 'react';
+import { useRef, useMemo, useState } from 'react';
+import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useTexture } from '@react-three/drei';
 import WallText from '../models/wall/WallText';
+import GitHubFloorGraph from '../components/GitHubFloorGraph';
 import { useResponsiveCanvas } from '../../hooks/useResponsive';
 
 interface AboutRoomProps {
@@ -26,12 +28,10 @@ export default function AboutRoom({
   const baseFloorTexture = useTexture('/3d/wall/textures/floor.webp');
 
   // Load certificate images
-  const nosqlTexture = useTexture('/3d/AboutRoom/images/nosql.webp');
   const cs50pTexture = useTexture('/3d/AboutRoom/images/cs50p.webp');
-  const nlpTexture = useTexture('/3d/AboutRoom/images/nlp.webp');
   const aiTexture = useTexture('/3d/AboutRoom/images/ai.webp');
   const awscloudTexture = useTexture('/3d/AboutRoom/images/awscloud.webp');
-  const mlTexture = useTexture('/3d/AboutRoom/images/ml.webp');
+  const awsMlAssociateTexture = useTexture('/3d/AboutRoom/images/awsmlassociate.webp');
 
   // Configure wall texture
   const wallTexture = useMemo(() => {
@@ -77,40 +77,71 @@ export default function AboutRoom({
   const floorY = 0;
   const ceilY = roomH;
 
-  // PhotoFrame Component
+  // Ultra-Smooth Premium PhotoFrame Component (Lerp Hover Scale + Instant In-Place Modal Opening)
   const PhotoFrame = ({
     position,
     width,
     height,
     texture,
+    certId,
   }: {
     position: [number, number, number];
     width: number;
     height: number;
     texture?: THREE.Texture;
+    certId: string;
   }) => {
-    const frameThickness = 0.15;
+    const frameRef = useRef<THREE.Group>(null);
+    const [hovered, setHovered] = useState(false);
+    const targetScale = useRef(1.0);
+    const frameBorder = 0.08;
+
+    useFrame((_, delta) => {
+      if (!frameRef.current) return;
+      targetScale.current = hovered ? 1.04 : 1.0;
+      const currentS = frameRef.current.scale.x;
+      const lerped = THREE.MathUtils.lerp(currentS, targetScale.current, Math.min(1, delta * 6));
+      frameRef.current.scale.set(lerped, lerped, lerped);
+    });
 
     return (
-      <group position={position}>
-        {/* Outer black frame */}
+      <group
+        ref={frameRef}
+        position={position}
+        onPointerOver={(e) => {
+          e.stopPropagation();
+          setHovered(true);
+          document.body.style.cursor = 'pointer';
+        }}
+        onPointerOut={() => {
+          setHovered(false);
+          document.body.style.cursor = 'auto';
+        }}
+        onClick={(e) => {
+          e.stopPropagation();
+          document.body.style.cursor = 'auto';
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(
+              new CustomEvent('openCertModal', { detail: { certId } })
+            );
+          }
+        }}
+      >
+        {/* Layer 1: Solid Clean Dark Charcoal Outer Frame */}
         <mesh position={[0, 0, 0.01]}>
           <planeGeometry args={[width, height]} />
-          <meshLambertMaterial
-            color="#000000"
-          />
+          <meshBasicMaterial color="#08080a" toneMapped={false} />
         </mesh>
-        {/* Inner content area with image */}
+
+        {/* Layer 2: Certificate Image (100% High-Contrast Crisp Texture, Zero Edge Artifacts) */}
         <mesh position={[0, 0, 0.02]}>
           <planeGeometry
-            args={[width - frameThickness * 2, height - frameThickness * 2]}
+            args={[width - frameBorder * 2, height - frameBorder * 2]}
           />
           {texture ? (
             <meshBasicMaterial map={texture} toneMapped={false} />
           ) : (
-            <meshLambertMaterial
-              color="#e8e4e0"
-            />
+            <meshBasicMaterial color="#e8e4e0" toneMapped={false} />
           )}
         </mesh>
       </group>
@@ -155,6 +186,9 @@ export default function AboutRoom({
         <meshLambertMaterial map={floorTexture} color="#b8a88a" />
       </mesh>
 
+      {/* ═══ GITHUB CONTRIBUTION GRAPH ═══ */}
+      <GitHubFloorGraph position={[-3.5, 0.05, 0]} />
+
       {/* ═══ CEILING ═══ */}
       <mesh position={[0, roomH - 0.3, 0]} rotation={[Math.PI / 2, 0, 0]}>
         <planeGeometry args={[roomW, roomD]} />
@@ -178,27 +212,51 @@ export default function AboutRoom({
 
       {/* ═══ PHOTO FRAMES GROUP ═══ */}
       <group position={[0, 0, backWallZ]}>
-        {/* Frame 1: Left-Top Portrait - NoSQL Certificate */}
-        <PhotoFrame position={[mapLinear(-2.6, -5.2), 6, 0.03]} width={2.5} height={3.5} texture={nosqlTexture} />
+        {/* Frame 1: Top-Left - Smaller: AWS Cloud Certificate */}
+        <PhotoFrame
+          position={[mapLinear(-1.05, -1.75), mapLinear(7.15, 7.45), 0.03]}
+          width={mapLinear(1.9, 3.2)}
+          height={mapLinear(1.425, 2.4)}
+          texture={awscloudTexture}
+          certId="aws-cloud-practitioner"
+        />
 
-        {/* Frame 2: Center-Top Large Landscape - CS50P Certificate */}
-        <PhotoFrame position={[mapLinear(-0.8, -1.57), 7.2, 0.03]} width={4.2} height={3} texture={cs50pTexture} />
+        {/* Frame 2: Top-Right - Bigger: CS50P Certificate */}
+        <PhotoFrame
+          position={[mapLinear(1.55, 2.55), mapLinear(7.45, 7.8), 0.03]}
+          width={mapLinear(2.8, 4.8)}
+          height={mapLinear(2.1, 3.6)}
+          texture={cs50pTexture}
+          certId="cs50-python"
+        />
 
-        {/* Frame 3: Right-Top Small Portrait - NLP Certificate */}
-        <PhotoFrame position={[mapLinear(1.0, 1.85), 6.8, 0.03]} width={2} height={2.8} texture={nlpTexture} />
+        {/* Frame 3: Bottom-Left - Bigger: AWS ML Associate Certificate */}
+        <PhotoFrame
+          position={[mapLinear(-1.55, -2.55), mapLinear(4.1, 4.3), 0.03]}
+          width={mapLinear(2.8, 4.8)}
+          height={mapLinear(2.1, 3.6)}
+          texture={awsMlAssociateTexture}
+          certId="aws-ml-associate"
+        />
 
-        {/* Frame 4: Center-Middle Landscape - AI Certificate */}
-        <PhotoFrame position={[mapLinear(-0.8, -1.65), 4.2, 0.03]} width={3.8} height={2.5} texture={aiTexture} />
-
-        {/* Frame 5: Right-Middle Landscape - AWS Cloud Certificate */}
-        <PhotoFrame position={[mapLinear(1.2, 2.2), 4, 0.03]} width={3.5} height={2.3} texture={awscloudTexture} />
-
-        {/* Frame 6: Center-Bottom Large Landscape - ML Certificate */}
-        <PhotoFrame position={[mapLinear(2.6, 5.0), 7, 0.03]} width={3.8} height={3} texture={mlTexture} />
+        {/* Frame 4: Bottom-Right - Smaller: AI Certificate */}
+        <PhotoFrame
+          position={[mapLinear(1.05, 1.75), mapLinear(4.4, 4.65), 0.03]}
+          width={mapLinear(1.9, 3.2)}
+          height={mapLinear(1.425, 2.4)}
+          texture={aiTexture}
+          certId="ai-for-everyone"
+        />
       </group>
 
-      {/* ═══ ACCENT LIGHTING ═══ */}
-      {/* Optimized lighting setup */}
+      {/* ═══ GALLERY ACCENT LIGHTING ═══ */}
+      <spotLight
+        position={[0, 9.5, backWallZ + 3.0]}
+        intensity={1.2}
+        angle={0.7}
+        penumbra={0.5}
+        color="#ffffff"
+      />
     </group>
   );
 }

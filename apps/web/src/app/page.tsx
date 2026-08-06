@@ -2,17 +2,26 @@
 
 import dynamic from 'next/dynamic';
 import { GlobalOverlay } from '../components/Loader';
-
-// Dynamic import to avoid SSR issues with Three.js
+// Dynamic imports for zero initial bundle overhead
 const BuildingScene = dynamic(() => import('../three/scenes/BuildingScene'), {
   ssr: false,
   loading: () => null,
+});
+
+const CertificationModal = dynamic(() => import('../components/CertificationModal'), {
+  ssr: false,
+});
+
+const GitHubReadmeModal = dynamic(() => import('../components/GitHubReadmeModal'), {
+  ssr: false,
 });
 
 export default function Home() {
   return (
     <>
       <GlobalOverlay />
+      <CertificationModal />
+      <GitHubReadmeModal />
       {/* Hero Section - Full viewport 3D scene with scroll-driven building */}
       <main
         id="main-hero"
