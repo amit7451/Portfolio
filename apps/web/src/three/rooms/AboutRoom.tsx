@@ -6,6 +6,7 @@ import * as THREE from 'three';
 import { useTexture } from '@react-three/drei';
 import WallText from '../models/wall/WallText';
 import GitHubFloorGraph from '../components/GitHubFloorGraph';
+import LeetCodeFloorGraph from '../components/LeetCodeFloorGraph';
 import { useResponsiveCanvas } from '../../hooks/useResponsive';
 
 interface AboutRoomProps {
@@ -188,6 +189,9 @@ export default function AboutRoom({
 
       {/* ═══ GITHUB CONTRIBUTION GRAPH ═══ */}
       <GitHubFloorGraph position={[-3.5, 0.05, 0]} />
+
+      {/* ═══ LEETCODE STATS GRAPH ═══ */}
+      <LeetCodeFloorGraph position={[5.25, 0.05, 0]} />
 
       {/* ═══ CEILING ═══ */}
       <mesh position={[0, roomH - 0.3, 0]} rotation={[Math.PI / 2, 0, 0]}>
